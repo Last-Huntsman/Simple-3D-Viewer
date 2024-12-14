@@ -3,8 +3,8 @@ package com.cgvsu.objreader;
 
 
 
-import com.cgvsu.math.vectors.Vector2f;
-import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.vectors.Vector2f;
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;
 

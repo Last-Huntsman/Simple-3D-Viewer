@@ -1,7 +1,7 @@
-package com.cgvsu.math.matrices;
+package com.cgvsu.Pavel.math.matrices;
 
 
-import com.cgvsu.math.vectors.Vector4f;
+import com.cgvsu.Pavel.math.vectors.Vector4f;
 
 /**
  * Класс Matrix4x4 для работы с матрицами размером 4x4.

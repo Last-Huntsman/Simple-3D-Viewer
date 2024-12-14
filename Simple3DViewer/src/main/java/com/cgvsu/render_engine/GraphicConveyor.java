@@ -1,14 +1,20 @@
 package com.cgvsu.render_engine;
 
-
-import com.cgvsu.math.matrices.Matrix4x4;
-import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.matrices.Matrix4x4;
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 
 import javax.vecmath.Point2f;
 
+/**
+ * Утилитарный класс для выполнения различных графических преобразований и операций.
+ */
 public class GraphicConveyor {
 
-
+    /**
+     * Создает единичную матрицу трансформации, которая не выполняет никаких преобразований.
+     *
+     * @return Единичная матрица (4x4).
+     */
     public static Matrix4x4 rotateScaleTranslate() {
         float[] matrix = new float[]{
                 1, 0, 0, 0,
@@ -18,23 +24,43 @@ public class GraphicConveyor {
         return new Matrix4x4(matrix);
     }
 
-
+    /**
+     * Создает матрицу вида ("смотри на") для камеры.
+     * По умолчанию вектор "вверх" равен (0, 1, 0).
+     *
+     * @param eye    Позиция камеры (точка наблюдения).
+     * @param target Точка, на которую смотрит камера.
+     * @return Матрица вида (4x4).
+     */
     public static Matrix4x4 lookAt(Vector3f eye, Vector3f target) {
         return lookAt(eye, target, new Vector3f(0F, 1.0F, 0F));
     }
 
+    /**
+     * Создает матрицу вида ("смотри на") для камеры с указанным направлением "вверх".
+     *
+     * @param eye    Позиция камеры (точка наблюдения).
+     * @param target Точка, на которую смотрит камера.
+     * @param up     Вектор, определяющий направление "вверх".
+     * @return Матрица вида (4x4).
+     */
     public static Matrix4x4 lookAt(Vector3f eye, Vector3f target, Vector3f up) {
 
+        // Вычисляем вектор направления (z-axis) из позиции камеры к цели.
         Vector3f resultZ = target.subtract(eye);
+
+        // Вычисляем вектор "вправо" (x-axis) как векторное произведение "вверх" и "вперед".
         Vector3f resultX = up.crossProduct(resultZ);
+
+        // Вычисляем вектор "вверх" (y-axis) как векторное произведение "вперед" и "вправо".
         Vector3f resultY = resultZ.crossProduct(resultX);
 
-
-
+        // Нормализуем все векторы для получения ортогональных осей.
         resultX.normalize();
         resultY.normalize();
         resultZ.normalize();
 
+        // Создаем матрицу вида.
         float[] matrix = new float[]{
                 resultX.x, resultY.x, resultZ.x, 0,
                 resultX.y, resultY.y, resultZ.y, 0,
@@ -43,6 +69,15 @@ public class GraphicConveyor {
         return new Matrix4x4(matrix);
     }
 
+    /**
+     * Создает перспективную проекционную матрицу.
+     *
+     * @param fov        Угол обзора (в радианах).
+     * @param aspectRatio Соотношение сторон экрана.
+     * @param nearPlane   Ближняя плоскость отсечения.
+     * @param farPlane    Дальняя плоскость отсечения.
+     * @return Матрица перспективной проекции (4x4).
+     */
     public static Matrix4x4 perspective(
             final float fov,
             final float aspectRatio,
@@ -58,6 +93,13 @@ public class GraphicConveyor {
         return result;
     }
 
+    /**
+     * Умножает матрицу 4x4 на вектор 3D, возвращая преобразованный вектор.
+     *
+     * @param matrix Матрица 4x4.
+     * @param vertex Вектор 3D (координаты вершины).
+     * @return Преобразованный вектор 3D.
+     */
     public static Vector3f multiplyMatrix4ByVector3(final Matrix4x4 matrix, final Vector3f vertex) {
         final float x = (vertex.x * matrix.elements[0]) + (vertex.y * matrix.elements[4]) +
                 (vertex.z * matrix.elements[8]) + matrix.elements[12];
@@ -70,11 +112,14 @@ public class GraphicConveyor {
         return new Vector3f(x / w, y / w, z / w);
     }
 
-
-
-
-
-
+    /**
+     * Преобразует координаты вершины в экранные координаты.
+     *
+     * @param vertex Координаты вершины.
+     * @param width  Ширина экрана.
+     * @param height Высота экрана.
+     * @return Экранные координаты точки.
+     */
     public static Point2f vertexToPoint(final Vector3f vertex, final int width, final int height) {
         return new Point2f(vertex.x * width + width / 2.0F, -vertex.y * height + height / 2.0F);
     }

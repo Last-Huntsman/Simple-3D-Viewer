@@ -1,4 +1,4 @@
-package com.cgvsu.math.vectors;
+package com.cgvsu.Pavel.math.vectors;
 
 import java.util.Objects;
 

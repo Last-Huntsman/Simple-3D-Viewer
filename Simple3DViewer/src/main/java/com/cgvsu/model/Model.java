@@ -3,8 +3,8 @@ package com.cgvsu.model;
 
 
 
-import com.cgvsu.math.vectors.Vector2f;
-import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.vectors.Vector2f;
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Locale;

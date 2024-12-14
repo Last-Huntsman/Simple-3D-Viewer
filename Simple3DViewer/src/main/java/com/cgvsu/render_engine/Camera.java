@@ -1,8 +1,8 @@
 package com.cgvsu.render_engine;
 
 
-import com.cgvsu.math.matrices.Matrix4x4;
-import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.matrices.Matrix4x4;
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 
 public class Camera {
 

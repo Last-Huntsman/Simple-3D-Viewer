@@ -1,7 +1,7 @@
-package com.cgvsu.math.matrices;
+package com.cgvsu.Pavel.math.matrices;
 
 
-import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 
 /**
  * Класс Matrix3x3 для работы с матрицами размером 3x3.

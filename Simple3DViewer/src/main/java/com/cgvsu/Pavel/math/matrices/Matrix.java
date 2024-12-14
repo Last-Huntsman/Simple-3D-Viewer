@@ -1,4 +1,4 @@
-package com.cgvsu.math.matrices;
+package com.cgvsu.Pavel.math.matrices;
 
 public interface Matrix<M, V> {
 

@@ -1,4 +1,4 @@
-package com.cgvsu.math.gauss;
+package com.cgvsu.Pavel.math.gauss;
 
 public class GaussMethod {
     private static boolean equalsZero(double num) {

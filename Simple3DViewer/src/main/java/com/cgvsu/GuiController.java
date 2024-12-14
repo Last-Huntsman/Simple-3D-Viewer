@@ -1,6 +1,6 @@
 package com.cgvsu;
 
-import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
