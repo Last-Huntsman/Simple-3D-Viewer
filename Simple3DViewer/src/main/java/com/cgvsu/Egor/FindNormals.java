@@ -14,6 +14,7 @@ public class FindNormals {
 
 	// Метод для вычисления нормалей для всех вершин модели
 	public static ArrayList<Vector3f> findNormals(Model m) {
+
 		List<Polygon> polygons = m.polygons;  // Список всех полигонов модели
 		List<Vector3f> vertices = m.vertices;  // Список всех вершин модели
 
