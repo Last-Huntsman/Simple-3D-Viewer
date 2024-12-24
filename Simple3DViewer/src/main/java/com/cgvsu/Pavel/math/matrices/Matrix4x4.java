@@ -1,6 +1,6 @@
 package com.cgvsu.Pavel.math.matrices;
 
-
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 import com.cgvsu.Pavel.math.vectors.Vector4f;
 
 /**
@@ -9,6 +9,15 @@ import com.cgvsu.Pavel.math.vectors.Vector4f;
 public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
     public float[] elements;
 
+    public Matrix4x4() {
+        this.elements = new float[] {
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0
+        };
+    }
+
     // Конструктор
     public Matrix4x4(float[] elements) {
         if (elements == null || elements.length != 16) {
@@ -16,6 +25,111 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         }
         this.elements = new float[16];
         System.arraycopy(elements, 0, this.elements, 0, 16);
+    }
+
+
+    public final void set(Matrix3x3 var1) {
+        elements[0] = var1.elements[0];
+        elements[1] = var1.elements[1];
+        elements[2] = var1.elements[2];
+        elements[3] = 0.0F;
+        elements[4] = var1.elements[3];
+        elements[5] = var1.elements[4];
+        elements[6] = var1.elements[5];
+        elements[7] = 0.0F;
+        elements[8] = var1.elements[6];
+        elements[9] = var1.elements[7];
+        elements[10] = var1.elements[8];
+        elements[11] = 0.0F;
+        elements[12] = 0.0F;
+        elements[13] = 0.0F;
+        elements[14] = 0.0F;
+        elements[15] = 1.0F;
+    }
+
+
+
+    @Override
+    public Matrix4x4 multiplyMM(Matrix4x4 m2) {
+        float[] result = new float[16];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                result[i * 4 + j] = 0;
+                for (int k = 0; k < 4; k++) {
+                    result[i * 4 + j] += this.elements[i * 4 + k] * m2.elements[k * 4 + j];
+                }
+            }
+        }
+        return new Matrix4x4(result);
+    }
+
+    public Matrix4x4 multiplyMM(Matrix4x4 m1, Matrix4x4 m2) {
+        float[] result = new float[16];
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                result[i * 4 + j] = 0;
+                for (int k = 0; k < 4; k++) {
+                    result[i * 4 + j] += m1.elements[i * 4 + k] * m2.elements[k * 4 + j];
+                }
+            }
+        }
+        System.arraycopy(result, 0, this.elements, 0, 16);
+        return this;
+    }
+
+
+
+    public Vector3f multiplyMV(Vector3f v3) {
+        float x = elements[0] * v3.x() + elements[1] * v3.y() + elements[2] * v3.z() + elements[3];
+        float y = elements[4] * v3.x() + elements[5] * v3.y() + elements[6] * v3.z() + elements[7];
+        float z = elements[8] * v3.x() + elements[9] * v3.y() + elements[10] * v3.z() + elements[11];
+        return new Vector3f(x, y, z);
+    }
+
+
+    @Override
+    public Vector4f multiplyMV(Vector4f v2) {
+        float[] result = new float[4];
+        for (int i = 0; i < 4; i++) {
+            result[i] = this.elements[i * 4] * v2.x() +
+                    this.elements[i * 4 + 1] * v2.y() +
+                    this.elements[i * 4 + 2] * v2.z() +
+                    this.elements[i * 4 + 3] * v2.w();
+
+        }
+        return new Vector4f(result[0], result[1], result[2], result[3]);
+    }
+
+
+    public void setElement(int row, int col, float value) {
+        if (row < 0 || row >= 4 || col < 0 || col >= 4) {
+            throw new IndexOutOfBoundsException("Индексы строки и столбца должны быть в диапазоне [0, 3].");
+        }
+        elements[row * 4 + col] = value;
+    }
+
+    public void setColumn(int col, float[] values) {
+        if (col < 0 || col >= 4) {
+            throw new IndexOutOfBoundsException("Индекс столбца должен быть в диапазоне [0, 3].");
+        }
+        if (values == null || values.length != 4) {
+            throw new IllegalArgumentException("Массив должен содержать ровно 4 элемента.");
+        }
+        elements[col] = values[0];
+        elements[4 + col] = values[1];
+        elements[2 * 4 + col] = values[2];
+        elements[3 * 4 + col] = values[3];
+    }
+
+
+    public void setColumn(int col, Vector4f vector) {
+        if (col < 0 || col >= 4) {
+            throw new IndexOutOfBoundsException("Индекс столбца должен быть в диапазоне [0, 3].");
+        }
+        elements[col] = vector.x();
+        elements[4 + col] = vector.y();
+        elements[2 * 4 + col] = vector.z();
+        elements[3 * 4 + col] = vector.w();
     }
 
     // Реализация методов интерфейса Matrix
@@ -38,33 +152,6 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
     }
 
     @Override
-    public Matrix4x4 multiplyMM(Matrix4x4 m2) {
-        float[] result = new float[16];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                result[i * 4 + j] = 0;
-                for (int k = 0; k < 4; k++) {
-                    result[i * 4 + j] += this.elements[i * 4 + k] * m2.elements[k * 4 + j];
-                }
-            }
-        }
-        return new Matrix4x4(result);
-    }
-
-    @Override
-    public Vector4f multiplyMV(Vector4f v2) {
-        float[] result = new float[4];
-        for (int i = 0; i < 4; i++) {
-            result[i] = this.elements[i * 4] * v2.x() +
-                    this.elements[i * 4 + 1] * v2.y() +
-                    this.elements[i * 4 + 2] * v2.z() +
-                    this.elements[i * 4 + 3] * v2.w();
-
-        }
-        return new Vector4f(result[0], result[1], result[2], result[3]);
-    }
-
-    @Override
     public Matrix4x4 transpose() {
         float[] result = new float[16];
         for (int i = 0; i < 4; i++) {
@@ -75,19 +162,6 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         return new Matrix4x4(result);
     }
 
-    public static Matrix4x4 identity() {
-        float[] identity = {
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-        };
-        return new Matrix4x4(identity);
-    }
-
-    public static Matrix4x4 zero() {
-        return new Matrix4x4(new float[16]);
-    }
 
     public float determinant() {
         float det = 0;
@@ -101,6 +175,16 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         float[] minor = getMinor(elements, 0, col);
         return determinant3x3(minor);
     }
+
+    public Matrix4x4 identity() {
+        return new Matrix4x4(new float[]{
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+        });
+    }
+
 
     public Matrix4x4 inverse() {
         float det = determinant();

@@ -21,6 +21,26 @@ public final class Vector4f implements Vector<Vector4f> {
         this.w = w;
     }
 
+    @Override
+    public float x() {
+        return x;
+    }
+
+    @Override
+    public float y() {
+        return y;
+    }
+
+    @Override
+    public float z() {
+        return z;
+    }
+
+    @Override
+    public float w() {
+        return w;
+    }
+
     // Реализация методов интерфейса Vector
     @Override
     public Vector4f add(Vector4f v2) {
@@ -84,26 +104,6 @@ public final class Vector4f implements Vector<Vector4f> {
     @Override
     public Vector4f clone() {
         return new Vector4f(x, y, z, w);
-    }
-
-    @Override
-    public float x() {
-        return x;
-    }
-
-    @Override
-    public float y() {
-        return y;
-    }
-
-    @Override
-    public float z() {
-        return z;
-    }
-
-    @Override
-    public float w() {
-        return w;
     }
 
     @Override

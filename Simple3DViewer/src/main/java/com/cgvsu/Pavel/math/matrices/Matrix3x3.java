@@ -18,7 +18,23 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         System.arraycopy(elements, 0, this.elements, 0, 9);
     }
 
+    public Matrix3x3() {
+        this.elements = new float[] {
+                0, 0, 0,
+                0, 0, 0,
+                0, 0, 0
+        };
+    }
+
     // Реализация методов интерфейса Matrix
+
+    public void setElement(int row, int col, float value) {
+        if (row < 0 || row >= 3 || col < 0 || col >= 3) {
+            throw new IndexOutOfBoundsException("Индексы строки и столбца должны быть в диапазоне [0, 2].");
+        }
+        elements[row * 3 + col] = value;
+    }
+
     @Override
     public Matrix3x3 add(Matrix3x3 m2) {
         float[] result = new float[9];
