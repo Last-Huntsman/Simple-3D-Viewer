@@ -63,7 +63,7 @@ public class Test extends Application {
         p3 = new Point2D(rnd.nextInt(1000), rnd.nextInt(1000));
 
         // Отрисовка треугольника с помощью растеризатора
-        tr.draw(p1, p2, p3, gt);
+//        tr.draw(p1, p2, p3, gt);
     }
 
     /**

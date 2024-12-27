@@ -2,7 +2,8 @@ package com.cgvsu.render_engine;
 
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
-import javax.vecmath.Point2f;
+
+import javafx.geometry.Point2D;;
 
 /**
  * Утилитарный класс для выполнения различных графических преобразований и операций.
@@ -112,14 +113,18 @@ public class GraphicConveyor {
     }
 
     /**
-     * Преобразует координаты вершины в экранные координаты.
+     * Возвращает точку на основе вектора
      *
      * @param vertex Координаты вершины.
-     * @param width  Ширина экрана.
-     * @param height Высота экрана.
      * @return Экранные координаты точки.
      */
-    public static Point2f vertexToPoint(final Vector3f vertex, final int width, final int height) {
-        return new Point2f(vertex.x * width + width / 2.0F, -vertex.y * height + height / 2.0F);
+    public static Point2D vertexToPoint(final Vector3f vertex) {
+        return new Point2D(vertex.x, vertex.y);
     }
+
+    public static Vector3f vertexToBord(final Vector3f vertex, final int width, final int height) {
+        return new Vector3f(vertex.x * width + width / 2.0F, -vertex.y * height + height / 2.0F, vertex.z);
+
+    }
+
 }

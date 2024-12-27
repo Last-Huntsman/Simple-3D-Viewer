@@ -1,6 +1,5 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Egor.triangle_rasterisation.color.GradientTexture;
 import com.cgvsu.Egor.triangle_rasterisation.color.MonotoneTexture;
 import com.cgvsu.Egor.triangle_rasterisation.rasterisers.TriangleRasterisator;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
@@ -13,25 +12,23 @@ import java.util.ArrayList;
 
 import static com.cgvsu.render_engine.GraphicConveyor.vertexToPoint;
 
+
 public class PictureProcess {
 
-    /**
-     * Рисует треугольник с использованием заданного графического контекста и координат вершин.
-     *
-     * @param gc графический контекст для рисования
-     * @param p1 первая вершина треугольника
-     * @param p2 вторая вершина треугольника
-     * @param p3 третья вершина треугольника
-     */
-    public static void showTriangle(GraphicsContext gc, Point2D p1, Point2D p2, Point2D p3) {
-        // Создание растеризатора для отрисовки треугольника
-        TriangleRasterisator tr = new TriangleRasterisator(gc.getPixelWriter());
 
-        // Создание однотонной текстуры (используется для закраски треугольника)
-        MonotoneTexture mt = new MonotoneTexture(Color.BLACK);
+    public static void showTriangle(GraphicsContext gc, final ArrayList<Vector3f> vertices,
+                                    final double[][] zBuffer) {
 
-        // Отрисовка треугольника с помощью растеризатора
-        tr.draw(p1, p2, p3, mt);
+            // Создание растеризатора для отрисовки треугольника
+            TriangleRasterisator tr = new TriangleRasterisator(gc.getPixelWriter());
+
+            // Создание однотонной текстуры (используется для закраски треугольника)
+            MonotoneTexture mt = new MonotoneTexture(Color.BLACK);
+
+            // Отрисовка треугольника с помощью растеризатора
+            tr.draw(vertexToPoint(vertices.get(0)), vertices.get(0).z, vertexToPoint(vertices.get(1)), vertices.get(1).z,vertexToPoint(vertices.get(2)), vertices.get(2).z,  mt,zBuffer);
+
+
     }
 
     /**
@@ -60,8 +57,8 @@ public class PictureProcess {
             Vector3f v2 = vertices.get((i + 1) % nVertices);
 
             // Преобразование в экранные координаты
-            Point2f p1 = vertexToPoint(v1, width, height);
-            Point2f p2 = vertexToPoint(v2, width, height);
+            Point2D p1 = vertexToPoint(v1);
+            Point2D p2 = vertexToPoint(v2);
 
             // Растровизация линии между двумя вершинами с учётом глубины
             drawLineWithZBuffer(graphicsContext, p1, p2, v1.z, v2.z, zBuffer);
@@ -80,17 +77,17 @@ public class PictureProcess {
      */
     private static void drawLineWithZBuffer(
             final GraphicsContext graphicsContext,
-            final Point2f p1,
-            final Point2f p2,
+            final Point2D p1,
+            final Point2D p2,
             final double z1,
             final double z2,
             final double[][] zBuffer) {
 
         // Преобразование координат в целочисленные значения
-        int x1 = Math.round(p1.x);
-        int y1 = Math.round(p1.y);
-        int x2 = Math.round(p2.x);
-        int y2 = Math.round(p2.y);
+        int x1 = (int) Math.round(p1.getX());
+        int y1 = (int) Math.round(p1.getY());
+        int x2 = (int) Math.round(p2.getX());
+        int y2 = (int) Math.round(p2.getY());
 
         // Инициализация параметров алгоритма Брезенхема
         int dx = Math.abs(x2 - x1);

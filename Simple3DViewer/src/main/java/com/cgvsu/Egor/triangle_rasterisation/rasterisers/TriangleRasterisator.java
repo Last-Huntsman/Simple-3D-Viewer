@@ -129,7 +129,7 @@ public class TriangleRasterisator {
                 if (currentZ > zBuffer[x][y]) {
                     // Если пиксель ближе, чем текущий в z-буфере, обновляем.
                     zBuffer[x][y] = currentZ;
-                    pixelWriter.setColor(x, y, t.getTexture().get(new Barycentric(t, new Point2D(x, y))).convertToJFXColor());
+                    pixelWriter.setColor(x, y, t.getTexture().get(t.barycentrics( new Point2D(x, y))).convertToJFXColor());
                 }
             }
             currentZ += dz; // Увеличиваем глубину.
@@ -142,6 +142,7 @@ public class TriangleRasterisator {
         Objects.requireNonNull(p1);
         Objects.requireNonNull(p2);
         Objects.requireNonNull(p3);
+
 
         // Создаем треугольник из вершин и текстуры.
         Triangle t = new Triangle(p1, p2, p3, texture);

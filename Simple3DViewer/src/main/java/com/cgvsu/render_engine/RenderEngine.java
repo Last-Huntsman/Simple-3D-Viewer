@@ -73,31 +73,17 @@ public class RenderEngine {
                 // Преобразование вершины в формат Vector3f (можно опустить, если структура совпадает).
                 Vector3f vertexVecmath = new Vector3f(vertex.x, vertex.y, vertex.z);
                 // Добавление преобразованной вершины в список.
-                resultVectors.add(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath));
+                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width,height));
             }
             if (nVerticesInPolygon > 1 && true) {
                 PictureProcess.rasterizePolygon(graphicsContext, resultVectors,zBuffer,width,height );
             }
+            if(nVerticesInPolygon==3 && true){
+                PictureProcess.showTriangle(graphicsContext,resultVectors,zBuffer);
+            }
 
 
-//            // Рисование рёбер полигона.
-//            for (int vertexInPolygonInd = 1; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
-//                // Линия между текущей и предыдущей вершинами.
-//                graphicsContext.strokeLine(
-//                        resultPoints.get(vertexInPolygonInd - 1).x,
-//                        resultPoints.get(vertexInPolygonInd - 1).y,
-//                        resultPoints.get(vertexInPolygonInd).x,
-//                        resultPoints.get(vertexInPolygonInd).y);
-//            }
-//
-//            // Замыкание полигона (соединение последней вершины с первой).
-//            if (nVerticesInPolygon > 0) {
-//                graphicsContext.strokeLine(
-//                        resultPoints.get(nVerticesInPolygon - 1).x,
-//                        resultPoints.get(nVerticesInPolygon - 1).y,
-//                        resultPoints.get(0).x,
-//                        resultPoints.get(0).y);
-//            }
+
         }
     }
 
