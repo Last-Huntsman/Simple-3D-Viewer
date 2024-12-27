@@ -2,7 +2,6 @@ package com.cgvsu.render_engine;
 
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
-
 import javax.vecmath.Point2f;
 
 /**
@@ -72,7 +71,7 @@ public class GraphicConveyor {
     /**
      * Создает перспективную проекционную матрицу.
      *
-     * @param fov        Угол обзора (в радианах).
+     * @param fov         Угол обзора (в радианах).
      * @param aspectRatio Соотношение сторон экрана.
      * @param nearPlane   Ближняя плоскость отсечения.
      * @param farPlane    Дальняя плоскость отсечения.
