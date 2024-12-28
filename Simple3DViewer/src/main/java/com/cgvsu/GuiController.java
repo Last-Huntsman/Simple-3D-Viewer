@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.File;
 
 import com.cgvsu.model.Model;
-import com.cgvsu.objreader.ObjReader;
+import com.cgvsu.Ilya.ObjReader;
 import com.cgvsu.render_engine.Camera;
 
 public class GuiController {
