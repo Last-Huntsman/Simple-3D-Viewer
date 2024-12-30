@@ -45,15 +45,18 @@ public class GraphicConveyor {
      * @return Матрица вида (4x4).
      */
     public static Matrix4x4 lookAt(Vector3f eye, Vector3f target, Vector3f up) {
+        Vector3f resultX = new Vector3f();
+        Vector3f resultY = new Vector3f();
+        Vector3f resultZ = new Vector3f();
 
         // Вычисляем вектор направления (z-axis) из позиции камеры к цели.
-        Vector3f resultZ = target.subtract(eye);
+        resultZ.sub(target, eye);
 
         // Вычисляем вектор "вправо" (x-axis) как векторное произведение "вверх" и "вперед".
-        Vector3f resultX = up.crossProduct(resultZ);
+        resultX.cross(up, resultZ);
 
         // Вычисляем вектор "вверх" (y-axis) как векторное произведение "вперед" и "вправо".
-        Vector3f resultY = resultZ.crossProduct(resultX);
+        resultY.cross(resultZ, resultX);
 
         // Нормализуем все векторы для получения ортогональных осей.
         resultX.normalize();
@@ -65,7 +68,7 @@ public class GraphicConveyor {
                 resultX.x, resultY.x, resultZ.x, 0,
                 resultX.y, resultY.y, resultZ.y, 0,
                 resultX.z, resultY.z, resultZ.z, 0,
-                -resultX.dotProduct(eye), -resultY.dotProduct(eye), -resultZ.dotProduct(eye), 1};
+                -resultX.dot(eye), -resultY.dot(eye), -resultZ.dot(eye), 1};
         return new Matrix4x4(matrix);
     }
 
@@ -83,7 +86,7 @@ public class GraphicConveyor {
             final float aspectRatio,
             final float nearPlane,
             final float farPlane) {
-        Matrix4x4 result = new Matrix4x4(new float[]{});
+        Matrix4x4 result = new Matrix4x4();
         float tangentMinusOneDegree = (float) (1.0F / (Math.tan(fov * 0.5F)));
         result.elements[0] = tangentMinusOneDegree / aspectRatio; // m00
         result.elements[5] = tangentMinusOneDegree;              // m11

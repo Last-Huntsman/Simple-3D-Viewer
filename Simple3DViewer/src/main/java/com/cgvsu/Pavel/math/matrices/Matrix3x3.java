@@ -6,16 +6,43 @@ import com.cgvsu.Pavel.math.vectors.Vector3f;
 /**
  * Класс Matrix3x3 для работы с матрицами размером 3x3.
  */
-public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
+public class Matrix3x3 {
     public float[] elements;
 
-    // Конструктор
-    public Matrix3x3(float[] elements) {
-        if (elements == null || elements.length != 9) {
-            throw new IllegalArgumentException("Matrix3x3X: некорректные размеры матрицы.");
-        }
-        this.elements = new float[9];
-        System.arraycopy(elements, 0, this.elements, 0, 9);
+    public Matrix3x3(float var1, float var2, float var3, float var4, float var5, float var6, float var7, float var8, float var9) {
+        this.elements[0] = var1;
+        this.elements[1] = var2;
+        this.elements[2] = var3;
+        this.elements[3] = var4;
+        this.elements[4] = var5;
+        this.elements[5] = var6;
+        this.elements[6] = var7;
+        this.elements[7] = var8;
+        this.elements[8] = var9;
+    }
+
+    public Matrix3x3(float[] var) {
+        this.elements[0] = var[0];
+        this.elements[1] = var[1];
+        this.elements[2] = var[2];
+        this.elements[3] = var[3];
+        this.elements[4] = var[4];
+        this.elements[5] = var[5];
+        this.elements[6] = var[6];
+        this.elements[7] = var[7];
+        this.elements[8] = var[8];
+    }
+
+    public Matrix3x3(Matrix3x3 var) {
+        this.elements[0] = var.elements[0];
+        this.elements[1] = var.elements[1];
+        this.elements[2] = var.elements[2];
+        this.elements[3] = var.elements[3];
+        this.elements[4] = var.elements[4];
+        this.elements[5] = var.elements[5];
+        this.elements[6] = var.elements[6];
+        this.elements[7] = var.elements[7];
+        this.elements[8] = var.elements[8];
     }
 
     public Matrix3x3() {
@@ -26,16 +53,26 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         };
     }
 
-    // Реализация методов интерфейса Matrix
+    public String toString() {
+        return this.elements[0] + ", " + this.elements[1] + ", " + this.elements[2] + "\n" + this.elements[3] + ", " + this.elements[4] + ", " + this.elements[5] + "\n" + this.elements[6] + ", " + this.elements[7] + ", " + this.elements[8] + "\n";
+    }
+
+    public final void setIdentity() {
+        this.elements[0] = 1.0F;
+        this.elements[1] = 0.0F;
+        this.elements[2] = 0.0F;
+        this.elements[3] = 0.0F;
+        this.elements[4] = 1.0F;
+        this.elements[5] = 0.0F;
+        this.elements[6] = 0.0F;
+        this.elements[7] = 0.0F;
+        this.elements[8] = 1.0F;
+    }
 
     public void setElement(int row, int col, float value) {
-        if (row < 0 || row >= 3 || col < 0 || col >= 3) {
-            throw new IndexOutOfBoundsException("Индексы строки и столбца должны быть в диапазоне [0, 2].");
-        }
         elements[row * 3 + col] = value;
     }
 
-    @Override
     public Matrix3x3 add(Matrix3x3 m2) {
         float[] result = new float[9];
         for (int i = 0; i < 9; i++) {
@@ -44,7 +81,6 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         return new Matrix3x3(result);
     }
 
-    @Override
     public Matrix3x3 subtract(Matrix3x3 m2) {
         float[] result = new float[9];
         for (int i = 0; i < 9; i++) {
@@ -53,7 +89,6 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         return new Matrix3x3(result);
     }
 
-    @Override
     public Matrix3x3 multiplyMM(Matrix3x3 m2) {
         float[] result = new float[9];
         for (int i = 0; i < 3; i++) {
@@ -67,13 +102,12 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         return new Matrix3x3(result);
     }
 
-    @Override
     public Vector3f multiplyMV(Vector3f v2) {
         float[] result = new float[3];
         for (int i = 0; i < 3; i++) {
-            result[i] = this.elements[i * 3] * v2.x() +
-                    this.elements[i * 3 + 1] * v2.y() +
-                    this.elements[i * 3 + 2] * v2.z();
+            result[i] = this.elements[i * 3] * v2.x +
+                    this.elements[i * 3 + 1] * v2.y +
+                    this.elements[i * 3 + 2] * v2.z;
         }
         return new Vector3f(result[0], result[1], result[2]);
 
@@ -88,8 +122,6 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         }
         return new Matrix3x3(result);
     }
-
-
 
     public static Matrix3x3 identity() {
         return new Matrix3x3(new float[]{1, 0, 0, 0, 1, 0, 0, 0, 1});
@@ -122,22 +154,7 @@ public class Matrix3x3 implements Matrix<Matrix3x3, Vector3f> {
         result[8] = (elements[0] * elements[4] - elements[1] * elements[3]) / det;
         return new Matrix3x3(result);
     }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder("Matrix3x3X{\n");
-        for (int i = 0; i < 3; i++) {
-            sb.append("  [");
-            for (int j = 0; j < 3; j++) {
-                sb.append(elements[i * 3 + j]).append(j < 2 ? ", " : "");
-            }
-            sb.append("]\n");
-        }
-        sb.append("}");
-        return sb.toString();
-    }
-
-    @Override
+    
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Matrix3x3 other)) return false;

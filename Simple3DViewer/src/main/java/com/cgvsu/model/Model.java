@@ -70,17 +70,17 @@ public class Model implements Cloneable {
 
         // Вывод вершин
         for (Vector3f vertex : vertices) {
-            System.out.printf("v %.6f %.6f %.6f%n", vertex.x(), vertex.y(), vertex.z());
+            System.out.printf("v %.6f %.6f %.6f%n", vertex.x, vertex.y, vertex.z);
         }
 
         // Вывод нормалей
         for (Vector3f normal : normals) {
-            System.out.printf("vn %.6f %.6f %.6f%n", normal.x(), normal.y(), normal.z());
+            System.out.printf("vn %.6f %.6f %.6f%n", normal.x, normal.y, normal.z);
         }
 
         // Вывод текстурных координат
         for (Vector2f textureVertex : textureVertices) {
-            System.out.printf("vt %.6f %.6f%n", textureVertex.x(), textureVertex.y());
+            System.out.printf("vt %.6f %.6f%n", textureVertex.x, textureVertex.y);
         }
 
         // Вывод полигонов

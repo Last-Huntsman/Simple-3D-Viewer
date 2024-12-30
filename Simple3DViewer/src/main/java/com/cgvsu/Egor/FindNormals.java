@@ -53,15 +53,15 @@ public class FindNormals {
 	// Метод для вычисления нормали для полигона, заданного тремя вершинами
 	public static Vector3f findPolygonsNormals(Vector3f... vs) {
 		// Вычисляем два вектора, образующие стороны полигона
-		Vector3f a = vs[0].subtract(vs[1]);
-		Vector3f b = vs[0].subtract(vs[2]);
-
+		Vector3f a = new Vector3f();
+		Vector3f b = new Vector3f();
+		a.sub(vs[0], vs[1]);
+		b.sub(vs[0], vs[2]);
 		// Вычисляем векторное произведение для нахождения нормали
 		Vector3f c = vectorProduct(a, b);
 		if (determinant(a, b, c) < 0) {
 			c = vectorProduct(b, a);  // Если ориентация нормали неправильная, инвертируем её
 		}
-
 		return normalize(c);  // Нормализуем и возвращаем нормаль
 	}
 
@@ -71,9 +71,9 @@ public class FindNormals {
 
 		// Суммируем нормали всех прилегающих полигонов
 		for (Vector3f v : vs) {
-			xs += v.x();
-			ys += v.y();
-			zs += v.z();
+			xs += v.x;
+			ys += v.y;
+			zs += v.z;
 		}
 
 		// Усредняем значения
@@ -86,7 +86,7 @@ public class FindNormals {
 
 	// Метод для вычисления детерминанта из трёх векторов
 	public static double determinant(Vector3f a, Vector3f b, Vector3f c) {
-		return a.x() * (b.y() * c.z()) - a.y() * (b.x() * c.z() - c.x() * b.z()) + a.z() * (b.x() * c.y() - c.x() * b.y());
+		return a.x * (b.y * c.z) - a.y * (b.x * c.z - c.x * b.z) + a.z * (b.x * c.y - c.x * b.y);
 	}
 
 	// Метод для нормализации вектора
@@ -96,7 +96,7 @@ public class FindNormals {
 		}
 
 		// Вычисление длины вектора
-		float length = (float) Math.sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
+		float length = (float) Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
 		// Если длина вектора равна 0, возвращаем нулевой вектор
 		if (length == 0) {
@@ -104,11 +104,11 @@ public class FindNormals {
 		}
 
 		// Возвращаем нормализованный вектор
-		return new Vector3f(v.x() / length, v.y() / length, v.z() / length);
+		return new Vector3f(v.x / length, v.y / length, v.z / length);
 	}
 
 	// Метод для вычисления векторного произведения двух векторов
 	public static Vector3f vectorProduct(Vector3f a, Vector3f b) {
-		return new Vector3f(a.y() * b.z() - b.y() * a.z(), -a.x() * b.z() + b.x() * a.z(), a.x() * b.y() - b.x() * a.y());
+		return new Vector3f(a.y * b.z - b.y * a.z, -a.x * b.z + b.x * a.z, a.x * b.y - b.x * a.y);
 	}
 }

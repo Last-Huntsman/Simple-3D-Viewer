@@ -6,7 +6,7 @@ import com.cgvsu.Pavel.math.vectors.Vector4f;
 /**
  * Класс Matrix4x4 для работы с матрицами размером 4x4.
  */
-public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
+public class Matrix4x4 {
     public float[] elements;
 
     public Matrix4x4() {
@@ -47,9 +47,6 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         elements[15] = 1.0F;
     }
 
-
-
-    @Override
     public Matrix4x4 multiplyMM(Matrix4x4 m2) {
         float[] result = new float[16];
         for (int i = 0; i < 4; i++) {
@@ -80,21 +77,21 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
 
 
     public Vector3f multiplyMV(Vector3f v3) {
-        float x = elements[0] * v3.x() + elements[1] * v3.y() + elements[2] * v3.z() + elements[3];
-        float y = elements[4] * v3.x() + elements[5] * v3.y() + elements[6] * v3.z() + elements[7];
-        float z = elements[8] * v3.x() + elements[9] * v3.y() + elements[10] * v3.z() + elements[11];
+        float x = elements[0] * v3.x + elements[1] * v3.y + elements[2] * v3.z + elements[3];
+        float y = elements[4] * v3.x + elements[5] * v3.y + elements[6] * v3.z + elements[7];
+        float z = elements[8] * v3.x + elements[9] * v3.y + elements[10] * v3.z + elements[11];
         return new Vector3f(x, y, z);
     }
 
 
-    @Override
+    
     public Vector4f multiplyMV(Vector4f v2) {
         float[] result = new float[4];
         for (int i = 0; i < 4; i++) {
-            result[i] = this.elements[i * 4] * v2.x() +
-                    this.elements[i * 4 + 1] * v2.y() +
-                    this.elements[i * 4 + 2] * v2.z() +
-                    this.elements[i * 4 + 3] * v2.w();
+            result[i] = this.elements[i * 4] * v2.x +
+                    this.elements[i * 4 + 1] * v2.y +
+                    this.elements[i * 4 + 2] * v2.z +
+                    this.elements[i * 4 + 3] * v2.w;
 
         }
         return new Vector4f(result[0], result[1], result[2], result[3]);
@@ -126,14 +123,14 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         if (col < 0 || col >= 4) {
             throw new IndexOutOfBoundsException("Индекс столбца должен быть в диапазоне [0, 3].");
         }
-        elements[col] = vector.x();
-        elements[4 + col] = vector.y();
-        elements[2 * 4 + col] = vector.z();
-        elements[3 * 4 + col] = vector.w();
+        elements[col] = vector.x;
+        elements[4 + col] = vector.y;
+        elements[2 * 4 + col] = vector.z;
+        elements[3 * 4 + col] = vector.w;
     }
 
     // Реализация методов интерфейса Matrix
-    @Override
+    
     public Matrix4x4 add(Matrix4x4 m2) {
         float[] result = new float[16];
         for (int i = 0; i < 16; i++) {
@@ -142,7 +139,7 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         return new Matrix4x4(result);
     }
 
-    @Override
+    
     public Matrix4x4 subtract(Matrix4x4 m2) {
         float[] result = new float[16];
         for (int i = 0; i < 16; i++) {
@@ -151,7 +148,7 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         return new Matrix4x4(result);
     }
 
-    @Override
+    
     public Matrix4x4 transpose() {
         float[] result = new float[16];
         for (int i = 0; i < 4; i++) {
@@ -230,7 +227,7 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
                 + matrix[2] * (matrix[3] * matrix[7] - matrix[4] * matrix[6]);
     }
 
-    @Override
+    
     public String toString() {
         StringBuilder builder = new StringBuilder("Matrix4x4X{\n");
         for (int i = 0; i < 4; i++) {
@@ -244,7 +241,7 @@ public class Matrix4x4 implements Matrix<Matrix4x4, Vector4f> {
         return builder.toString();
     }
 
-    @Override
+    
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;

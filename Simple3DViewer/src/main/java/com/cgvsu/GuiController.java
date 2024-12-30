@@ -129,6 +129,7 @@ public class GuiController {
     // Двигаем камеру вверх
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
+
         camera.movePosition(new Vector3f(0, TRANSLATION, 0));
     }
 
