@@ -1,6 +1,7 @@
 package com.cgvsu.Pavel.math.vectors;
 
-import javax.vecmath.Tuple3f;
+import com.cgvsu.Pavel.math.matrices.Matrix3x3;
+
 import java.util.Objects;
 
 /**
@@ -104,7 +105,7 @@ public final class Vector3f {
         this.z = -this.z;
     }
 
-    public final void scale(float var1, Tuple3f var2) {
+    public final void scale(float var1, Vector3f var2) {
         this.x = var1 * var2.x;
         this.y = var1 * var2.y;
         this.z = var1 * var2.z;

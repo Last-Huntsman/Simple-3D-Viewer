@@ -1,5 +1,6 @@
 package com.cgvsu.Pavel.math.aTransform;
 
+import com.cgvsu.Pavel.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 
 public class AffineConverter {
@@ -11,9 +12,8 @@ public class AffineConverter {
     }
 
     public void apply(Model model) {
-        model.vertices.replaceAll(v3 -> modelTransform.vertexTransform().multiplyMV(v3));
+        for (Vector3f vect : model.vertices) {
+            modelTransform.vertexTransform().mul(vect);//ToDO: умножение матрицы на вектор
+        }
     }
-
-
-
 }

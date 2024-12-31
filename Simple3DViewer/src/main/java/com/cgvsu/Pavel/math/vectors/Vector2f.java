@@ -1,7 +1,5 @@
 package com.cgvsu.Pavel.math.vectors;
 
-import javax.vecmath.Tuple2d;
-import javax.vecmath.Tuple2f;
 import java.util.Objects;
 
 /**
@@ -85,7 +83,7 @@ public final class Vector2f {
         this.y = -this.y;
     }
 
-    public final void scale(float var1, Tuple2f var2) {
+    public final void scale(float var1, Vector2f var2) {
         this.x = var1 * var2.x;
         this.y = var1 * var2.y;
     }

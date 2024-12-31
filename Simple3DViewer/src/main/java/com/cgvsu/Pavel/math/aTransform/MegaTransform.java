@@ -25,9 +25,9 @@ public class MegaTransform implements IAffine{//composite
     public Matrix4x4 vertexTransform() {
 
         Matrix4x4 modelMatrix = new Matrix4x4();
-        modelMatrix.identity();
+        modelMatrix.setIdentity();
         for (IAffine a : affine) {
-            modelMatrix.multiplyMM(a.vertexTransform());
+            modelMatrix.mul(a.vertexTransform());
         }
         return modelMatrix;
     }

@@ -34,8 +34,8 @@ public class AffineTransformations { //основная логика вычис�
         Matrix4x4 transitionMatrix = translationMatrix(tx, ty, tz);
         Matrix4x4 rotationMatrix = makeMatrix4f(rotationMatrix(alpha, beta, gamma));
         Matrix4x4 scaleMatrix = makeMatrix4f(scaleMatrix(sx, sy, sz));
-        modelMatrix.multiplyMM(transitionMatrix, rotationMatrix);
-        modelMatrix.multiplyMM(scaleMatrix);
+        modelMatrix.mul(transitionMatrix, rotationMatrix);
+        modelMatrix.mul(scaleMatrix);
         return modelMatrix;
     }
 

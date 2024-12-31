@@ -7,7 +7,84 @@ import com.cgvsu.Pavel.math.vectors.Vector4f;
  * Класс Matrix4x4 для работы с матрицами размером 4x4.
  */
 public class Matrix4x4 {
-    public float[] elements;
+
+    public float[] elements = new float[16];
+
+    public Matrix4x4(float var1, float var2, float var3, float var4, float var5, float var6, float var7, float var8, float var9, float var10, float var11, float var12, float var13, float var14, float var15, float var16) {
+        this.elements[0] = var1;
+        this.elements[1] = var2;
+        this.elements[2] = var3;
+        this.elements[3] = var4;
+        this.elements[4] = var5;
+        this.elements[5] = var6;
+        this.elements[6] = var7;
+        this.elements[7] = var8;
+        this.elements[8] = var9;
+        this.elements[9] = var10;
+        this.elements[10] = var11;
+        this.elements[11] = var12;
+        this.elements[12] = var13;
+        this.elements[13] = var14;
+        this.elements[14] = var15;
+        this.elements[15] = var16;
+    }
+
+    public Matrix4x4(float[] var1) {
+        this.elements[0] = var1[0];
+        this.elements[1] = var1[1];
+        this.elements[2] = var1[2];
+        this.elements[3] = var1[3];
+        this.elements[4] = var1[4];
+        this.elements[5] = var1[5];
+        this.elements[6] = var1[6];
+        this.elements[7] = var1[7];
+        this.elements[8] = var1[8];
+        this.elements[9] = var1[9];
+        this.elements[10] = var1[10];
+        this.elements[11] = var1[11];
+        this.elements[12] = var1[12];
+        this.elements[13] = var1[13];
+        this.elements[14] = var1[14];
+        this.elements[15] = var1[15];
+    }
+
+    public Matrix4x4(Matrix3x3 var1, Vector3f var2, float var3) {
+        this.elements[0] = var1.elements[0] * var3;
+        this.elements[1] = var1.elements[1] * var3;
+        this.elements[2] = var1.elements[2] * var3;
+        this.elements[3] = var2.x;
+        this.elements[4] = var1.elements[4] * var3;
+        this.elements[5] = var1.elements[5] * var3;
+        this.elements[6] = var1.elements[6] * var3;
+        this.elements[7] = var2.y;
+        this.elements[8] = var1.elements[8] * var3;
+        this.elements[9] = var1.elements[9] * var3;
+        this.elements[10] = var1.elements[10] * var3;
+        this.elements[11] = var2.z;
+        this.elements[12] = 0.0F;
+        this.elements[13] = 0.0F;
+        this.elements[14] = 0.0F;
+        this.elements[15] = 1.0F;
+    }
+
+    public Matrix4x4(Matrix4x4 var1) {
+        this.elements[0] = var1.elements[0];
+        this.elements[1] = var1.elements[1];
+        this.elements[2] = var1.elements[2];
+        this.elements[3] = var1.elements[3];
+        this.elements[4] = var1.elements[4];
+        this.elements[5] = var1.elements[5];
+        this.elements[6] = var1.elements[6];
+        this.elements[7] = var1.elements[7];
+        this.elements[8] = var1.elements[8];
+        this.elements[9] = var1.elements[9];
+        this.elements[10] = var1.elements[10];
+        this.elements[11] = var1.elements[11];
+        this.elements[12] = var1.elements[12];
+        this.elements[13] = var1.elements[13];
+        this.elements[14] = var1.elements[14];
+        this.elements[15] = var1.elements[15];
+    }
 
     public Matrix4x4() {
         this.elements = new float[] {
@@ -18,15 +95,24 @@ public class Matrix4x4 {
         };
     }
 
-    // Конструктор
-    public Matrix4x4(float[] elements) {
-        if (elements == null || elements.length != 16) {
-            throw new IllegalArgumentException("Matrix4x4: некорректные размеры матрицы.");
-        }
-        this.elements = new float[16];
-        System.arraycopy(elements, 0, this.elements, 0, 16);
+    public final void set(Matrix4x4 var1) {
+        this.elements[0] = var1.elements[0];
+        this.elements[1] = var1.elements[1];
+        this.elements[2] = var1.elements[2];
+        this.elements[3] = var1.elements[3];
+        this.elements[4] = var1.elements[4];
+        this.elements[5] = var1.elements[5];
+        this.elements[6] = var1.elements[6];
+        this.elements[7] = var1.elements[7];
+        this.elements[8] = var1.elements[8];
+        this.elements[9] = var1.elements[9];
+        this.elements[10] = var1.elements[10];
+        this.elements[11] = var1.elements[11];
+        this.elements[12] = var1.elements[12];
+        this.elements[13] = var1.elements[13];
+        this.elements[14] = var1.elements[14];
+        this.elements[15] = var1.elements[15];
     }
-
 
     public final void set(Matrix3x3 var1) {
         elements[0] = var1.elements[0];
@@ -47,77 +133,513 @@ public class Matrix4x4 {
         elements[15] = 1.0F;
     }
 
-    public Matrix4x4 multiplyMM(Matrix4x4 m2) {
-        float[] result = new float[16];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                result[i * 4 + j] = 0;
-                for (int k = 0; k < 4; k++) {
-                    result[i * 4 + j] += this.elements[i * 4 + k] * m2.elements[k * 4 + j];
-                }
-            }
-        }
-        return new Matrix4x4(result);
+    public final void set(float var1) {
+        this.elements[0] = var1;
+        this.elements[1] = 0.0F;
+        this.elements[2] = 0.0F;
+        this.elements[3] = 0.0F;
+        this.elements[4] = 0.0F;
+        this.elements[5] = var1;
+        this.elements[6] = 0.0F;
+        this.elements[7] = 0.0F;
+        this.elements[8] = 0.0F;
+        this.elements[9] = 0.0F;
+        this.elements[10] = var1;
+        this.elements[11] = 0.0F;
+        this.elements[12] = 0.0F;
+        this.elements[13] = 0.0F;
+        this.elements[14] = 0.0F;
+        this.elements[15] = 1.0F;
     }
 
-    public Matrix4x4 multiplyMM(Matrix4x4 m1, Matrix4x4 m2) {
-        float[] result = new float[16];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                result[i * 4 + j] = 0;
-                for (int k = 0; k < 4; k++) {
-                    result[i * 4 + j] += m1.elements[i * 4 + k] * m2.elements[k * 4 + j];
-                }
-            }
-        }
-        System.arraycopy(result, 0, this.elements, 0, 16);
-        return this;
+    public final void set(float[] var1) {
+        this.elements[0] = var1[0];
+        this.elements[1] = var1[1];
+        this.elements[2] = var1[2];
+        this.elements[3] = var1[3];
+        this.elements[4] = var1[4];
+        this.elements[5] = var1[5];
+        this.elements[6] = var1[6];
+        this.elements[7] = var1[7];
+        this.elements[8] = var1[8];
+        this.elements[9] = var1[9];
+        this.elements[10] = var1[10];
+        this.elements[11] = var1[11];
+        this.elements[12] = var1[12];
+        this.elements[13] = var1[13];
+        this.elements[14] = var1[14];
+        this.elements[15] = var1[15];
     }
 
-
-
-    public Vector3f multiplyMV(Vector3f v3) {
-        float x = elements[0] * v3.x + elements[1] * v3.y + elements[2] * v3.z + elements[3];
-        float y = elements[4] * v3.x + elements[5] * v3.y + elements[6] * v3.z + elements[7];
-        float z = elements[8] * v3.x + elements[9] * v3.y + elements[10] * v3.z + elements[11];
-        return new Vector3f(x, y, z);
+    public final void set(javax.vecmath.Vector3f var1) {
+        this.elements[0] = 1.0F;
+        this.elements[1] = 0.0F;
+        this.elements[2] = 0.0F;
+        this.elements[3] = var1.x;
+        this.elements[4] = 0.0F;
+        this.elements[5] = 1.0F;
+        this.elements[6] = 0.0F;
+        this.elements[7] = var1.y;
+        this.elements[8] = 0.0F;
+        this.elements[9] = 0.0F;
+        this.elements[10] = 1.0F;
+        this.elements[11] = var1.z;
+        this.elements[12] = 0.0F;
+        this.elements[13] = 0.0F;
+        this.elements[14] = 0.0F;
+        this.elements[15] = 1.0F;
     }
 
-
-    
-    public Vector4f multiplyMV(Vector4f v2) {
-        float[] result = new float[4];
-        for (int i = 0; i < 4; i++) {
-            result[i] = this.elements[i * 4] * v2.x +
-                    this.elements[i * 4 + 1] * v2.y +
-                    this.elements[i * 4 + 2] * v2.z +
-                    this.elements[i * 4 + 3] * v2.w;
-
-        }
-        return new Vector4f(result[0], result[1], result[2], result[3]);
+    public final void set(float var1, javax.vecmath.Vector3f var2) {
+        this.elements[0] = var1;
+        this.elements[1] = 0.0F;
+        this.elements[2] = 0.0F;
+        this.elements[3] = var2.x;
+        this.elements[4] = 0.0F;
+        this.elements[5] = var1;
+        this.elements[6] = 0.0F;
+        this.elements[7] = var2.y;
+        this.elements[8] = 0.0F;
+        this.elements[9] = 0.0F;
+        this.elements[10] = var1;
+        this.elements[11] = var2.z;
+        this.elements[12] = 0.0F;
+        this.elements[13] = 0.0F;
+        this.elements[14] = 0.0F;
+        this.elements[15] = 1.0F;
     }
 
+    public final void set(javax.vecmath.Vector3f var1, float var2) {
+        this.elements[0] = var2;
+        this.elements[1] = 0.0F;
+        this.elements[2] = 0.0F;
+        this.elements[3] = var2 * var1.x;
+        this.elements[4] = 0.0F;
+        this.elements[5] = var2;
+        this.elements[6] = 0.0F;
+        this.elements[7] = var2 * var1.y;
+        this.elements[8] = 0.0F;
+        this.elements[9] = 0.0F;
+        this.elements[10] = var2;
+        this.elements[11] = var2 * var1.z;
+        this.elements[12] = 0.0F;
+        this.elements[13] = 0.0F;
+        this.elements[14] = 0.0F;
+        this.elements[15] = 1.0F;
+    }
+
+    public final void set(Matrix3x3 var1, javax.vecmath.Vector3f var2, float var3) {
+        this.elements[0] = var1.elements[0] * var3;
+        this.elements[1] = var1.elements[1] * var3;
+        this.elements[2] = var1.elements[2] * var3;
+        this.elements[3] = var2.x;
+        this.elements[4] = var1.elements[4] * var3;
+        this.elements[5] = var1.elements[5] * var3;
+        this.elements[6] = var1.elements[6] * var3;
+        this.elements[7] = var2.y;
+        this.elements[8] = var1.elements[8] * var3;
+        this.elements[9] = var1.elements[9] * var3;
+        this.elements[10] = var1.elements[10] * var3;
+        this.elements[11] = var2.z;
+        this.elements[12] = 0.0F;
+        this.elements[13] = 0.0F;
+        this.elements[14] = 0.0F;
+        this.elements[15] = 1.0F;
+    }
+
+    public String toString() {
+        return this.elements[0] + ", " + this.elements[1] + ", " + this.elements[2] + ", " + this.elements[3] + "\n" + this.elements[4] + ", " + this.elements[5] + ", " + this.elements[6] + ", " + this.elements[7] + "\n" + this.elements[8] + ", " + this.elements[9] + ", " + this.elements[10] + ", " + this.elements[11] + "\n" + this.elements[12] + ", " + this.elements[13] + ", " + this.elements[14] + ", " + this.elements[15] + "\n";
+    }
+
+    public final void setIdentity() {
+        this.elements = new float[]{
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+        };
+    }
 
     public void setElement(int row, int col, float value) {
-        if (row < 0 || row >= 4 || col < 0 || col >= 4) {
-            throw new IndexOutOfBoundsException("Индексы строки и столбца должны быть в диапазоне [0, 3].");
-        }
         elements[row * 4 + col] = value;
     }
 
-    public void setColumn(int col, float[] values) {
-        if (col < 0 || col >= 4) {
-            throw new IndexOutOfBoundsException("Индекс столбца должен быть в диапазоне [0, 3].");
-        }
-        if (values == null || values.length != 4) {
-            throw new IllegalArgumentException("Массив должен содержать ровно 4 элемента.");
-        }
-        elements[col] = values[0];
-        elements[4 + col] = values[1];
-        elements[2 * 4 + col] = values[2];
-        elements[3 * 4 + col] = values[3];
+    public final void add(float var1) {
+        this.elements[0] += var1;
+        this.elements[1] += var1;
+        this.elements[2] += var1;
+        this.elements[3] += var1;
+        this.elements[4] += var1;
+        this.elements[5] += var1;
+        this.elements[6] += var1;
+        this.elements[7] += var1;
+        this.elements[8] += var1;
+        this.elements[9] += var1;
+        this.elements[10] += var1;
+        this.elements[11] += var1;
+        this.elements[12] += var1;
+        this.elements[13] += var1;
+        this.elements[14] += var1;
+        this.elements[15] += var1;
     }
 
+    public final void add(float var1, Matrix4x4 var2) {
+        this.elements[0] = var2.elements[0] + var1;
+        this.elements[1] = var2.elements[1] + var1;
+        this.elements[2] = var2.elements[2] + var1;
+        this.elements[3] = var2.elements[3] + var1;
+        this.elements[4] = var2.elements[4] + var1;
+        this.elements[5] = var2.elements[5] + var1;
+        this.elements[6] = var2.elements[6] + var1;
+        this.elements[7] = var2.elements[7] + var1;
+        this.elements[8] = var2.elements[8] + var1;
+        this.elements[9] = var2.elements[9] + var1;
+        this.elements[10] = var2.elements[10] + var1;
+        this.elements[11] = var2.elements[11] + var1;
+        this.elements[12] = var2.elements[12] + var1;
+        this.elements[13] = var2.elements[13] + var1;
+        this.elements[14] = var2.elements[14] + var1;
+        this.elements[15] = var2.elements[15] + var1;
+    }
+
+    public final void add(Matrix4x4 var1, Matrix4x4 var2) {
+        this.elements[0] = var1.elements[0] + var2.elements[0];
+        this.elements[1] = var1.elements[1] + var2.elements[1];
+        this.elements[2] = var1.elements[2] + var2.elements[2];
+        this.elements[3] = var1.elements[3] + var2.elements[3];
+        this.elements[4] = var1.elements[4] + var2.elements[4];
+        this.elements[5] = var1.elements[5] + var2.elements[5];
+        this.elements[6] = var1.elements[6] + var2.elements[6];
+        this.elements[7] = var1.elements[7] + var2.elements[7];
+        this.elements[8] = var1.elements[8] + var2.elements[8];
+        this.elements[9] = var1.elements[9] + var2.elements[9];
+        this.elements[10] = var1.elements[10] + var2.elements[10];
+        this.elements[11] = var1.elements[11] + var2.elements[11];
+        this.elements[12] = var1.elements[12] + var2.elements[12];
+        this.elements[13] = var1.elements[13] + var2.elements[13];
+        this.elements[14] = var1.elements[14] + var2.elements[14];
+        this.elements[15] = var1.elements[15] + var2.elements[15];
+    }
+
+    public final void add(Matrix4x4 var) {
+        for (int i = 0; i < 16; i++) {
+            this.elements[i] += var.elements[i];
+        }
+    }
+
+    public final void sub(Matrix4x4 var1, Matrix4x4 var2) {
+        this.elements[0] = var1.elements[0] - var2.elements[0];
+        this.elements[1] = var1.elements[1] - var2.elements[1];
+        this.elements[2] = var1.elements[2] - var2.elements[2];
+        this.elements[3] = var1.elements[3] - var2.elements[3];
+        this.elements[4] = var1.elements[4] - var2.elements[4];
+        this.elements[5] = var1.elements[5] - var2.elements[5];
+        this.elements[6] = var1.elements[6] - var2.elements[6];
+        this.elements[7] = var1.elements[7] - var2.elements[7];
+        this.elements[8] = var1.elements[8] - var2.elements[8];
+        this.elements[9] = var1.elements[9] - var2.elements[9];
+        this.elements[10] = var1.elements[10] - var2.elements[10];
+        this.elements[11] = var1.elements[11] - var2.elements[11];
+        this.elements[12] = var1.elements[12] - var2.elements[12];
+        this.elements[13] = var1.elements[13] - var2.elements[13];
+        this.elements[14] = var1.elements[14] - var2.elements[14];
+        this.elements[15] = var1.elements[15] - var2.elements[15];
+    }
+
+    public final void sub(Matrix4x4 var1) {
+        this.elements[0] -= var1.elements[0];
+        this.elements[1] -= var1.elements[1];
+        this.elements[2] -= var1.elements[2];
+        this.elements[3] -= var1.elements[3];
+        this.elements[4] -= var1.elements[4];
+        this.elements[5] -= var1.elements[5];
+        this.elements[6] -= var1.elements[6];
+        this.elements[7] -= var1.elements[7];
+        this.elements[8] -= var1.elements[8];
+        this.elements[9] -= var1.elements[9];
+        this.elements[10] -= var1.elements[10];
+        this.elements[11] -= var1.elements[11];
+        this.elements[12] -= var1.elements[12];
+        this.elements[13] -= var1.elements[13];
+        this.elements[14] -= var1.elements[14];
+        this.elements[15] -= var1.elements[15];
+    }
+
+    public final void transpose() {
+        float var1 = this.elements[4];
+        this.elements[4] = this.elements[1];
+        this.elements[1] = var1;
+        var1 = this.elements[8];
+        this.elements[8] = this.elements[2];
+        this.elements[2] = var1;
+        var1 = this.elements[12];
+        this.elements[12] = this.elements[3];
+        this.elements[3] = var1;
+        var1 = this.elements[9];
+        this.elements[9] = this.elements[6];
+        this.elements[6] = var1;
+        var1 = this.elements[13];
+        this.elements[13] = this.elements[7];
+        this.elements[7] = var1;
+        var1 = this.elements[14];
+        this.elements[14] = this.elements[11];
+        this.elements[11] = var1;
+    }
+
+    public final void transpose(Matrix4x4 var) {
+        if (this != var) {
+            this.elements[0] = var.elements[0];
+            this.elements[1] = var.elements[4];
+            this.elements[2] = var.elements[8];
+            this.elements[3] = var.elements[12];
+            this.elements[4] = var.elements[1];
+            this.elements[5] = var.elements[5];
+            this.elements[6] = var.elements[9];
+            this.elements[7] = var.elements[13];
+            this.elements[8] = var.elements[2];
+            this.elements[9] = var.elements[6];
+            this.elements[10] = var.elements[10];
+            this.elements[11] = var.elements[14];
+            this.elements[12] = var.elements[3];
+            this.elements[13] = var.elements[7];
+            this.elements[14] = var.elements[11];
+            this.elements[15] = var.elements[15];
+        } else {
+            this.transpose();
+        }
+
+    }
+
+    public final float determinant() {
+        float var1 = this.elements[0] * (this.elements[5] * this.elements[10] * this.elements[15] + this.elements[6] * this.elements[11] * this.elements[13] + this.elements[7] * this.elements[9] * this.elements[14] - this.elements[7] * this.elements[10] * this.elements[13] - this.elements[5] * this.elements[11] * this.elements[14] - this.elements[6] * this.elements[9] * this.elements[15]);
+        var1 -= this.elements[1] * (this.elements[4] * this.elements[10] * this.elements[15] + this.elements[6] * this.elements[11] * this.elements[12] + this.elements[7] * this.elements[8] * this.elements[14] - this.elements[7] * this.elements[10] * this.elements[12] - this.elements[4] * this.elements[11] * this.elements[14] - this.elements[6] * this.elements[8] * this.elements[15]);
+        var1 += this.elements[2] * (this.elements[4] * this.elements[9] * this.elements[15] + this.elements[5] * this.elements[11] * this.elements[12] + this.elements[7] * this.elements[8] * this.elements[13] - this.elements[7] * this.elements[9] * this.elements[12] - this.elements[4] * this.elements[11] * this.elements[13] - this.elements[5] * this.elements[8] * this.elements[15]);
+        var1 -= this.elements[3] * (this.elements[4] * this.elements[9] * this.elements[14] + this.elements[5] * this.elements[10] * this.elements[12] + this.elements[6] * this.elements[8] * this.elements[13] - this.elements[6] * this.elements[9] * this.elements[12] - this.elements[4] * this.elements[10] * this.elements[13] - this.elements[5] * this.elements[8] * this.elements[14]);
+        return var1;
+    }
+
+    public final void mul(float var1) {
+        this.elements[0] *= var1;
+        this.elements[1] *= var1;
+        this.elements[2] *= var1;
+        this.elements[3] *= var1;
+        this.elements[4] *= var1;
+        this.elements[5] *= var1;
+        this.elements[6] *= var1;
+        this.elements[7] *= var1;
+        this.elements[8] *= var1;
+        this.elements[9] *= var1;
+        this.elements[10] *= var1;
+        this.elements[11] *= var1;
+        this.elements[12] *= var1;
+        this.elements[13] *= var1;
+        this.elements[14] *= var1;
+        this.elements[15] *= var1;
+    }
+
+    public final void mul(float var1, Matrix4x4 var2) {
+        this.elements[0] = var2.elements[0] * var1;
+        this.elements[1] = var2.elements[1] * var1;
+        this.elements[2] = var2.elements[2] * var1;
+        this.elements[3] = var2.elements[3] * var1;
+        this.elements[4] = var2.elements[4] * var1;
+        this.elements[5] = var2.elements[5] * var1;
+        this.elements[6] = var2.elements[6] * var1;
+        this.elements[7] = var2.elements[7] * var1;
+        this.elements[8] = var2.elements[8] * var1;
+        this.elements[9] = var2.elements[9] * var1;
+        this.elements[10] = var2.elements[10] * var1;
+        this.elements[11] = var2.elements[11] * var1;
+        this.elements[12] = var2.elements[12] * var1;
+        this.elements[13] = var2.elements[13] * var1;
+        this.elements[14] = var2.elements[14] * var1;
+        this.elements[15] = var2.elements[15] * var1;
+    }
+
+    public final void mul(Matrix4x4 var) {
+        float var1 = this.elements[0] * var.elements[0] + this.elements[1] * var.elements[4] + this.elements[2] * var.elements[8] + this.elements[3] * var.elements[12];
+        float var2 = this.elements[0] * var.elements[1] + this.elements[1] * var.elements[5] + this.elements[2] * var.elements[9] + this.elements[3] * var.elements[13];
+        float var3 = this.elements[0] * var.elements[2] + this.elements[1] * var.elements[6] + this.elements[2] * var.elements[10] + this.elements[3] * var.elements[14];
+        float var4 = this.elements[0] * var.elements[3] + this.elements[1] * var.elements[7] + this.elements[2] * var.elements[11] + this.elements[3] * var.elements[15];
+        float var5 = this.elements[4] * var.elements[0] + this.elements[5] * var.elements[4] + this.elements[6] * var.elements[8] + this.elements[7] * var.elements[12];
+        float var6 = this.elements[4] * var.elements[1] + this.elements[5] * var.elements[5] + this.elements[6] * var.elements[9] + this.elements[7] * var.elements[13];
+        float var7 = this.elements[4] * var.elements[2] + this.elements[5] * var.elements[6] + this.elements[6] * var.elements[10] + this.elements[7] * var.elements[14];
+        float var8 = this.elements[4] * var.elements[3] + this.elements[5] * var.elements[7] + this.elements[6] * var.elements[11] + this.elements[7] * var.elements[15];
+        float var9 = this.elements[8] * var.elements[0] + this.elements[9] * var.elements[4] + this.elements[10] * var.elements[8] + this.elements[11] * var.elements[12];
+        float var10 = this.elements[8] * var.elements[1] + this.elements[9] * var.elements[5] + this.elements[10] * var.elements[9] + this.elements[11] * var.elements[13];
+        float var11 = this.elements[8] * var.elements[2] + this.elements[9] * var.elements[6] + this.elements[10] * var.elements[10] + this.elements[11] * var.elements[14];
+        float var12 = this.elements[8] * var.elements[3] + this.elements[9] * var.elements[7] + this.elements[10] * var.elements[11] + this.elements[11] * var.elements[15];
+        float var13 = this.elements[12] * var.elements[0] + this.elements[13] * var.elements[4] + this.elements[14] * var.elements[8] + this.elements[15] * var.elements[12];
+        float var14 = this.elements[12] * var.elements[1] + this.elements[13] * var.elements[5] + this.elements[14] * var.elements[9] + this.elements[15] * var.elements[13];
+        float var15 = this.elements[12] * var.elements[2] + this.elements[13] * var.elements[6] + this.elements[14] * var.elements[10] + this.elements[15] * var.elements[14];
+        float var16 = this.elements[12] * var.elements[3] + this.elements[13] * var.elements[7] + this.elements[14] * var.elements[11] + this.elements[15] * var.elements[15];
+        this.elements[0] = var1;
+        this.elements[1] = var2;
+        this.elements[2] = var3;
+        this.elements[3] = var4;
+        this.elements[4] = var5;
+        this.elements[5] = var6;
+        this.elements[6] = var7;
+        this.elements[7] = var8;
+        this.elements[8] = var9;
+        this.elements[9] = var10;
+        this.elements[10] = var11;
+        this.elements[11] = var12;
+        this.elements[12] = var13;
+        this.elements[13] = var14;
+        this.elements[14] = var15;
+        this.elements[15] = var16;
+    }
+
+    public final void mul(Matrix4x4 var1, Matrix4x4 var2) {
+        if (this != var1 && this != var2) {
+            this.elements[0] = var1.elements[0] * var2.elements[0] + var1.elements[1] * var2.elements[4] + var1.elements[2] * var2.elements[8] + var1.elements[3] * var2.elements[12];
+            this.elements[1] = var1.elements[0] * var2.elements[1] + var1.elements[1] * var2.elements[5] + var1.elements[2] * var2.elements[9] + var1.elements[3] * var2.elements[13];
+            this.elements[2] = var1.elements[0] * var2.elements[2] + var1.elements[1] * var2.elements[6] + var1.elements[2] * var2.elements[10] + var1.elements[3] * var2.elements[14];
+            this.elements[3] = var1.elements[0] * var2.elements[3] + var1.elements[1] * var2.elements[7] + var1.elements[2] * var2.elements[11] + var1.elements[3] * var2.elements[15];
+            this.elements[4] = var1.elements[4] * var2.elements[0] + var1.elements[5] * var2.elements[4] + var1.elements[6] * var2.elements[8] + var1.elements[7] * var2.elements[12];
+            this.elements[5] = var1.elements[4] * var2.elements[1] + var1.elements[5] * var2.elements[5] + var1.elements[6] * var2.elements[9] + var1.elements[7] * var2.elements[13];
+            this.elements[6] = var1.elements[4] * var2.elements[2] + var1.elements[5] * var2.elements[6] + var1.elements[6] * var2.elements[10] + var1.elements[7] * var2.elements[14];
+            this.elements[7] = var1.elements[4] * var2.elements[3] + var1.elements[5] * var2.elements[7] + var1.elements[6] * var2.elements[11] + var1.elements[7] * var2.elements[15];
+            this.elements[8] = var1.elements[8] * var2.elements[0] + var1.elements[9] * var2.elements[4] + var1.elements[10] * var2.elements[8] + var1.elements[11] * var2.elements[12];
+            this.elements[9] = var1.elements[8] * var2.elements[1] + var1.elements[9] * var2.elements[5] + var1.elements[10] * var2.elements[9] + var1.elements[11] * var2.elements[13];
+            this.elements[10] = var1.elements[8] * var2.elements[2] + var1.elements[9] * var2.elements[6] + var1.elements[10] * var2.elements[10] + var1.elements[11] * var2.elements[14];
+            this.elements[11] = var1.elements[8] * var2.elements[3] + var1.elements[9] * var2.elements[7] + var1.elements[10] * var2.elements[11] + var1.elements[11] * var2.elements[15];
+            this.elements[12] = var1.elements[12] * var2.elements[0] + var1.elements[13] * var2.elements[4] + var1.elements[14] * var2.elements[8] + var1.elements[15] * var2.elements[12];
+            this.elements[13] = var1.elements[12] * var2.elements[1] + var1.elements[13] * var2.elements[5] + var1.elements[14] * var2.elements[9] + var1.elements[15] * var2.elements[13];
+            this.elements[14] = var1.elements[12] * var2.elements[2] + var1.elements[13] * var2.elements[6] + var1.elements[14] * var2.elements[10] + var1.elements[15] * var2.elements[14];
+            this.elements[15] = var1.elements[12] * var2.elements[3] + var1.elements[13] * var2.elements[7] + var1.elements[14] * var2.elements[11] + var1.elements[15] * var2.elements[15];
+        } else {
+            float var3 = var1.elements[0] * var2.elements[0] + var1.elements[1] * var2.elements[4] + var1.elements[2] * var2.elements[8] + var1.elements[3] * var2.elements[12];
+            float var4 = var1.elements[0] * var2.elements[1] + var1.elements[1] * var2.elements[5] + var1.elements[2] * var2.elements[9] + var1.elements[3] * var2.elements[13];
+            float var5 = var1.elements[0] * var2.elements[2] + var1.elements[1] * var2.elements[6] + var1.elements[2] * var2.elements[10] + var1.elements[3] * var2.elements[14];
+            float var6 = var1.elements[0] * var2.elements[3] + var1.elements[1] * var2.elements[7] + var1.elements[2] * var2.elements[11] + var1.elements[3] * var2.elements[15];
+            float var7 = var1.elements[4] * var2.elements[0] + var1.elements[5] * var2.elements[4] + var1.elements[6] * var2.elements[8] + var1.elements[7] * var2.elements[12];
+            float var8 = var1.elements[4] * var2.elements[1] + var1.elements[5] * var2.elements[5] + var1.elements[6] * var2.elements[9] + var1.elements[7] * var2.elements[13];
+            float var9 = var1.elements[4] * var2.elements[2] + var1.elements[5] * var2.elements[6] + var1.elements[6] * var2.elements[10] + var1.elements[7] * var2.elements[14];
+            float var10 = var1.elements[4] * var2.elements[3] + var1.elements[5] * var2.elements[7] + var1.elements[6] * var2.elements[11] + var1.elements[7] * var2.elements[15];
+            float var11 = var1.elements[8] * var2.elements[0] + var1.elements[9] * var2.elements[4] + var1.elements[10] * var2.elements[8] + var1.elements[11] * var2.elements[12];
+            float var12 = var1.elements[8] * var2.elements[1] + var1.elements[9] * var2.elements[5] + var1.elements[10] * var2.elements[9] + var1.elements[11] * var2.elements[13];
+            float var13 = var1.elements[8] * var2.elements[2] + var1.elements[9] * var2.elements[6] + var1.elements[10] * var2.elements[10] + var1.elements[11] * var2.elements[14];
+            float var14 = var1.elements[8] * var2.elements[3] + var1.elements[9] * var2.elements[7] + var1.elements[10] * var2.elements[11] + var1.elements[11] * var2.elements[15];
+            float var15 = var1.elements[12] * var2.elements[0] + var1.elements[13] * var2.elements[4] + var1.elements[14] * var2.elements[8] + var1.elements[15] * var2.elements[12];
+            float var16 = var1.elements[12] * var2.elements[1] + var1.elements[13] * var2.elements[5] + var1.elements[14] * var2.elements[9] + var1.elements[15] * var2.elements[13];
+            float var17 = var1.elements[12] * var2.elements[2] + var1.elements[13] * var2.elements[6] + var1.elements[14] * var2.elements[10] + var1.elements[15] * var2.elements[14];
+            float var18 = var1.elements[12] * var2.elements[3] + var1.elements[13] * var2.elements[7] + var1.elements[14] * var2.elements[11] + var1.elements[15] * var2.elements[15];
+            this.elements[0] = var3;
+            this.elements[1] = var4;
+            this.elements[2] = var5;
+            this.elements[3] = var6;
+            this.elements[4] = var7;
+            this.elements[5] = var8;
+            this.elements[6] = var9;
+            this.elements[7] = var10;
+            this.elements[8] = var11;
+            this.elements[9] = var12;
+            this.elements[10] = var13;
+            this.elements[11] = var14;
+            this.elements[12] = var15;
+            this.elements[13] = var16;
+            this.elements[14] = var17;
+            this.elements[15] = var18;
+        }
+
+    }
+
+    public final void mul(Vector3f var) {
+        float var1 = this.elements[0] * var.x + this.elements[1] * var.y + this.elements[2] * var.z + this.elements[3] * 1;
+        float var2 = this.elements[4] * var.x + this.elements[5] * var.y + this.elements[6] * var.z + this.elements[7] * 1;
+        float var3 = this.elements[8] * var.x + this.elements[9] * var.y + this.elements[10] * var.z + this.elements[11] * 1;
+        var.x = var1;
+        var.y = var2;
+        var.z = var3;
+    }
+
+    public final void mul(Vector4f var) {
+        float var1 = this.elements[0] * var.x + this.elements[1] * var.y + this.elements[2] * var.z + this.elements[3] * var.w;
+        float var2 = this.elements[4] * var.x + this.elements[5] * var.y + this.elements[6] * var.z + this.elements[7] * var.w;
+        float var3 = this.elements[8] * var.x + this.elements[9] * var.y + this.elements[10] * var.z + this.elements[11] * var.w;
+        float var4 = this.elements[12] * var.x + this.elements[13] * var.y + this.elements[14] * var.z + this.elements[15] * var.w;
+        var.x = var1;
+        var.y = var2;
+        var.z = var3;
+        var.w = var4;
+    }
+
+    public int hashCode() {
+        long var1 = 1L;
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[0]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[1]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[2]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[3]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[4]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[5]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[6]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[7]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[8]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[9]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[10]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[11]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[12]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[13]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[14]);
+        var1 = 31L * var1 + (long)Float.floatToIntBits(this.elements[15]);
+        return (int)(var1 ^ var1 >> 32);
+    }
+
+    public boolean equals(Object var1) {
+        try {
+            Matrix4x4 var2 = (Matrix4x4)var1;
+            return this.elements[0] == var2.elements[0] && this.elements[1] == var2.elements[1] && this.elements[2] == var2.elements[2] && this.elements[3] == var2.elements[3] && this.elements[4] == var2.elements[4] && this.elements[5] == var2.elements[5] && this.elements[6] == var2.elements[6] && this.elements[7] == var2.elements[7] && this.elements[8] == var2.elements[8] && this.elements[9] == var2.elements[9] && this.elements[10] == var2.elements[10] && this.elements[11] == var2.elements[11] && this.elements[12] == var2.elements[12] && this.elements[13] == var2.elements[13] && this.elements[14] == var2.elements[14] && this.elements[15] == var2.elements[15];
+        } catch (ClassCastException var4) {
+            return false;
+        } catch (NullPointerException var5) {
+            return false;
+        }
+    }
+
+    public Object clone() {
+        Matrix4x4 var1 = null;
+
+        try {
+            var1 = (Matrix4x4)super.clone();
+            return var1;
+        } catch (CloneNotSupportedException var3) {
+            throw new InternalError();
+        }
+    }
+
+    public final void setColumn(int var1, float[] var2) {
+        switch (var1) {
+            case 0:
+                this.elements[0] = var2[0];
+                this.elements[4] = var2[1];
+                this.elements[8] = var2[2];
+                this.elements[12] = var2[3];
+                break;
+            case 1:
+                this.elements[1] = var2[0];
+                this.elements[5] = var2[1];
+                this.elements[9] = var2[2];
+                this.elements[13] = var2[3];
+                break;
+            case 2:
+                this.elements[2] = var2[0];
+                this.elements[6] = var2[1];
+                this.elements[10] = var2[2];
+                this.elements[14] = var2[3];
+                break;
+            case 3:
+                this.elements[3] = var2[0];
+                this.elements[7] = var2[1];
+                this.elements[11] = var2[2];
+                this.elements[15] = var2[3];
+                break;
+            default:
+                throw new ArrayIndexOutOfBoundsException();
+        }
+
+    }
 
     public void setColumn(int col, Vector4f vector) {
         if (col < 0 || col >= 4) {
@@ -128,132 +650,5 @@ public class Matrix4x4 {
         elements[2 * 4 + col] = vector.z;
         elements[3 * 4 + col] = vector.w;
     }
-
-    // Реализация методов интерфейса Matrix
-    
-    public Matrix4x4 add(Matrix4x4 m2) {
-        float[] result = new float[16];
-        for (int i = 0; i < 16; i++) {
-            result[i] = this.elements[i] + m2.elements[i];
-        }
-        return new Matrix4x4(result);
-    }
-
-    
-    public Matrix4x4 subtract(Matrix4x4 m2) {
-        float[] result = new float[16];
-        for (int i = 0; i < 16; i++) {
-            result[i] = this.elements[i] - m2.elements[i];
-        }
-        return new Matrix4x4(result);
-    }
-
-    
-    public Matrix4x4 transpose() {
-        float[] result = new float[16];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                result[j * 4 + i] = this.elements[i * 4 + j];
-            }
-        }
-        return new Matrix4x4(result);
-    }
-
-
-    public float determinant() {
-        float det = 0;
-        for (int i = 0; i < 4; i++) {
-            det += (i % 2 == 0 ? 1 : -1) * elements[i] * minorDeterminant(i);
-        }
-        return det;
-    }
-
-    private float minorDeterminant(int col) {
-        float[] minor = getMinor(elements, 0, col);
-        return determinant3x3(minor);
-    }
-
-    public Matrix4x4 identity() {
-        return new Matrix4x4(new float[]{
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-        });
-    }
-
-
-    public Matrix4x4 inverse() {
-        float det = determinant();
-        if (Math.abs(det) < 1e-6) {
-            throw new IllegalArgumentException("Matrix4x4X.inverse: матрица вырождена, обратной нет.");
-        }
-        float[] cofactor = new float[16];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                float[] minor = getMinor(elements, i, j);
-                cofactor[i * 4 + j] = ((i + j) % 2 == 0 ? 1 : -1) * determinant3x3(minor);
-            }
-        }
-        float[] adj = new float[16];
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                adj[j * 4 + i] = cofactor[i * 4 + j];
-            }
-        }
-        float[] inverse = new float[16];
-        for (int i = 0; i < 16; i++) {
-            inverse[i] = adj[i] / det;
-        }
-        return new Matrix4x4(inverse);
-    }
-
-    private float[] getMinor(float[] matrix, int row, int col) {
-        float[] minor = new float[9];
-        int minorIndex = 0;
-        for (int i = 0; i < 4; i++) {
-            if (i == row) continue;
-            for (int j = 0; j < 4; j++) {
-                if (j == col) continue;
-                minor[minorIndex++] = matrix[i * 4 + j];
-            }
-        }
-        return minor;
-    }
-
-    private float determinant3x3(float[] matrix) {
-        return matrix[0] * (matrix[4] * matrix[8] - matrix[5] * matrix[7])
-                - matrix[1] * (matrix[3] * matrix[8] - matrix[5] * matrix[6])
-                + matrix[2] * (matrix[3] * matrix[7] - matrix[4] * matrix[6]);
-    }
-
-    
-    public String toString() {
-        StringBuilder builder = new StringBuilder("Matrix4x4X{\n");
-        for (int i = 0; i < 4; i++) {
-            builder.append("  [");
-            for (int j = 0; j < 4; j++) {
-                builder.append(elements[i * 4 + j]).append(j < 3 ? ", " : "");
-            }
-            builder.append("]\n");
-        }
-        builder.append("}");
-        return builder.toString();
-    }
-
-    
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        Matrix4x4 matrix = (Matrix4x4) obj;
-        for (int i = 0; i < 16; i++) {
-            if (Math.abs(this.elements[i] - matrix.elements[i]) > 1e-6) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
 }

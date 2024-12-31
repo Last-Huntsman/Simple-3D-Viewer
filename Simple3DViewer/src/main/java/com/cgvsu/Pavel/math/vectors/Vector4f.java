@@ -1,8 +1,5 @@
 package com.cgvsu.Pavel.math.vectors;
 
-import javax.vecmath.Tuple3f;
-import javax.vecmath.Tuple4d;
-import javax.vecmath.Tuple4f;
 import java.util.Objects;
 
 /**
