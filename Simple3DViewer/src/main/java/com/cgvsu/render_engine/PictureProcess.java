@@ -7,7 +7,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import javax.vecmath.Point2f;
 import java.util.ArrayList;
 
 import static com.cgvsu.render_engine.GraphicConveyor.vertexToPoint;
@@ -16,15 +15,12 @@ import static com.cgvsu.render_engine.GraphicConveyor.vertexToPoint;
 public class PictureProcess {
 
 
-    public static void showTriangle(GraphicsContext gc, final ArrayList<Vector3f> vertices,
-                                    final double[][] zBuffer) {
+    public static void showTriangle(GraphicsContext gc, final ArrayList<Vector3f> vertices, final double[][] zBuffer) {
 
             // Создание растеризатора для отрисовки треугольника
             TriangleRasterisator tr = new TriangleRasterisator(gc.getPixelWriter());
-
             // Создание однотонной текстуры (используется для закраски треугольника)
             MonotoneTexture mt = new MonotoneTexture(Color.BLACK);
-
             // Отрисовка треугольника с помощью растеризатора
             tr.draw(vertexToPoint(vertices.get(0)), vertices.get(0).z, vertexToPoint(vertices.get(1)), vertices.get(1).z,vertexToPoint(vertices.get(2)), vertices.get(2).z,  mt,zBuffer);
 
@@ -40,12 +36,7 @@ public class PictureProcess {
      * @param width           ширина области отрисовки
      * @param height          высота области отрисовки
      */
-    public static void rasterizePolygon(
-            final GraphicsContext graphicsContext,
-            final ArrayList<Vector3f> vertices,
-            final double[][] zBuffer,
-            final int width,
-            final int height) {
+    public static void rasterizePolygon(final GraphicsContext graphicsContext,  final ArrayList<Vector3f> vertices,  final double[][] zBuffer,  final int width,  final int height) {
 
         // Преобразование координат вершин многоугольника
         int nVertices = vertices.size();

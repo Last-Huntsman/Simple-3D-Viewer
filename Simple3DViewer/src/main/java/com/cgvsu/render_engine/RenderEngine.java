@@ -25,12 +25,28 @@ public class RenderEngine {
      * @param width           Ширина канваса.
      * @param height          Высота канваса.
      */
-    public static void render(
-            final GraphicsContext graphicsContext,
-            final Camera camera,
-            final Model mesh,
-            final int width,
-            final int height) {
+    public static void render(final GraphicsContext graphicsContext, final Camera camera, final Model mesh, final int width, final int height) {
+
+        // Отрисовка координатных осей
+        graphicsContext.setStroke(javafx.scene.paint.Color.GRAY);
+        graphicsContext.setLineWidth(1);
+        graphicsContext.strokeLine(0, height / 2.0, width, height / 2.0); // Ось X
+        graphicsContext.strokeLine(width / 2.0, 0, width / 2.0, height); // Ось Y
+
+        // Отрисовка сетки
+        int step = 50;
+        graphicsContext.setStroke(javafx.scene.paint.Color.LIGHTGRAY);
+        graphicsContext.setLineWidth(0.5);
+        for (int x = step; x < width; x += step) {
+            graphicsContext.strokeLine(x, 0, x, height);
+            graphicsContext.strokeLine(width - x, 0, width - x, height);
+        }
+        for (int y = step; y < height; y += step) {
+            graphicsContext.strokeLine(0, y, width, y);
+            graphicsContext.strokeLine(0, height - y, width, height - y);
+        }
+
+
         // Создание модельной матрицы (единичной матрицы, поскольку повороты, масштабирование и трансляции здесь не заданы).
         Matrix4x4 modelMatrix = rotateScaleTranslate();
 
@@ -42,8 +58,9 @@ public class RenderEngine {
 
         // Объединение (умножение) матриц модельной, видовой и проекционной.
         Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(modelMatrix.elements);
-        modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу вида.
-        modelViewProjectionMatrix.mul(projectionMatrix); // Умножение на матрицу проекции.
+
+        modelViewProjectionMatrix.mul(projectionMatrix); // Умножение на матрицу вида.
+        modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу проекции.
 
         Triangulation.triangulateModel(mesh.polygons);
         double[][] zBuffer = new double[width][height];
@@ -73,17 +90,17 @@ public class RenderEngine {
                 // Преобразование вершины в формат Vector3f (можно опустить, если структура совпадает).
                 Vector3f vertexVecmath = new Vector3f(vertex.x, vertex.y, vertex.z);
                 // Добавление преобразованной вершины в список.
-                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width,height));
+                /**
+                 * Проверить вот эту строчку
+                  */
+                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width, height));
             }
-            if (nVerticesInPolygon > 1 && true) {
+            if (nVerticesInPolygon > 1) {
                 PictureProcess.rasterizePolygon(graphicsContext, resultVectors,zBuffer,width,height );
             }
-            if(nVerticesInPolygon==3 && true){
+            if(nVerticesInPolygon == 3){
                 PictureProcess.showTriangle(graphicsContext,resultVectors,zBuffer);
             }
-
-
-
         }
     }
 

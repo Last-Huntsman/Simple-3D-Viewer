@@ -34,17 +34,14 @@ public class Polygon implements Cloneable {
 
     // Сеттеры и геттеры (остаются неизменными)
     public void setVertexIndices(ArrayList<Integer> vertexIndices) {
-
         this.vertexIndices = vertexIndices;
     }
 
     public void setTextureVertexIndices(ArrayList<Integer> textureVertexIndices) {
-
         this.textureVertexIndices = textureVertexIndices;
     }
 
     public void setNormalIndices(ArrayList<Integer> normalIndices) {
-
         this.normalIndices = normalIndices;
     }
 

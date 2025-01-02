@@ -16,8 +16,6 @@ public class Model implements Cloneable {
     public ArrayList<Vector3f> normals = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<>();
 
-
-
     // Метод клонирования вершин
     public ArrayList<Vector3f> cloneVertices() {
         ArrayList<Vector3f> clonedVertices = new ArrayList<>();
@@ -105,4 +103,5 @@ public class Model implements Cloneable {
             System.out.println();
         }
     }
+
 }

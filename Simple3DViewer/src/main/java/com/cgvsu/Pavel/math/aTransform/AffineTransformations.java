@@ -4,8 +4,8 @@ import com.cgvsu.Pavel.math.matrices.Matrix3x3;
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.model.Model;
 
-public class AffineTransformations { //основная логика вычислений (дубль)
-    public void xxx() { //пример применения методов
+public class AffineTransformations {
+    public void xxx() {
         Model model = new Model();
         MegaTransform mt = new MegaTransform();
         mt.add(new Translate(1, 3, 0));
@@ -16,9 +16,7 @@ public class AffineTransformations { //основная логика вычис�
 
         AffineConverter ac = new AffineConverter();
         ac.setModelTransform(mt);
-        //ac.set(r);
         ac.apply(model);
-        //r.addAngle(1);
         mt.add(new Rotate(1, AXIS.X));
         ac.apply(model);
 
@@ -73,12 +71,12 @@ public class AffineTransformations { //основная логика вычис�
     }
 
     public static Matrix3x3 rotationMatrix(double alpha, double beta, double gamma) {
-        /*Matrix3x3 Rx = rotationAroundAxisMatrix(alpha, AXIS.x);
-        Matrix3f Ry = rotationAroundAxisMatrix(beta, AXIS.y);
-        Matrix3f Rz = rotationAroundAxisMatrix(gamma, AXIS.z);
-        Matrix3f R = new Matrix3f();
+        Matrix3x3 Rx = rotationAroundAxisMatrix(alpha, AXIS.X);
+        Matrix3x3 Ry = rotationAroundAxisMatrix(beta, AXIS.Y);
+        Matrix3x3 Rz = rotationAroundAxisMatrix(gamma, AXIS.X);
+        Matrix3x3 R = new Matrix3x3();
         R.mul(Rz, Ry);
-        R.mul(Rx);*/
+        R.mul(Rx);
         float y1 = (float) Math.cos(beta), y2 = (float) Math.sin(beta), y3 = (float) - Math.sin(beta), y4 = (float) Math.cos(beta);
         float x1 = (float) Math.cos(alpha), x2 = (float) Math.sin(alpha), x3 = (float) -Math.sin(alpha), x4 = (float) Math.cos(alpha);
         float z1 = (float) Math.cos(gamma), z2 = (float) Math.sin(gamma), z3 = (float) -Math.sin(gamma), z4 = (float) Math.cos(gamma);
