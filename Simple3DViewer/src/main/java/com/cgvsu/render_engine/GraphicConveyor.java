@@ -89,8 +89,8 @@ public class GraphicConveyor {
 
         float tangentMinusOneDegree = (float) (1.0F / (Math.tan(fov * 0.5F))); // Нужно ли делить на 2?  Вроде как да.
 
-        result.elements[0] = tangentMinusOneDegree/ aspectRatio;
-        result.elements[5] = tangentMinusOneDegree;
+        result.elements[0] = tangentMinusOneDegree;
+        result.elements[5] = tangentMinusOneDegree/aspectRatio;
         result.elements[10] = (farPlane + nearPlane) / (farPlane - nearPlane);
         result.elements[11] = 2 * (nearPlane * farPlane) / (nearPlane - farPlane);
         result.elements[14] = 1;

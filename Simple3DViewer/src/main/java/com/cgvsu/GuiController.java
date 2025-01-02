@@ -62,7 +62,7 @@ public class GuiController {
             canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
 
             // Обновляем соотношение сторон для камеры в зависимости от размеров холста
-            camera.setAspectRatio((float) (width / height));
+            camera.setAspectRatio((float) (height / width));
 
             // Если модель загружена, рендерим её
             if (mesh != null) {
