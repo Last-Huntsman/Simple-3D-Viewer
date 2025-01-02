@@ -1,5 +1,6 @@
 package com.cgvsu.render_engine;
 
+import com.cgvsu.Egor.FindNormals;
 import com.cgvsu.Egor.Triangulation;
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
@@ -63,6 +64,9 @@ public class RenderEngine {
         modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу проекции.
 
         Triangulation.triangulateModel(mesh.polygons);
+        FindNormals.findNormals(mesh);
+
+
         double[][] zBuffer = new double[width][height];
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -95,10 +99,10 @@ public class RenderEngine {
                   */
                 resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width, height));
             }
-            if (nVerticesInPolygon > 1) {
+            if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
                 PictureProcess.rasterizePolygon(graphicsContext, resultVectors,zBuffer,width,height );
             }
-            if(nVerticesInPolygon == 3){
+            if(nVerticesInPolygon == 3 && true){
                 PictureProcess.showTriangle(graphicsContext,resultVectors,zBuffer);
             }
         }
