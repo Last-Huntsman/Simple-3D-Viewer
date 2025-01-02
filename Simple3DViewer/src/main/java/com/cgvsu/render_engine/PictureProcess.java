@@ -33,10 +33,8 @@ public class PictureProcess {
      * @param graphicsContext графический контекст для рисования
      * @param vertices        список вершин многоугольника
      * @param zBuffer         z-буфер для управления глубиной
-     * @param width           ширина области отрисовки
-     * @param height          высота области отрисовки
      */
-    public static void rasterizePolygon(final GraphicsContext graphicsContext,  final ArrayList<Vector3f> vertices,  final double[][] zBuffer,  final int width,  final int height) {
+    public static void rasterizePolygon(final GraphicsContext graphicsContext,  final ArrayList<Vector3f> vertices,  final double[][] zBuffer) {
 
         // Преобразование координат вершин многоугольника
         int nVertices = vertices.size();

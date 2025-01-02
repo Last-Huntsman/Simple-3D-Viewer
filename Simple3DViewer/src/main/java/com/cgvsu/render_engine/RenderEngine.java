@@ -100,7 +100,7 @@ public class RenderEngine {
                 resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width, height));
             }
             if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
-                PictureProcess.rasterizePolygon(graphicsContext, resultVectors,zBuffer,width,height );
+                PictureProcess.rasterizePolygon(graphicsContext, resultVectors,zBuffer );
             }
             if(nVerticesInPolygon == 3 && true){
                 PictureProcess.showTriangle(graphicsContext,resultVectors,zBuffer);

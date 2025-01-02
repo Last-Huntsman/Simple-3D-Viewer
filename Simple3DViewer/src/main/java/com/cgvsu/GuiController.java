@@ -74,7 +74,29 @@ public class GuiController {
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
+    @FXML
+    private void onOpenTextureIntemClick() {
+        // Создаем диалоговое окно для выбора файла с фильтром для *.obj
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG (*.png)", "*.png"));
+        fileChooser.setTitle("Load Texture");
 
+        // Показываем диалоговое окно для выбора файла
+        File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
+        if (file == null) {
+            return;  // Если файл не выбран, ничего не делаем
+        }
+
+        Path fileName = Path.of(file.getAbsolutePath());
+
+        try {
+            // Чтение содержимого файла и загрузка модели
+            String fileContent = Files.readString(fileName);
+            mesh = ObjReader.read(fileContent);  // Загружаем модель из содержимого файла
+        } catch (IOException exception) {
+            // Обработка ошибок при чтении файла (например, если файл повреждён)
+        }
+    }
     // Метод для открытия файла модели (.obj)
     @FXML
     private void onOpenModelMenuItemClick() {
