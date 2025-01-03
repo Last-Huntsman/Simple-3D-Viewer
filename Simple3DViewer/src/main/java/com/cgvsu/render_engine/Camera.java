@@ -1,44 +1,46 @@
 package com.cgvsu.render_engine;
 
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
+import com.cgvsu.Pavel.math.vectors.Vector2f;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
 
-/**
- * Класс Camera представляет виртуальную камеру, которая используется для
- * рендеринга сцены в 3D пространстве.
- */
 public class Camera {
 
-    private Vector3f position;
-    private Vector3f target;
-    private final float fov;
-    private float aspectRatio;
-    private final float nearPlane;
-    private final float farPlane;
+    private Vector3f position;   // Позиция камеры
+    private Vector3f target;     // Точка, на которую направлена камера
+    private Vector2f rotation;   // Углы вращения (yaw, pitch)
+    private final float fov;     // Угол обзора
+    private float aspectRatio;   // Соотношение сторон экрана
+    private final float nearPlane; // Ближняя плоскость отсечения
+    private final float farPlane;  // Дальняя плоскость отсечения
 
-    /**
-     * Конструктор для создания камеры с заданными параметрами.
-     *
-     * @param position    Позиция камеры
-     * @param target      Целевая точка камеры
-     * @param fov         Угол обзора (в радианах)
-     * @param aspectRatio Соотношение сторон кадра
-     * @param nearPlane   Ближняя плоскость отсечения
-     * @param farPlane    Дальняя плоскость отсечения
-     */
     public Camera(
+            final Vector2f rotation,
             final Vector3f position,
             final Vector3f target,
             final float fov,
             final float aspectRatio,
             final float nearPlane,
             final float farPlane) {
+        this.rotation = rotation;
         this.position = position;
         this.target = target;
         this.fov = fov;
         this.aspectRatio = aspectRatio;
         this.nearPlane = nearPlane;
         this.farPlane = farPlane;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
+    public Vector2f getRotation() {
+        return rotation;
+    }
+
+    public Vector3f getTarget() {
+        return target;
     }
 
     public Matrix4x4 getViewMatrix() {
@@ -49,67 +51,77 @@ public class Camera {
         return GraphicConveyor.perspective(fov, aspectRatio, nearPlane, farPlane);
     }
 
-    public void movePosition(final Vector3f translation) {
-        this.position.add(translation);
-    }
-
-    public void movePosition(Vector3f direction, float amount) {
-        direction.normalize();
-        direction.scale(amount);
-        position.add(direction);
-        target.add(direction);
-    }
-
-    public void rotateAroundTarget(float angleX, float angleY) {
-        // Вычисляем новое положение камеры на основе углов
-        float radius = position.distance(target);
-        float x = (float) (target.x + radius * Math.sin(angleX) * Math.cos(angleY));
-        float y = (float) (target.y + radius * Math.sin(angleY));
-        float z = (float) (target.z + radius * Math.cos(angleX) * Math.cos(angleY));
-        position.set(x, y, z);
-    }
-
-    public void rotate(float angleX, float angleY) {
-        Vector3f direction = new Vector3f(target);
-        direction.sub(position);
-        direction.normalize();
-
-        float cosAngleX = (float) Math.cos(angleX);
-        float sinAngleX = (float) Math.sin(angleX);
-
-        float newX = direction.x * cosAngleX - direction.z * sinAngleX;
-        float newZ = direction.x * sinAngleX + direction.z * cosAngleX;
-
-        direction.x = newX;
-        direction.z = newZ;
-
-        float cosAngleY = (float) Math.cos(angleY);
-        float sinAngleY = (float) Math.sin(angleY);
-
-        float newY = direction.y * cosAngleY - direction.z * sinAngleY;
-        newZ = direction.y * sinAngleY + direction.z * cosAngleY;
-
-        direction.y = newY;
-        direction.z = newZ;
-
-        target.set(position.x + direction.x, position.y + direction.y, position.z + direction.z);
-    }
-
-
-    public Vector3f getTarget() {
-        return target;
-    }
-
-    public void setTarget(final Vector3f target) {
-        this.target = target;
-    }
-
     public void setAspectRatio(final float aspectRatio) {
         this.aspectRatio = aspectRatio;
     }
 
-    public Vector3f getPosition() {
-        return position;
+    public void moveForward(float distance) {
+        Vector3f direction = calculateDirection();
+        direction.scale(distance);
+        position.add(direction);
+        target.add(direction);
+    }
+
+    public void moveBackward(float distance) {
+        moveForward(-distance);
+    }
+
+    public void moveRight(float distance) {
+        Vector3f direction = calculateRightVector();
+        direction.scale(distance);
+        position.add(direction);
+        target.add(direction);
+    }
+
+    public void moveLeft(float distance) {
+        moveRight(-distance);
+    }
+
+    public void moveUp(float distance) {
+        Vector3f up = new Vector3f(0, 1, 0);
+        up.scale(distance);
+        position.add(up);
+        target.add(up);
+    }
+
+    public void moveDown(float distance) {
+        moveUp(-distance);
+    }
+
+    public void rotate(float yaw, float pitch) {
+        rotation.x += yaw;
+        rotation.y += pitch;
+
+        rotation.y = Math.max(-90.0f, Math.min(90.0f, rotation.y));
+
+        Vector3f direction = calculateDirection();
+        target.set(
+                position.x + direction.x,
+                position.y + direction.y,
+                position.z + direction.z
+        );
+    }
+
+
+    private Vector3f calculateDirection() {
+        float cosPitch = (float) Math.cos(Math.toRadians(rotation.y));
+        float sinPitch = (float) Math.sin(Math.toRadians(rotation.y));
+        float cosYaw = (float) Math.cos(Math.toRadians(rotation.x));
+        float sinYaw = (float) Math.sin(Math.toRadians(rotation.x));
+        Vector3f res = new Vector3f(
+                cosYaw * cosPitch,
+                sinPitch,
+                sinYaw * cosPitch
+        );
+        res.normalize();
+        return res;
+    }
+
+    private Vector3f calculateRightVector() {
+        Vector3f direction = calculateDirection();
+        Vector3f res = new Vector3f(direction.z, 0, -direction.x);
+        res.normalize();
+        return res;
     }
 
 }

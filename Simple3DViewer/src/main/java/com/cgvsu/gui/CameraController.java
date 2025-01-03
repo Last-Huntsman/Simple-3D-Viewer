@@ -1,5 +1,6 @@
-package com.cgvsu;
+package com.cgvsu.gui;
 
+import com.cgvsu.Pavel.math.vectors.Vector2f;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.fxml.FXML;
@@ -8,6 +9,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
@@ -21,7 +23,7 @@ import com.cgvsu.model.Model;
 import com.cgvsu.Ilya.ObjReader;
 import com.cgvsu.render_engine.Camera;
 
-public class GuiController {
+public class CameraController {
 
     @FXML
     private AnchorPane anchorPane;
@@ -31,72 +33,90 @@ public class GuiController {
 
     private Model mesh;
 
-    private final Camera camera = new Camera(
-            new Vector3f(0, 0, 100),
-            new Vector3f(0, 0, 0),
-            1.0F,
-            1,
-            0.01F,
-            100
-    );
+    @FXML
+    private Label positionLabel;
+
+    @FXML
+    private Label rotationLabel;
+
+    private void updateLabels() {
+        Vector3f position = camera.getPosition();
+        Vector2f rotation = camera.getRotation();
+
+        positionLabel.setText(String.format("Camera Position: (%.2f, %.2f, %.2f)",
+                position.x, position.y, position.z));
+        rotationLabel.setText(String.format("Camera Rotation: (%.2f°, %.2f°)",
+                rotation.x, rotation.y));
+    }
+
+
+
+    private final Camera camera = new Camera(new Vector2f(0.0f, 0.0f), new Vector3f(20, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
 
     private static final float TRANSLATION = 0.5F;
     private static final float ROTATION_ANGLE = 1.0F;
 
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, -TRANSLATION), 1);
+        camera.moveForward(TRANSLATION);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraBackward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, TRANSLATION), 1);
+        camera.moveBackward(TRANSLATION);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraLeft(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(TRANSLATION, 0, 0), 1);
+        camera.moveLeft(TRANSLATION);
+        updateLabels();
+
     }
 
     @FXML
     public void handleCameraRight(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(-TRANSLATION, 0, 0), 1);
+        camera.moveRight(TRANSLATION);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraUp(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, TRANSLATION, 0), 1);
+        camera.moveUp(TRANSLATION);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraDown(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, -TRANSLATION, 0), 1);
+        camera.moveDown(TRANSLATION);
+        updateLabels();
     }
-
 
     @FXML
     public void handleCameraRotateLeft(ActionEvent actionEvent) {
-        rotateCamera(-ROTATION_ANGLE, 0);
+        camera.rotate(-ROTATION_ANGLE, 0);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraRotateRight(ActionEvent actionEvent) {
-        rotateCamera(ROTATION_ANGLE, 0);
+        camera.rotate(ROTATION_ANGLE, 0);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraRotateUp(ActionEvent actionEvent) {
-        rotateCamera(0, ROTATION_ANGLE);
+        camera.rotate(0, ROTATION_ANGLE);
+        updateLabels();
     }
 
     @FXML
     public void handleCameraRotateDown(ActionEvent actionEvent) {
-        rotateCamera(0, -ROTATION_ANGLE);
+        camera.rotate(0, -ROTATION_ANGLE);
+        updateLabels();
     }
 
-    private void rotateCamera(float deltaYaw, float deltaPitch) {
-        camera.rotate((float) Math.toRadians(deltaYaw), (float) Math.toRadians(deltaPitch));
-    }
 
     @FXML
     private void initialize() {

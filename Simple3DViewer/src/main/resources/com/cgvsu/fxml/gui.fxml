@@ -7,7 +7,9 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.canvas.Canvas?>
 
-<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.GuiController">
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.gui.CameraController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
@@ -77,7 +79,14 @@
                 </accelerator>
             </MenuItem>
         </Menu>
+
     </MenuBar>
+
+    <VBox spacing="10" alignment="BOTTOM_LEFT" layoutX="10" layoutY="40">
+        <Label fx:id="positionLabel" text="Camera Position: (0, 0, 0)" />
+        <Label fx:id="rotationLabel" text="Camera Rotation: (0°, 0°)" />
+    </VBox>
+
 
     <Canvas fx:id="canvas" width="1600" height="870" AnchorPane.topAnchor="30.0"/>
 </AnchorPane>

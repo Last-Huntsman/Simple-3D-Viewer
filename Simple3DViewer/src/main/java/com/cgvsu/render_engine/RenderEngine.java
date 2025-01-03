@@ -87,9 +87,6 @@ public class RenderEngine {
                 // Преобразование вершины в формат Vector3f (можно опустить, если структура совпадает).
                 Vector3f vertexVecmath = new Vector3f(vertex.x, vertex.y, vertex.z);
                 // Добавление преобразованной вершины в список.
-                /**
-                 * Проверить вот эту строчку
-                  */
                 resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width, height));
             }
             if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
