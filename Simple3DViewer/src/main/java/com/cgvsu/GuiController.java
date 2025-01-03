@@ -23,26 +23,81 @@ import com.cgvsu.render_engine.Camera;
 
 public class GuiController {
 
-    // Шаг перемещения камеры
-    final private float TRANSLATION = 0.5F;
+    @FXML
+    private AnchorPane anchorPane;
 
     @FXML
-    AnchorPane anchorPane;  // Панель, в которой расположен холст
+    private Canvas canvas;
+
+    private Model mesh;
+
+    private final Camera camera = new Camera(
+            new Vector3f(0, 0, 100),
+            new Vector3f(0, 0, 0),
+            1.0F,
+            1,
+            0.01F,
+            100
+    );
+
+    private static final float TRANSLATION = 0.5F;
+    private static final float ROTATION_ANGLE = 1.0F;
 
     @FXML
-    private Canvas canvas;  // Холст для отображения 3D модели
+    public void handleCameraForward(ActionEvent actionEvent) {
+        camera.movePosition(new Vector3f(0, 0, -TRANSLATION), 1);
+    }
 
-    private Model mesh = null;  // Переменная для хранения загруженной 3D модели
+    @FXML
+    public void handleCameraBackward(ActionEvent actionEvent) {
+        camera.movePosition(new Vector3f(0, 0, TRANSLATION), 1);
+    }
 
-    // Камера, с которой будет происходить рендеринг
-    private Camera camera = new Camera(
-            new Vector3f(0, 00, 100),  // Позиция камеры (изначально далеко от центра сцены)
-            new Vector3f(0, 0, 0),     // Точка, на которую камера будет смотреть (центральная точка сцены)
-            1.0F, 1, 0.01F, 100);      // Дополнительные параметры камеры (соотношение сторон, дальние и ближние плоскости)
+    @FXML
+    public void handleCameraLeft(ActionEvent actionEvent) {
+        camera.movePosition(new Vector3f(TRANSLATION, 0, 0), 1);
+    }
 
-    private Timeline timeline;  // Таймлайн для обновлений сцены (анимировать рендеринг)
+    @FXML
+    public void handleCameraRight(ActionEvent actionEvent) {
+        camera.movePosition(new Vector3f(-TRANSLATION, 0, 0), 1);
+    }
 
-    // Метод инициализации, который вызывается при запуске GUI
+    @FXML
+    public void handleCameraUp(ActionEvent actionEvent) {
+        camera.movePosition(new Vector3f(0, TRANSLATION, 0), 1);
+    }
+
+    @FXML
+    public void handleCameraDown(ActionEvent actionEvent) {
+        camera.movePosition(new Vector3f(0, -TRANSLATION, 0), 1);
+    }
+
+
+    @FXML
+    public void handleCameraRotateLeft(ActionEvent actionEvent) {
+        rotateCamera(-ROTATION_ANGLE, 0);
+    }
+
+    @FXML
+    public void handleCameraRotateRight(ActionEvent actionEvent) {
+        rotateCamera(ROTATION_ANGLE, 0);
+    }
+
+    @FXML
+    public void handleCameraRotateUp(ActionEvent actionEvent) {
+        rotateCamera(0, ROTATION_ANGLE);
+    }
+
+    @FXML
+    public void handleCameraRotateDown(ActionEvent actionEvent) {
+        rotateCamera(0, -ROTATION_ANGLE);
+    }
+
+    private void rotateCamera(float deltaYaw, float deltaPitch) {
+        camera.rotate((float) Math.toRadians(deltaYaw), (float) Math.toRadians(deltaPitch));
+    }
+
     @FXML
     private void initialize() {
         // Устанавливаем размеры холста в зависимости от размеров панели
@@ -50,7 +105,7 @@ public class GuiController {
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
         // Инициализация таймлайна для регулярного обновления сцены
-        timeline = new Timeline();
+        Timeline timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);  // Таймлайн будет работать бесконечно
 
         // Создаём новый ключевой кадр, который обновляет сцену каждые 15 миллисекунд
@@ -74,6 +129,7 @@ public class GuiController {
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
+
     @FXML
     private void onOpenTextureIntemClick() {
         // Создаем диалоговое окно для выбора файла с фильтром для *.obj
@@ -97,6 +153,7 @@ public class GuiController {
             // Обработка ошибок при чтении файла (например, если файл повреждён)
         }
     }
+
     // Метод для открытия файла модели (.obj)
     @FXML
     private void onOpenModelMenuItemClick() {
@@ -120,44 +177,5 @@ public class GuiController {
         } catch (IOException exception) {
             // Обработка ошибок при чтении файла (например, если файл повреждён)
         }
-    }
-
-    // Методы для перемещения камеры по сцене
-
-    // Двигаем камеру вперёд
-    @FXML
-    public void handleCameraForward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, -TRANSLATION));
-    }
-
-    // Двигаем камеру назад
-    @FXML
-    public void handleCameraBackward(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, 0, TRANSLATION));
-    }
-
-    // Двигаем камеру влево
-    @FXML
-    public void handleCameraLeft(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(TRANSLATION, 0, 0));
-    }
-
-    // Двигаем камеру вправо
-    @FXML
-    public void handleCameraRight(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(-TRANSLATION, 0, 0));
-    }
-
-    // Двигаем камеру вверх
-    @FXML
-    public void handleCameraUp(ActionEvent actionEvent) {
-
-        camera.movePosition(new Vector3f(0, TRANSLATION, 0));
-    }
-
-    // Двигаем камеру вниз
-    @FXML
-    public void handleCameraDown(ActionEvent actionEvent) {
-        camera.movePosition(new Vector3f(0, -TRANSLATION, 0));
     }
 }

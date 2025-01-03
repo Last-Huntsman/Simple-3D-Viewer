@@ -129,6 +129,15 @@ public final class Vector3f {
         this.y = var4;
     }
 
+    public final void cross(Vector3f var) {
+        float var1 = this.y * var.z - this.z * var.y;
+        float var2 = this.z * var.x - this.x * var.z;
+        float var3 = this.x * var.y - this.y * var.x;
+        this.x = var1;
+        this.y = var2;
+        this.z = var3;
+    }
+
     public final float dot(Vector3f var1) {
         return this.x * var1.x + this.y * var1.y + this.z * var1.z;
     }
@@ -147,8 +156,8 @@ public final class Vector3f {
         this.z *= var1;
     }
 
-    public final float angle(Vector3f var1) {
-        double var2 = (double)(this.dot(var1) / (this.length() * var1.length()));
+    public final float angle(Vector3f var) {
+        double var2 = (double)(this.dot(var) / (this.length() * var.length()));
         if (var2 < -1.0) {
             var2 = -1.0;
         }
@@ -158,6 +167,13 @@ public final class Vector3f {
         }
 
         return (float)Math.acos(var2);
+    }
+
+    public float distance(Vector3f other) {
+        float dx = this.x - other.x;
+        float dy = this.y - other.y;
+        float dz = this.z - other.z;
+        return (float) Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     public Vector3f clone() {

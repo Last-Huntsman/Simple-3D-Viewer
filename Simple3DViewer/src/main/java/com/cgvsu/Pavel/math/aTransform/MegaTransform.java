@@ -7,8 +7,8 @@ import java.util.List;
 
 import javax.vecmath.Matrix4f;
 
-public class MegaTransform implements IAffine{//composite
-    // point transformations
+public class MegaTransform implements IAffine{
+
     private final List<IAffine> affine = new ArrayList<>();
 
     public MegaTransform() {}

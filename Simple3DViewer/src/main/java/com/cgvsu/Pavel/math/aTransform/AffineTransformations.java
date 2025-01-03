@@ -5,16 +5,20 @@ import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.model.Model;
 
 public class AffineTransformations {
-    public void xxx() {
+    public static void main(String[] args) {
+        xxx();
+    }
+    public static void xxx() {
         Model model = new Model();
         MegaTransform mt = new MegaTransform();
+
         mt.add(new Translate(1, 3, 0));
         mt.add(new Scale(1, 0, 0));
         mt.add(new Translate(-1, 0, 0));
-
-        Rotate r = new Rotate(0, AXIS.X);
+        mt.add(new Rotate(0, AXIS.X));
 
         AffineConverter ac = new AffineConverter();
+
         ac.setModelTransform(mt);
         ac.apply(model);
         mt.add(new Rotate(1, AXIS.X));

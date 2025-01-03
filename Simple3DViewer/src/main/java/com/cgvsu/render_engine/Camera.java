@@ -9,23 +9,12 @@ import com.cgvsu.Pavel.math.vectors.Vector3f;
  */
 public class Camera {
 
-    // Позиция камеры в мировых координатах
     private Vector3f position;
-
-    // Целевая точка, на которую смотрит камера
     private Vector3f target;
-
-    // Угол обзора (в радианах)
-    private float fov;
-
-    // Соотношение сторон кадра (ширина / высота)
+    private final float fov;
     private float aspectRatio;
-
-    // Расстояние до ближней плоскости отсечения
-    private float nearPlane;
-
-    // Расстояние до дальней плоскости отсечения
-    private float farPlane;
+    private final float nearPlane;
+    private final float farPlane;
 
     /**
      * Конструктор для создания камеры с заданными параметрами.
@@ -37,7 +26,13 @@ public class Camera {
      * @param nearPlane   Ближняя плоскость отсечения
      * @param farPlane    Дальняя плоскость отсечения
      */
-    public Camera(final Vector3f position, final Vector3f target, final float fov, final float aspectRatio, final float nearPlane, final float farPlane) {
+    public Camera(
+            final Vector3f position,
+            final Vector3f target,
+            final float fov,
+            final float aspectRatio,
+            final float nearPlane,
+            final float farPlane) {
         this.position = position;
         this.target = target;
         this.fov = fov;
@@ -46,84 +41,75 @@ public class Camera {
         this.farPlane = farPlane;
     }
 
-    /**
-     * Устанавливает новую позицию камеры.
-     *
-     * @param position Новая позиция камеры
-     */
-    public void setPosition(final Vector3f position) {
-        this.position = position;
+    public Matrix4x4 getViewMatrix() {
+        return GraphicConveyor.lookAt(position, target);
     }
 
-    /**
-     * Устанавливает новую целевую точку камеры.
-     *
-     * @param target Новая целевая точка
-     */
-    public void setTarget(final Vector3f target) {
-        this.target = target;
+    public Matrix4x4 getProjectionMatrix() {
+        return GraphicConveyor.perspective(fov, aspectRatio, nearPlane, farPlane);
     }
 
-    /**
-     * Устанавливает новое соотношение сторон кадра.
-     *
-     * @param aspectRatio Новое соотношение сторон
-     */
-    public void setAspectRatio(final float aspectRatio) {
-        this.aspectRatio = aspectRatio;
-    }
-
-    /**
-     * Возвращает текущую позицию камеры.
-     *
-     * @return Позиция камеры
-     */
-    public Vector3f getPosition() {
-        return position;
-    }
-
-    /**
-     * Возвращает текущую целевую точку камеры.
-     *
-     * @return Целевая точка камеры
-     */
-    public Vector3f getTarget() {
-        return target;
-    }
-
-    /**
-     * Перемещает камеру на указанное смещение.
-     *
-     * @param translation Вектор смещения
-     */
     public void movePosition(final Vector3f translation) {
         this.position.add(translation);
     }
 
-    /**
-     * Перемещает целевую точку камеры на указанное смещение.
-     *
-     * @param translation Вектор смещения
-     */
-    public void moveTarget(final Vector3f translation) {
-        this.target.add(translation);
+    public void movePosition(Vector3f direction, float amount) {
+        direction.normalize();
+        direction.scale(amount);
+        position.add(direction);
+        target.add(direction);
     }
 
-    /**
-     * Создает и возвращает матрицу вида для камеры.
-     *
-     * @return Матрица вида, определяющая ориентацию камеры в пространсве
-     */
-    Matrix4x4 getViewMatrix() {
-        return GraphicConveyor.lookAt(position, target);
+    public void rotateAroundTarget(float angleX, float angleY) {
+        // Вычисляем новое положение камеры на основе углов
+        float radius = position.distance(target);
+        float x = (float) (target.x + radius * Math.sin(angleX) * Math.cos(angleY));
+        float y = (float) (target.y + radius * Math.sin(angleY));
+        float z = (float) (target.z + radius * Math.cos(angleX) * Math.cos(angleY));
+        position.set(x, y, z);
     }
 
-    /**
-     * Создает и возвращает проекционную матрицу для камеры.
-     *
-     * @return Проекционная матрица, основанная на параметрах камеры
-     */
-    Matrix4x4 getProjectionMatrix() {
-        return GraphicConveyor.perspective(fov, aspectRatio, nearPlane, farPlane);
+    public void rotate(float angleX, float angleY) {
+        Vector3f direction = new Vector3f(target);
+        direction.sub(position);
+        direction.normalize();
+
+        float cosAngleX = (float) Math.cos(angleX);
+        float sinAngleX = (float) Math.sin(angleX);
+
+        float newX = direction.x * cosAngleX - direction.z * sinAngleX;
+        float newZ = direction.x * sinAngleX + direction.z * cosAngleX;
+
+        direction.x = newX;
+        direction.z = newZ;
+
+        float cosAngleY = (float) Math.cos(angleY);
+        float sinAngleY = (float) Math.sin(angleY);
+
+        float newY = direction.y * cosAngleY - direction.z * sinAngleY;
+        newZ = direction.y * sinAngleY + direction.z * cosAngleY;
+
+        direction.y = newY;
+        direction.z = newZ;
+
+        target.set(position.x + direction.x, position.y + direction.y, position.z + direction.z);
     }
+
+
+    public Vector3f getTarget() {
+        return target;
+    }
+
+    public void setTarget(final Vector3f target) {
+        this.target = target;
+    }
+
+    public void setAspectRatio(final float aspectRatio) {
+        this.aspectRatio = aspectRatio;
+    }
+
+    public Vector3f getPosition() {
+        return position;
+    }
+
 }

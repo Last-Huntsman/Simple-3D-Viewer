@@ -2,8 +2,11 @@ package com.cgvsu.render_engine;
 
 import com.cgvsu.Egor.FindNormals;
 import com.cgvsu.Egor.Triangulation;
+import com.cgvsu.Pavel.math.aTransform.AffineConverter;
+import com.cgvsu.Pavel.math.aTransform.Translate;
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.Pavel.math.aTransform.MegaTransform;
 import com.cgvsu.model.Model;
 import javafx.scene.canvas.GraphicsContext;
 
@@ -26,34 +29,24 @@ public class RenderEngine {
      * @param width           Ширина канваса.
      * @param height          Высота канваса.
      */
-    public static void render(final GraphicsContext graphicsContext, final Camera camera, final Model mesh, final int width, final int height) {
+    public static void render(
+            final GraphicsContext graphicsContext,
+            final Camera camera,
+            final Model mesh,
+            final int width,
+            final int height) {
 
-        // Отрисовка координатных осей
-        graphicsContext.setStroke(javafx.scene.paint.Color.GRAY);
-        graphicsContext.setLineWidth(1);
-        graphicsContext.strokeLine(0, height / 2.0, width, height / 2.0); // Ось X
-        graphicsContext.strokeLine(width / 2.0, 0, width / 2.0, height); // Ось Y
+        // Создание модельной матрицы.
+        MegaTransform mt = new MegaTransform();
+        AffineConverter ac = new AffineConverter();
 
-        // Отрисовка сетки
-        int step = 50;
-        graphicsContext.setStroke(javafx.scene.paint.Color.LIGHTGRAY);
-        graphicsContext.setLineWidth(0.5);
-        for (int x = step; x < width; x += step) {
-            graphicsContext.strokeLine(x, 0, x, height);
-            graphicsContext.strokeLine(width - x, 0, width - x, height);
-        }
-        for (int y = step; y < height; y += step) {
-            graphicsContext.strokeLine(0, y, width, y);
-            graphicsContext.strokeLine(0, height - y, width, height - y);
-        }
+        ac.setModelTransform(mt);
+        ac.apply(mesh);
 
-
-        // Создание модельной матрицы (единичной матрицы, поскольку повороты, масштабирование и трансляции здесь не заданы).
-        Matrix4x4 modelMatrix = rotateScaleTranslate();
+        Matrix4x4 modelMatrix = mt.vertexTransform();
 
         // Получение матрицы вида из объекта камеры.
         Matrix4x4 viewMatrix = camera.getViewMatrix();
-
         // Получение матрицы проекции из объекта камеры.
         Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
 

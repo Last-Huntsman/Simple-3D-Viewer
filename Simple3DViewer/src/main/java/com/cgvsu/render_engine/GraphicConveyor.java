@@ -1,29 +1,17 @@
 package com.cgvsu.render_engine;
 
+import com.cgvsu.Pavel.math.aTransform.*;
 import com.cgvsu.Pavel.math.matrices.Matrix3x3;
 import com.cgvsu.Pavel.math.matrices.Matrix4x4;
 import com.cgvsu.Pavel.math.vectors.Vector3f;
 
+import com.cgvsu.model.Model;
 import javafx.geometry.Point2D;;
 
 /**
  * Утилитарный класс для выполнения различных графических преобразований и операций.
  */
 public class GraphicConveyor {
-
-    /**
-     * Создает единичную матрицу трансформации, которая не выполняет никаких преобразований.
-     *
-     * @return Единичная матрица (4x4).
-     */
-    public static Matrix4x4 rotateScaleTranslate() {
-        float[] matrix = new float[]{
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1};
-        return new Matrix4x4(matrix);
-    }
 
     /**
      * Создает матрицу вида ("смотри на") для камеры.
