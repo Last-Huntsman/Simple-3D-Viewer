@@ -56,24 +56,24 @@
             </MenuItem>
         </Menu>
         <Menu mnemonicParsing="false" text="Camera Rotation">
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateLeft" text="Rotate Left">
+            <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateLeft" text="Rotate Right">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="Z"/>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="RIGHT"/>
                 </accelerator>
             </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateRight" text="Rotate Right">
+            <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateRight" text="Rotate Left">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="X"/>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="LEFT"/>
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateUp" text="Rotate Up">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="C"/>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="UP"/>
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateDown" text="Rotate Down">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="V"/>
+                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="DOWN"/>
                 </accelerator>
             </MenuItem>
         </Menu>
