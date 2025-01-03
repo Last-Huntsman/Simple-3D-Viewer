@@ -22,7 +22,6 @@ public class ObjReader {
         int lineInd = 0;
         Scanner scanner = new Scanner(fileContent);
 
-        // Добавлено: флаги для проверки наличия обязательных данных
         boolean hasVertices = false;
         boolean hasPolygons = false;
 
@@ -40,26 +39,29 @@ public class ObjReader {
             final String token = wordsInLine.remove(0);
             ++lineInd;
 
-            switch (token) {
-                case OBJ_VERTEX_TOKEN -> {
-                    result.vertices.add(parseVertex(wordsInLine, lineInd));
-                    hasVertices = true; // Устанавливаем флаг наличия вершин
+            if (!isRecognizedToken(token)) {
+                continue; // Игнорируем строки с непредусмотренными токенами
+            }
+
+            try {
+                switch (token) {
+                    case OBJ_VERTEX_TOKEN -> {
+                        result.vertices.add(parseVertex(wordsInLine, lineInd));
+                        hasVertices = true;
+                    }
+                    case OBJ_TEXTURE_TOKEN -> result.textureVertices.add(parseTextureVertex(wordsInLine, lineInd));
+                    case OBJ_NORMAL_TOKEN -> result.normals.add(parseNormal(wordsInLine, lineInd));
+                    case OBJ_FACE_TOKEN -> {
+                        result.polygons.add(parseFace(wordsInLine, result.vertices.size(),
+                                result.textureVertices.size(), result.normals.size(), lineInd));
+                        hasPolygons = true;
+                    }
                 }
-                case OBJ_TEXTURE_TOKEN -> result.textureVertices.add(parseTextureVertex(wordsInLine, lineInd));
-                case OBJ_NORMAL_TOKEN -> result.normals.add(parseNormal(wordsInLine, lineInd));
-                case OBJ_FACE_TOKEN -> {
-                    result.polygons.add(parseFace(wordsInLine, result.vertices.size(),
-                            result.textureVertices.size(), result.normals.size(), lineInd));
-                    hasPolygons = true; // Устанавливаем флаг наличия полигонов
-                }
-                default -> {
-                    // Добавлено: логирование предупреждений для неизвестных токенов
-                    System.err.println("Warning: Unrecognized token at line " + lineInd + ": " + token);
-                }
+            } catch (ObjReaderException | NumberFormatException e) {
+                System.err.println("Error at line " + lineInd + ": " + e.getMessage());
             }
         }
 
-        // Добавлено: проверка наличия обязательных данных (вершин и полигонов)
         if (!hasVertices) {
             throw new ObjReaderException("The OBJ file contains no vertices.", lineInd);
         }
@@ -69,6 +71,11 @@ public class ObjReader {
         }
 
         return result;
+    }
+
+    private static boolean isRecognizedToken(String token) {
+        return token.equals(OBJ_VERTEX_TOKEN) || token.equals(OBJ_TEXTURE_TOKEN)
+                || token.equals(OBJ_NORMAL_TOKEN) || token.equals(OBJ_FACE_TOKEN);
     }
 
     protected static Vector3f parseVertex(final ArrayList<String> wordsInLineWithoutToken, int lineInd) {
@@ -115,7 +122,6 @@ public class ObjReader {
         }
     }
 
-    // Добавлено: проверка индексов и обработка отсутствующих текстур и нормалей
     protected static Polygon parseFace(final ArrayList<String> wordsInLineWithoutToken,
                                        int vertexCount, int textureCount, int normalCount, int lineInd) {
         ArrayList<Integer> onePolygonVertexIndices = new ArrayList<>();
@@ -126,21 +132,18 @@ public class ObjReader {
             parseFaceWord(s, onePolygonVertexIndices, onePolygonTextureVertexIndices, onePolygonNormalIndices, lineInd);
         }
 
-        // Проверка индексов вершин
         for (int index : onePolygonVertexIndices) {
             if (index < 0 || index >= vertexCount) {
                 throw new ObjReaderException("Vertex index out of bounds at line ", lineInd);
             }
         }
 
-        // Проверка индексов текстур
         for (int index : onePolygonTextureVertexIndices) {
             if (index != -1 && (index < 0 || index >= textureCount)) {
                 throw new ObjReaderException("Texture vertex index out of bounds at line ", lineInd);
             }
         }
 
-        // Проверка индексов нормалей
         for (int index : onePolygonNormalIndices) {
             if (index != -1 && (index < 0 || index >= normalCount)) {
                 throw new ObjReaderException("Normal index out of bounds at line ", lineInd);
@@ -162,7 +165,6 @@ public class ObjReader {
         try {
             onePolygonVertexIndices.add(Integer.parseInt(wordIndices[0]) - 1);
 
-            // Добавлено: обработка отсутствующих текстур и нормалей
             if (wordIndices.length > 1 && !wordIndices[1].isEmpty()) {
                 onePolygonTextureVertexIndices.add(Integer.parseInt(wordIndices[1]) - 1);
             } else {
@@ -179,4 +181,3 @@ public class ObjReader {
         }
     }
 }
-
