@@ -55,46 +55,50 @@ public class Camera {
         this.aspectRatio = aspectRatio;
     }
 
-    public void moveForward(float distance) {
-        Vector3f direction = calculateDirection();
+    /**
+     * Методы для свободного перемещения камеры
+     */
+
+    public void moveForwardWithoutTrigger(float distance) {
+        Vector3f direction = calculateDirectionWithoutTrigger();
         direction.scale(-distance);
         position.add(direction);
         target.add(direction);
     }
 
-    public void moveBackward(float distance) {
-        moveForward(-distance);
+    public void moveBackwardWithoutTrigger(float distance) {
+        moveForwardWithoutTrigger(-distance);
     }
 
-    public void moveRight(float distance) {
-        Vector3f direction = calculateRightVector();
+    public void moveRightWithoutTrigger(float distance) {
+        Vector3f direction = calculateRightVectorWithoutTrigger();
         direction.scale(-distance);
         position.add(direction);
         target.add(direction);
     }
 
-    public void moveLeft(float distance) {
-        moveRight(-distance);
+    public void moveLeftWithoutTrigger(float distance) {
+        moveRightWithoutTrigger(-distance);
     }
 
-    public void moveUp(float distance) {
+    public void moveUpWithoutTrigger(float distance) {
         Vector3f up = new Vector3f(0, 1, 0);
         up.scale(distance);
         position.add(up);
         target.add(up);
     }
 
-    public void moveDown(float distance) {
-        moveUp(-distance);
+    public void moveDownWithoutTrigger(float distance) {
+        moveUpWithoutTrigger(-distance);
     }
 
-    public void rotate(float yaw, float pitch) {
+    public void rotateWithoutTrigger(float yaw, float pitch) {
         rotation.x += yaw;
         rotation.y += pitch;
 
         rotation.y = Math.max(-90.0f, Math.min(90.0f, rotation.y));
 
-        Vector3f direction = calculateDirection();
+        Vector3f direction = calculateDirectionWithoutTrigger();
         target.set(
                 position.x + direction.x,
                 position.y + direction.y,
@@ -102,8 +106,7 @@ public class Camera {
         );
     }
 
-
-    private Vector3f calculateDirection() {
+    private Vector3f calculateDirectionWithoutTrigger() {
         float cosPitch = (float) Math.cos(Math.toRadians(rotation.y));
         float sinPitch = (float) Math.sin(Math.toRadians(rotation.y));
         float cosYaw = (float) Math.cos(Math.toRadians(rotation.x));
@@ -117,11 +120,97 @@ public class Camera {
         return res;
     }
 
-    private Vector3f calculateRightVector() {
-        Vector3f direction = calculateDirection();
+    private Vector3f calculateRightVectorWithoutTrigger() {
+        Vector3f direction = calculateDirectionWithoutTrigger();
         Vector3f res = new Vector3f(direction.z, 0, -direction.x);
         res.normalize();
         return res;
+    }
+
+
+
+    /**
+     * Методы для перемещения камеры относительно триггера
+     */
+
+    public void moveForwardAroundTrigger(float distance) {
+        Vector3f direction = calculateDirectionAroundTrigger();
+        direction.scale(distance);
+        position.add(direction);
+        updateTargetAroundTrigger();
+    }
+
+    public void moveBackwardAroundTrigger(float distance) {
+        moveForwardAroundTrigger(-distance);
+    }
+
+    public void moveRightAroundTrigger(float distance) {
+        Vector3f right = calculateRightVectorAroundTrigger();
+        right.scale(distance);
+        position.add(right);
+        updateTargetAroundTrigger();
+    }
+
+    public void moveLeftAroundTrigger(float distance) {
+        moveRightAroundTrigger(-distance);
+    }
+
+    public void moveUpAroundTrigger(float distance) {
+        Vector3f up = new Vector3f(0, 1, 0);
+        up.scale(distance);
+        position.add(up);
+        updateTargetAroundTrigger();
+    }
+
+    public void moveDownAroundTrigger(float distance) {
+        moveUpAroundTrigger(-distance);
+    }
+
+    public void rotateAroundTrigger(float yaw, float pitch) {
+        rotation.x += yaw;
+        rotation.y += pitch;
+
+        rotation.y = Math.max(-90.0f, Math.min(90.0f, rotation.y));
+
+        Vector3f direction = calculateDirectionAroundTrigger();
+        position.set(
+                target.x - direction.x,
+                target.y - direction.y,
+                target.z - direction.z
+        );
+    }
+
+    private Vector3f calculateDirectionAroundTrigger() {
+        float cosPitch = (float) Math.cos(Math.toRadians(rotation.y));
+        float sinPitch = (float) Math.sin(Math.toRadians(rotation.y));
+        float cosYaw = (float) Math.cos(Math.toRadians(rotation.x));
+        float sinYaw = (float) Math.sin(Math.toRadians(rotation.x));
+
+        Vector3f direction = new Vector3f(
+                cosYaw * cosPitch,
+                sinPitch,
+                sinYaw * cosPitch
+        );
+        direction.normalize();
+        return direction;
+    }
+
+    private Vector3f calculateRightVectorAroundTrigger() {
+        Vector3f direction = calculateDirectionAroundTrigger();
+        Vector3f up = new Vector3f(0, 1, 0);
+        Vector3f right = new Vector3f();
+        right.cross(direction, up);
+        right.normalize();
+        return right;
+    }
+
+    private void updateTargetAroundTrigger() {
+        Vector3f direction = calculateDirectionAroundTrigger();
+        target.set(
+                position.x + direction.x,
+                position.y + direction.y,
+                position.z + direction.z
+        );
     }
 
 }

@@ -9,7 +9,8 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.gui.CameraController">
+<?import javafx.scene.control.CheckBox?>
+<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.gui.GUIController">
     <MenuBar>
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
@@ -85,6 +86,8 @@
     <VBox spacing="10" alignment="BOTTOM_LEFT" layoutX="10" layoutY="40">
         <Label fx:id="positionLabel" text="Camera Position: (0, 0, 0)" />
         <Label fx:id="rotationLabel" text="Camera Rotation: (0°, 0°)" />
+        <Label fx:id="targetLabel" text="Target Position: (0, 0, 0)" />
+        <Label fx:id="modelLabel" text="Model Position: (0, 0, 0), Model Scale: (0, 0, 0), Model Rotation: (0, 0, 0)" />
     </VBox>
 
 

@@ -22,7 +22,7 @@ public class Model implements Cloneable {
     public Model() {
         position = new Vector3f(0f, 0f, 0f);
         rotation = new Vector3f(0, 0, 0f);
-        scale = new Vector3f(1f, 1f, 1f);
+        scale = new Vector3f(1f, 2f, 1f);
     }
 
     public Matrix4x4 getModelMatrix() {
