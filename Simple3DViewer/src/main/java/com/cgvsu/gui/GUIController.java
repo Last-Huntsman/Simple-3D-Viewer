@@ -185,7 +185,7 @@ public class GUIController {
             modelController.addNameToNameSet(modelName);
             updateLabels();
 
-        } catch (IOException exception) {}
+        } catch (IOException ignored) {}
 
 
         timeline.getKeyFrames().add(frame);
