@@ -5,8 +5,9 @@ import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.math.vectors.Vector4f;
-import com.cgvsu.model.Polygon;
+import com.cgvsu.model.FinishedModel;
 import com.cgvsu.render_engine.RenderEngine;
+import com.cgvsu.render_engine.RenderModeFactory;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -15,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -46,8 +48,6 @@ public class GUIController {
     @FXML
     private Canvas canvas;
 
-    @FXML
-    private ImageView imageView;
 
     @FXML
     private Label positionLabel;
@@ -84,6 +84,7 @@ public class GUIController {
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         camera.moveForwardWithoutTrigger(TRANSLATION);
+        mesh.scale = new Vector3f(3, 3, 3);
         updateLabels();
     }
 
@@ -174,9 +175,14 @@ public class GUIController {
 
 
         Path fileName = Path.of("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
+
         try {
             String fileContent = Files.readString(fileName);
+            String modelName = getModelName(fileName);
             mesh = ObjReader.read(fileContent);
+            FinishedModel loadedModel = new FinishedModel(mesh, modelName, RenderModeFactory.grid());
+            modelController.addModel(loadedModel);
+            modelController.addNameToNameSet(modelName);
             updateLabels();
 
         } catch (IOException exception) {}
@@ -239,12 +245,13 @@ public class GUIController {
     @FXML
     private void saveModelFile() {
         ObjWriter objWriter = new ObjWriter();
+        setCurrentModel(0);
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialFileName(modelController.currentModel.getName());
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Save model");
 
-        File file = fileChooser.showSaveDialog((Stage) imageView.getScene().getWindow());
+        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
 
         if (file == null) {
             return;
@@ -253,7 +260,7 @@ public class GUIController {
         String filename = file.getAbsolutePath();
 
         try {
-            objWriter.write(modelController.currentModel.mesh, filename);
+            objWriter.write(modelController.currentModel.model, filename);
         } catch (Exception e) {
             showError("Error", "Error while writing file");
         }
@@ -266,7 +273,7 @@ public class GUIController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Save model");
 
-        File file = fileChooser.showSaveDialog((Stage) imageView.getScene().getWindow());
+        File file = fileChooser.showSaveDialog((Stage) canvas.getScene().getWindow());
 
         if (file == null) {
             return;
@@ -275,7 +282,7 @@ public class GUIController {
         String filename = file.getAbsolutePath();
 
         try {
-            objWriter.write(getTransformedModel(modelController.currentModel.mesh), filename);
+            objWriter.write(getTransformedModel(modelController.currentModel.model), filename);
         } catch (Exception e) {
             showError("Error", "Error while writing file");
         }
@@ -293,10 +300,27 @@ public class GUIController {
         return newModel;
     }
 
+    private String getModelName(Path fileName) {
+        String modelName = fileName.getFileName().toString();
+        if (modelController.getNamesSet().contains(modelName)) {
+            int counter = 0;
+            while (modelController.getNamesSet().contains(modelName)) {
+                modelName = modelName.substring(0, (modelName.length() - 4 - (counter > 0 ? String.valueOf(counter).length() : 0))) + (counter + 1) + ".obj";
+                counter++;
+            }
+        }
+        return modelName;
+    }
+
+    private void setCurrentModel(int index) {
+        modelController.setCurrent(index);
+    }
+
     private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
         alert.setContentText(content);
         alert.showAndWait();
     }
+
 }
