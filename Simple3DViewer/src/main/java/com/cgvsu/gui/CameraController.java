@@ -52,7 +52,7 @@ public class CameraController {
                 rotation.x, rotation.y));
     }
 
-    private final Camera camera = new Camera(new Vector2f(0.0f, 0.0f), new Vector3f(20, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
+    private final Camera camera = new Camera(new Vector2f(90, 0), new Vector3f(0, 0, 40), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
 
     private static final float TRANSLATION = 0.5F;
     private static final float ROTATION_ANGLE = 1.0F;

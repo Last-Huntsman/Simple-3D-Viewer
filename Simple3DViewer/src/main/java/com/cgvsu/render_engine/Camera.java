@@ -6,13 +6,13 @@ import com.cgvsu.math.vectors.Vector3f;
 
 public class Camera {
 
-    private Vector3f position;   // Позиция камеры
-    private Vector3f target;     // Точка, на которую направлена камера
-    private Vector2f rotation;   // Углы вращения (yaw, pitch)
-    private final float fov;     // Угол обзора
-    private float aspectRatio;   // Соотношение сторон экрана
-    private final float nearPlane; // Ближняя плоскость отсечения
-    private final float farPlane;  // Дальняя плоскость отсечения
+    private Vector3f position;
+    private Vector3f target;
+    private Vector2f rotation;
+    private final float fov;
+    private float aspectRatio;
+    private final float nearPlane;
+    private final float farPlane;
 
     public Camera(
             final Vector2f rotation,
@@ -57,7 +57,7 @@ public class Camera {
 
     public void moveForward(float distance) {
         Vector3f direction = calculateDirection();
-        direction.scale(distance);
+        direction.scale(-distance);
         position.add(direction);
         target.add(direction);
     }
@@ -68,7 +68,7 @@ public class Camera {
 
     public void moveRight(float distance) {
         Vector3f direction = calculateRightVector();
-        direction.scale(distance);
+        direction.scale(-distance);
         position.add(direction);
         target.add(direction);
     }
