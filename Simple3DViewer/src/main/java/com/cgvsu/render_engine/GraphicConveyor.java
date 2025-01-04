@@ -1,38 +1,67 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Pavel.math.aTransform.*;
-import com.cgvsu.Pavel.math.matrices.Matrix3x3;
-import com.cgvsu.Pavel.math.matrices.Matrix4x4;
-import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector3f;
 
-import com.cgvsu.model.Model;
 import javafx.geometry.Point2D;;
 
-/**
- * Утилитарный класс для выполнения различных графических преобразований и операций.
- */
 public class GraphicConveyor {
 
-    /**
-     * Создает матрицу вида ("смотри на") для камеры.
-     * По умолчанию вектор "вверх" равен (0, 1, 0).
-     *
-     * @param eye    Позиция камеры (точка наблюдения).
-     * @param target Точка, на которую смотрит камера.
-     * @return Матрица вида (4x4).
-     */
+    public static float cos(float angle){
+        return (float) Math.cos(angle);
+    }
+
+    public static float sin(float angle){
+        return (float) Math.sin(angle);
+    }
+
+    public static Matrix4x4 scale(float sx, float sy, float sz) {
+        return new Matrix4x4(new float[]{
+                sx, 0, 0, 0,
+                0, sy, 0, 0,
+                0, 0, sz, 0,
+                0, 0, 0,  1
+        });
+    }
+
+    public static Matrix4x4 rotate(float alpha, float beta, float gamma) {
+        Matrix4x4 rotateZ = new Matrix4x4(new float[]{
+                cos(alpha), sin(alpha), 0, 0,
+                -sin(alpha), cos(alpha), 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+        });
+        Matrix4x4 rotateY = new Matrix4x4(new float[]{
+                cos(beta), 0, sin(beta), 0,
+                0, 1, 0, 0,
+                -sin(beta), 0, cos(beta), 0,
+                0, 0, 0, 1
+        });
+        Matrix4x4 rotateX = new Matrix4x4(new float[]{
+                1, 0, 0, 0,
+                0, cos(gamma), sin(gamma), 0,
+                0, -sin(gamma), cos(gamma), 0,
+                0, 0, 0, 1
+        });
+
+        rotateZ.mul(rotateY);
+        rotateZ.mul(rotateX);
+        return rotateZ;
+    }
+
+    public static Matrix4x4 transform(float tx, float ty, float tz) {
+        return new Matrix4x4(new float[]{
+                1, 0, 0, tx,
+                0, 1, 0, ty,
+                0, 0, 1, tz,
+                0, 0, 0, 1
+        });
+    }
+
     public static Matrix4x4 lookAt(Vector3f eye, Vector3f target) {
         return lookAt(eye, target, new Vector3f(0F, 1.0F, 0F));
     }
 
-    /**
-     * Создает матрицу вида ("смотри на") для камеры с указанным направлением "вверх".
-     *
-     * @param eye    Позиция камеры (точка наблюдения).
-     * @param target Точка, на которую смотрит камера.
-     * @param up     Вектор, определяющий направление "вверх".
-     * @return Матрица вида (4x4).
-     */
     public static Matrix4x4 lookAt(Vector3f eye, Vector3f target, Vector3f up) {
         Vector3f resultX = new Vector3f();
         Vector3f resultY = new Vector3f();
@@ -63,15 +92,6 @@ public class GraphicConveyor {
         return result;
     }
 
-    /**
-     * Создает перспективную проекционную матрицу.
-     *
-     * @param fov         Угол обзора (в радианах).
-     * @param aspectRatio Соотношение сторон экрана.
-     * @param nearPlane   Ближняя плоскость отсечения.
-     * @param farPlane    Дальняя плоскость отсечения.
-     * @return Матрица перспективной проекции (4x4).
-     */
     public static Matrix4x4 perspective(final float fov, final float aspectRatio, final float nearPlane, final float farPlane) {
         Matrix4x4 result = new Matrix4x4();
 
@@ -85,13 +105,6 @@ public class GraphicConveyor {
         return result;
     }
 
-    /**
-     * Умножает матрицу 4x4 на вектор-столбец 3D, возвращая преобразованный вектор.
-     *
-     * @param matrix Матрица 4x4.
-     * @param vertex Вектор 3D (координаты вершины).
-     * @return Преобразованный вектор 3D.
-     */
     public static Vector3f multiplyMatrix4ByVector3(final Matrix4x4 matrix, final Vector3f vertex) {
         final float x = (vertex.x * matrix.elements[0]) + (vertex.y * matrix.elements[1]) + (vertex.z * matrix.elements[2]) + matrix.elements[3];
         final float y = (vertex.x * matrix.elements[4]) + (vertex.y * matrix.elements[5]) + (vertex.z * matrix.elements[6]) + matrix.elements[7];
@@ -100,12 +113,6 @@ public class GraphicConveyor {
         return new Vector3f(x / w, y / w, z / w);
     }
 
-    /**
-     * Возвращает точку на основе вектора
-     *
-     * @param vertex Координаты вершины.
-     * @return Экранные координаты точки.
-     */
     public static Point2D vertexToPoint(final Vector3f vertex) {
         return new Point2D(vertex.x, vertex.y);
     }

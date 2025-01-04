@@ -1,7 +1,7 @@
 package com.cgvsu.Ilya;
 
 
-import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;
 import org.junit.jupiter.api.Test;

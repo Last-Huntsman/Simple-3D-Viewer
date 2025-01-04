@@ -1,8 +1,8 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Pavel.math.matrices.Matrix4x4;
-import com.cgvsu.Pavel.math.vectors.Vector2f;
-import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector2f;
+import com.cgvsu.math.vectors.Vector3f;
 
 public class Camera {
 
@@ -35,12 +35,12 @@ public class Camera {
         return position;
     }
 
-    public Vector2f getRotation() {
-        return rotation;
-    }
-
     public Vector3f getTarget() {
         return target;
+    }
+
+    public Vector2f getRotation() {
+        return rotation;
     }
 
     public Matrix4x4 getViewMatrix() {

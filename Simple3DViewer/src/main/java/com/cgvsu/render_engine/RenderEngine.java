@@ -2,15 +2,11 @@ package com.cgvsu.render_engine;
 
 import com.cgvsu.Egor.FindNormals;
 import com.cgvsu.Egor.Triangulation;
-import com.cgvsu.Pavel.math.aTransform.AffineConverter;
-import com.cgvsu.Pavel.math.aTransform.Translate;
-import com.cgvsu.Pavel.math.matrices.Matrix4x4;
-import com.cgvsu.Pavel.math.vectors.Vector3f;
-import com.cgvsu.Pavel.math.aTransform.MegaTransform;
+import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 import javafx.scene.canvas.GraphicsContext;
 
-import javax.vecmath.Point2f;
 import java.util.ArrayList;
 
 import static com.cgvsu.render_engine.GraphicConveyor.*;
@@ -19,6 +15,11 @@ import static com.cgvsu.render_engine.GraphicConveyor.*;
  * Класс для рендеринга 3D-моделей на 2D-канвас с использованием матриц преобразований.
  */
 public class RenderEngine {
+
+    private Model mesh;
+
+    public RenderEngine() { }
+
 
     /**
      * Метод для отрисовки 3D-модели на 2D-канвасе.
@@ -29,7 +30,7 @@ public class RenderEngine {
      * @param width           Ширина канваса.
      * @param height          Высота канваса.
      */
-    public static void render(
+    public void render(
             final GraphicsContext graphicsContext,
             final Camera camera,
             final Model mesh,
@@ -37,18 +38,13 @@ public class RenderEngine {
             final int height) {
 
         // Создание модельной матрицы.
-        MegaTransform mt = new MegaTransform();
-        AffineConverter ac = new AffineConverter();
-
-        ac.setModelTransform(mt);
-        ac.apply(mesh);
-
-        Matrix4x4 modelMatrix = mt.vertexTransform();
-
+        Matrix4x4 modelMatrix = mesh.getModelMatrix();
         // Получение матрицы вида из объекта камеры.
         Matrix4x4 viewMatrix = camera.getViewMatrix();
         // Получение матрицы проекции из объекта камеры.
         Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
+
+        this.mesh = mesh;
 
         // Объединение (умножение) матриц модельной, видовой и проекционной.
         Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(modelMatrix.elements);

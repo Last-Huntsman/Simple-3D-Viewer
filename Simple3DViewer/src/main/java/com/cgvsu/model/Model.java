@@ -1,12 +1,9 @@
 package com.cgvsu.model;
 
-import com.cgvsu.Pavel.math.aTransform.ConstantTransform;
-import com.cgvsu.Pavel.math.aTransform.IAffine;
-import com.cgvsu.Pavel.math.matrices.Matrix4x4;
-import com.cgvsu.Pavel.math.vectors.Vector2f;
-import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector2f;
+import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.render_engine.GraphicConveyor;
-import com.cgvsu.Pavel.math.aTransform.Scale;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -18,7 +15,36 @@ public class Model implements Cloneable {
     public ArrayList<Vector3f> normals = new ArrayList<>();
     public ArrayList<Polygon> polygons = new ArrayList<>();
 
-    // Метод клонирования вершин
+    public Vector3f position;
+    public Vector3f rotation;
+    public Vector3f scale;
+
+    public Model() {
+        position = new Vector3f(0f, 0f, 0f);
+        rotation = new Vector3f(0, 0, 0f);
+        scale = new Vector3f(1f, 1f, 1f);
+    }
+
+    public Matrix4x4 getModelMatrix() {
+        Matrix4x4 res;
+        res = getScaleMatrix();
+        res.mul(getRotateMatrix());
+        res.mul(getTransformMatrix());
+        return res;
+    }
+
+    private Matrix4x4 getScaleMatrix() {
+        return GraphicConveyor.scale(scale.x, scale.y, scale.z);
+    }
+
+    private Matrix4x4 getRotateMatrix() {
+        return GraphicConveyor.rotate(rotation.z, rotation.y, rotation.x);
+    }
+
+    private Matrix4x4 getTransformMatrix() {
+        return GraphicConveyor.transform(position.x, position.y, position.z);
+    }
+
     public ArrayList<Vector3f> cloneVertices() {
         ArrayList<Vector3f> clonedVertices = new ArrayList<>();
         for (Vector3f vertex : this.vertices) {
@@ -27,7 +53,6 @@ public class Model implements Cloneable {
         return clonedVertices;
     }
 
-    // Метод клонирования текстурных вершин
     public ArrayList<Vector2f> cloneTextureVertices() {
         ArrayList<Vector2f> clonedTextureVertices = new ArrayList<>();
         for (Vector2f textureVertex : this.textureVertices) {
@@ -36,7 +61,6 @@ public class Model implements Cloneable {
         return clonedTextureVertices;
     }
 
-    // Метод клонирования нормалей
     public ArrayList<Vector3f> cloneNormals() {
         ArrayList<Vector3f> clonedNormals = new ArrayList<>();
         for (Vector3f normal : this.normals) {
@@ -45,7 +69,6 @@ public class Model implements Cloneable {
         return clonedNormals;
     }
 
-    // Метод клонирования полигонов
     public ArrayList<Polygon> clonePolygons() {
         ArrayList<Polygon> clonedPolygons = new ArrayList<>();
         for (Polygon polygon : this.polygons) {
@@ -54,7 +77,6 @@ public class Model implements Cloneable {
         return clonedPolygons;
     }
 
-    // Метод clone
     @Override
     public Model clone() {
         Model clonedModel = new Model();
@@ -64,6 +86,7 @@ public class Model implements Cloneable {
         clonedModel.polygons = this.clonePolygons();
         return clonedModel;
     }
+
     public void exportToOBJ() {
         // Устанавливаем локаль для использования точки как разделителя дробной части
         Locale.setDefault(Locale.US);

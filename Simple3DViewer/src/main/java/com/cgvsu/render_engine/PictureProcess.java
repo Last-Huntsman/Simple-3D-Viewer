@@ -2,7 +2,7 @@ package com.cgvsu.render_engine;
 
 import com.cgvsu.Egor.triangle_rasterisation.color.MonotoneTexture;
 import com.cgvsu.Egor.triangle_rasterisation.rasterisers.TriangleRasterisator;
-import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.math.vectors.Vector3f;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;

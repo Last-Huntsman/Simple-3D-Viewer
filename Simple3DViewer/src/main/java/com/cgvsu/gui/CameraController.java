@@ -1,7 +1,9 @@
 package com.cgvsu.gui;
 
-import com.cgvsu.Pavel.math.vectors.Vector2f;
-import com.cgvsu.Pavel.math.vectors.Vector3f;
+import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector2f;
+import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.math.vectors.Vector4f;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
@@ -18,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.Ilya.ObjReader;
@@ -48,8 +51,6 @@ public class CameraController {
         rotationLabel.setText(String.format("Camera Rotation: (%.2f°, %.2f°)",
                 rotation.x, rotation.y));
     }
-
-
 
     private final Camera camera = new Camera(new Vector2f(0.0f, 0.0f), new Vector3f(20, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
 
@@ -120,6 +121,8 @@ public class CameraController {
 
     @FXML
     private void initialize() {
+
+
         // Устанавливаем размеры холста в зависимости от размеров панели
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
@@ -127,6 +130,9 @@ public class CameraController {
         // Инициализация таймлайна для регулярного обновления сцены
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);  // Таймлайн будет работать бесконечно
+
+        RenderEngine renderEngine = new RenderEngine();
+
 
         // Создаём новый ключевой кадр, который обновляет сцену каждые 15 миллисекунд
         KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
@@ -141,9 +147,11 @@ public class CameraController {
 
             // Если модель загружена, рендерим её
             if (mesh != null) {
-                RenderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
             }
         });
+
+
 
         // Добавляем ключевой кадр в таймлайн и начинаем анимацию
         timeline.getKeyFrames().add(frame);
@@ -194,8 +202,22 @@ public class CameraController {
             // Чтение содержимого файла и загрузка модели
             String fileContent = Files.readString(fileName);
             mesh = ObjReader.read(fileContent);  // Загружаем модель из содержимого файла
+            updateLabels();
+
         } catch (IOException exception) {
             // Обработка ошибок при чтении файла (например, если файл повреждён)
         }
+    }
+
+    private Model getTransformedModel(Model model) {
+        Model newModel = new Model();
+        newModel.vertices = new ArrayList<>();
+        Matrix4x4 modelMatrix = model.getModelMatrix();
+        for (Vector3f vertex : model.vertices){
+            Vector4f vertex4 = new Vector4f(vertex.x, vertex.y, vertex.z, 1f);
+            vertex4 = modelMatrix.mulV(vertex4);
+            newModel.vertices.add(new Vector3f(vertex4.x, vertex4.y, vertex.z));
+        }
+        return newModel;
     }
 }
