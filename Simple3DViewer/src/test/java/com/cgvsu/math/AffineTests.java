@@ -3,7 +3,7 @@ package com.cgvsu.math;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.math.vectors.Vector4f;
-import com.cgvsu.Ilya.ObjReader;
+import com.cgvsu.io.objReader.ObjReader;
 import com.cgvsu.model.Model;
 import com.cgvsu.render_engine.GraphicConveyor;
 import org.junit.jupiter.api.Assertions;

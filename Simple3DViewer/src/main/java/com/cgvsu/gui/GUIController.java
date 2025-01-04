@@ -1,9 +1,11 @@
 package com.cgvsu.gui;
 
+import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.math.vectors.Vector4f;
+import com.cgvsu.model.Polygon;
 import com.cgvsu.render_engine.RenderEngine;
 import javafx.fxml.FXML;
 import javafx.animation.Animation;
@@ -11,8 +13,9 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
@@ -24,15 +27,18 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.cgvsu.model.Model;
-import com.cgvsu.Ilya.ObjReader;
+import com.cgvsu.io.objReader.ObjReader;
 import com.cgvsu.render_engine.Camera;
 
 public class GUIController {
 
-    private final Camera camera = new Camera(new Vector2f(0, 0), new Vector3f(100, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
+    private final Camera camera = new Camera(new Vector2f(0, 0), new Vector3f(40, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
+    private final ModelsController modelController = new ModelsController();
 
     private static final float TRANSLATION = 0.5F;
     private static final float ROTATION_ANGLE = 1.0F;
+
+    private Model mesh;
 
     @FXML
     private AnchorPane anchorPane;
@@ -40,7 +46,8 @@ public class GUIController {
     @FXML
     private Canvas canvas;
 
-    private Model mesh;
+    @FXML
+    private ImageView imageView;
 
     @FXML
     private Label positionLabel;
@@ -114,7 +121,6 @@ public class GUIController {
     public void handleCameraRotateLeft(ActionEvent actionEvent) {
         camera.rotateWithoutTrigger(-ROTATION_ANGLE, 0);
         updateLabels();
-        System.out.println("1234567");
     }
 
     @FXML
@@ -137,7 +143,6 @@ public class GUIController {
 
     @FXML
     private void initialize() {
-
 
         // Устанавливаем размеры холста в зависимости от размеров панели
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
@@ -168,14 +173,21 @@ public class GUIController {
         });
 
 
+        Path fileName = Path.of("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
+        try {
+            String fileContent = Files.readString(fileName);
+            mesh = ObjReader.read(fileContent);
+            updateLabels();
 
-        // Добавляем ключевой кадр в таймлайн и начинаем анимацию
+        } catch (IOException exception) {}
+
+
         timeline.getKeyFrames().add(frame);
         timeline.play();
     }
 
     @FXML
-    private void onOpenTextureIntemClick() {
+    private void onOpenTextureItemClick() {
         // Создаем диалоговое окно для выбора файла с фильтром для *.obj
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG (*.png)", "*.png"));
@@ -198,7 +210,6 @@ public class GUIController {
         }
     }
 
-    // Метод для открытия файла модели (.obj)
     @FXML
     private void onOpenModelMenuItemClick() {
         // Создаем диалоговое окно для выбора файла с фильтром для *.obj
@@ -225,6 +236,51 @@ public class GUIController {
         }
     }
 
+    @FXML
+    private void saveModelFile() {
+        ObjWriter objWriter = new ObjWriter();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName(modelController.currentModel.getName());
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
+        fileChooser.setTitle("Save model");
+
+        File file = fileChooser.showSaveDialog((Stage) imageView.getScene().getWindow());
+
+        if (file == null) {
+            return;
+        }
+
+        String filename = file.getAbsolutePath();
+
+        try {
+            objWriter.write(modelController.currentModel.mesh, filename);
+        } catch (Exception e) {
+            showError("Error", "Error while writing file");
+        }
+    }
+
+    @FXML
+    private void saveModifiedModelFile() {
+        ObjWriter objWriter = new ObjWriter();
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
+        fileChooser.setTitle("Save model");
+
+        File file = fileChooser.showSaveDialog((Stage) imageView.getScene().getWindow());
+
+        if (file == null) {
+            return;
+        }
+
+        String filename = file.getAbsolutePath();
+
+        try {
+            objWriter.write(getTransformedModel(modelController.currentModel.mesh), filename);
+        } catch (Exception e) {
+            showError("Error", "Error while writing file");
+        }
+    }
+
     private Model getTransformedModel(Model model) {
         Model newModel = new Model();
         newModel.vertices = new ArrayList<>();
@@ -235,5 +291,12 @@ public class GUIController {
             newModel.vertices.add(new Vector3f(vertex4.x, vertex4.y, vertex.z));
         }
         return newModel;
+    }
+
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

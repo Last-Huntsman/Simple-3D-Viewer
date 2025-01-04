@@ -1,4 +1,4 @@
-package com.cgvsu.Ilya;
+package com.cgvsu.io.objReader;
 
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;

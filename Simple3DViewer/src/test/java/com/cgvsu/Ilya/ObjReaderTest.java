@@ -1,6 +1,8 @@
 package com.cgvsu.Ilya;
 
 
+import com.cgvsu.io.objReader.ObjReader;
+import com.cgvsu.io.objReader.ObjReaderException;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;

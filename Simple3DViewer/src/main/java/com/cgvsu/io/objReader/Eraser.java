@@ -1,4 +1,4 @@
-package com.cgvsu.Ilya;
+package com.cgvsu.io.objReader;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;

@@ -1,4 +1,4 @@
-package com.cgvsu.Ilya;
+package com.cgvsu.io.objReader;
 
 public class ObjReaderException extends RuntimeException {
     public ObjReaderException(String errorMessage, int lineInd) {
