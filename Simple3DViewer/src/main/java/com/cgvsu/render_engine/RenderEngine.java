@@ -1,5 +1,8 @@
 package com.cgvsu.render_engine;
 
+import com.cgvsu.Utils.FindNormals;
+import com.cgvsu.Utils.PictureProcess;
+import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
@@ -51,7 +54,7 @@ public class RenderEngine {
         modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу проекции.
 
         mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
-        FindNormals.findNormals(mesh);
+        mesh.normals = FindNormals.findNormals(mesh);
 
 
         double[][] zBuffer = new double[width][height];
