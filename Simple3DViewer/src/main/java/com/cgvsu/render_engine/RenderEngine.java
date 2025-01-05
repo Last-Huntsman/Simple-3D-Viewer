@@ -1,7 +1,5 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Egor.FindNormals;
-import com.cgvsu.Egor.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
@@ -52,7 +50,7 @@ public class RenderEngine {
         modelViewProjectionMatrix.mul(projectionMatrix); // Умножение на матрицу вида.
         modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу проекции.
 
-        Triangulation.triangulateModel(mesh.polygons);
+        mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
         FindNormals.findNormals(mesh);
 
 

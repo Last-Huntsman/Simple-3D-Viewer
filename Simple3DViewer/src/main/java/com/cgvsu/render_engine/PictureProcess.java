@@ -1,7 +1,7 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Egor.triangle_rasterisation.color.MonotoneTexture;
-import com.cgvsu.Egor.triangle_rasterisation.rasterisers.TriangleRasterisator;
+import com.cgvsu.triangle_rasterisation.color.MonotoneTexture;
+import com.cgvsu.triangle_rasterisation.rasterisers.TriangleRasterisator;
 import com.cgvsu.math.vectors.Vector3f;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -95,6 +95,7 @@ public class PictureProcess {
                 // Обновление z-буфера и рисование точки, если она ближе
                 if (currentZ > zBuffer[x1][y1]) {
                     zBuffer[x1][y1] = currentZ;
+                    graphicsContext.setStroke(Color.RED);
                     graphicsContext.strokeRect(x1, y1, 1, 1);
                 }
             }
