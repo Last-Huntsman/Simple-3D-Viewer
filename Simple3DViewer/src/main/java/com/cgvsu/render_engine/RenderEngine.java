@@ -1,16 +1,21 @@
 package com.cgvsu.render_engine;
 
 import com.cgvsu.Utils.FindNormals;
+import com.cgvsu.Utils.Overlay_texture;
 import com.cgvsu.Utils.PictureProcess;
 import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static com.cgvsu.render_engine.GraphicConveyor.*;
+import static com.cgvsu.render_engine.GraphicConveyor.multiplyMatrix4ByVector3;
+import static com.cgvsu.render_engine.GraphicConveyor.vertexToBord;
 
 /**
  * Класс для рендеринга 3D-моделей на 2D-канвас с использованием матриц преобразований.
@@ -18,8 +23,6 @@ import static com.cgvsu.render_engine.GraphicConveyor.*;
 public class RenderEngine {
 
     private Model mesh;
-
-    public RenderEngine() { }
 
 
     /**
@@ -36,7 +39,7 @@ public class RenderEngine {
             final Camera camera,
             final Model mesh,
             final int width,
-            final int height) {
+            final int height, Image texture) {
 
         // Создание модельной матрицы.
         Matrix4x4 modelMatrix = mesh.getModelMatrix();
@@ -84,15 +87,32 @@ public class RenderEngine {
                 // Преобразование вершины в формат Vector3f (можно опустить, если структура совпадает).
                 Vector3f vertexVecmath = new Vector3f(vertex.x, vertex.y, vertex.z);
                 // Добавление преобразованной вершины в список.
-                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath),width, height));
+                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath), width, height));
             }
+
+            if (nVerticesInPolygon == 3 ) { /// Нужно будет оптимизировать перевод координат в точку
+                PictureProcess.showTriangle(graphicsContext, resultVectors, zBuffer);
+                if(texture !=null &&  mesh.polygons.get(polygonInd).getTextureVertexIndices().size()==3  && true ){
+                    Overlay_texture.overlay_texture(
+                            resultVectors,
+                            new ArrayList<>(List.of(
+                                    mesh.textureVertices.get(mesh.polygons.get(polygonInd).getTextureVertexIndices().get(0)),
+                                    mesh.textureVertices.get(mesh.polygons.get(polygonInd).getTextureVertexIndices().get(1)),
+                                    mesh.textureVertices.get(mesh.polygons.get(polygonInd).getTextureVertexIndices().get(2))
+                            )),
+                            texture,
+                            zBuffer,
+                            graphicsContext.getPixelWriter()
+                    );
+ }
+            }
+
             if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
-                PictureProcess.rasterizePolygon(graphicsContext, resultVectors,zBuffer );
+                PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
             }
-            if(nVerticesInPolygon == 3 && true){
-                PictureProcess.showTriangle(graphicsContext,resultVectors,zBuffer);
-            }
+
         }
+
     }
 
 }

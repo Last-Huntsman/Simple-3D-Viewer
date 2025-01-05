@@ -24,6 +24,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.image.Image;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class GUIController {
     private static final float ROTATION_ANGLE = 1.0F; // Угол поворота камеры
 
     private Model mesh; // Текущая загруженная модель
+    private Image texture;
 
     @FXML
     private AnchorPane anchorPane; // Контейнер для интерфейса
@@ -157,21 +159,7 @@ public class GUIController {
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE); // Бесконечный цикл таймлайна
 
-        RenderEngine renderEngine = new RenderEngine(); // Движок рендеринга
-
-        // Обновление кадра каждые 15 миллисекунд
-        KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
-            double width = canvas.getWidth();
-            double height = canvas.getHeight();
-
-            canvas.getGraphicsContext2D().clearRect(0, 0, width, height); // Очистка холста
-            camera.setAspectRatio((float) (height / width)); // Обновление соотношения сторон
-
-            // Рендеринг модели, если она загружена
-            if (mesh != null) {
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height);
-            }
-        });
+        KeyFrame frame = getKeyFrame();
 
         Path fileName = Path.of("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
 
@@ -190,27 +178,62 @@ public class GUIController {
         timeline.play(); // Запуск анимации
     }
 
+    private KeyFrame getKeyFrame() {
+        RenderEngine renderEngine = new RenderEngine(); // Движок рендеринга
+
+        // Обновление кадра каждые 15 миллисекунд
+        KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+            double width = canvas.getWidth();
+            double height = canvas.getHeight();
+
+            canvas.getGraphicsContext2D().clearRect(0, 0, width, height); // Очистка холста
+            camera.setAspectRatio((float) (height / width)); // Обновление соотношения сторон
+
+            // Рендеринг модели, если она загружена
+            if (mesh != null) {
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,texture);
+            }
+        });
+        return frame;
+    }
+
     // Обработчик открытия текстуры
     @FXML
     private void onOpenTextureItemClick() {
         FileChooser fileChooser = new FileChooser();
+
+        // Устанавливаем фильтр для файлов PNG
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PNG (*.png)", "*.png"));
+
+        // Устанавливаем заголовок окна
         fileChooser.setTitle("Load Texture");
+
+        // Устанавливаем корневую папку проекта в качестве начального каталога
+        File projectRoot = new File(System.getProperty("user.dir"));
+        if (projectRoot.exists()) {
+            fileChooser.setInitialDirectory(projectRoot);
+        }
+
 
         File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
         if (file == null) {
             return;
         }
 
-        Path fileName = Path.of(file.getAbsolutePath());
-
         try {
-            // Здесь можно добавить обработку текстуры
-            String fileContent = Files.readString(fileName);
-            mesh = ObjReader.read(fileContent);
-        } catch (IOException exception) {
+            // Загружаем PNG изображение
+            Image textureImage = new Image(file.toURI().toString());
+             texture = textureImage;
+
+            // Печать для проверки
+            System.out.println("Текстура загружена: " + file.getName());
+
+        } catch (Exception exception) {
+            // Обработка ошибок при загрузке изображения
+            System.out.println("Ошибка при загрузке текстуры: " + exception.getMessage());
         }
     }
+
     @FXML
     private void onOpenModelMenuItemClick() {
         // Открывает диалоговое окно для выбора модели в формате *.obj
@@ -218,8 +241,12 @@ public class GUIController {
         // Устанавливаем фильтр для отображения только файлов с расширением *.obj
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Load Model");
-
-        // Показываем диалоговое окно и получаем выбранный файл
+        // Устанавливаем корневую папку проекта в качестве начального каталога
+        File projectRoot = new File(System.getProperty("user.dir"));
+        if (projectRoot.exists()) {
+            fileChooser.setInitialDirectory(projectRoot);
+        }
+        //Показываем диалоговое окно и получаем выбранный файл
         File file = fileChooser.showOpenDialog((Stage) canvas.getScene().getWindow());
         if (file == null) {
             return;  // Если файл не выбран, выходим из метода

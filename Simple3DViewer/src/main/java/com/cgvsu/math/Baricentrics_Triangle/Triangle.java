@@ -31,6 +31,18 @@ public class Triangle {
         this.point3 = point3;
         this.texture = texture;
     }
+    public Triangle(Point2D point1, Point2D point2, Point2D point3) {
+
+        // Проверка на null-значения для вершин и текстуры.
+        Objects.requireNonNull(point1);
+        Objects.requireNonNull(point2);
+        Objects.requireNonNull(point3);
+
+
+        this.point1 = point1;
+        this.point2 = point2;
+        this.point3 = point3;
+    }
 
     // Получить текстуру, связанную с треугольником.
     public Texture getTexture() {

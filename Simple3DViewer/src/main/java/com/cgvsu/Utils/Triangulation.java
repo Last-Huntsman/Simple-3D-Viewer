@@ -35,31 +35,39 @@ public class Triangulation {
         }
 
         // Создаем треугольники, соединяя первую вершину с остальными парами соседних вершин
-        for (int i = 2; i < vertexNum - 1; i++) {
-            ArrayList<Integer> vertex = new ArrayList<>(); // Вершины текущего треугольника
-            vertex.add(poly.getVertexIndices().get(0)); // Первая вершина
-            vertex.add(poly.getVertexIndices().get(i - 1)); // Предыдущая вершина
-            vertex.add(poly.getVertexIndices().get(i)); // Текущая вершина
+        for (int i = 1; i < vertexNum - 1; i++) {
+            ArrayList<Integer> vertexIndices = new ArrayList<>();
+            ArrayList<Integer> textureVertexIndices = new ArrayList<>();
+            ArrayList<Integer> normalIndices = new ArrayList<>();
 
-            Polygon currPoly = new Polygon(); // Новый треугольник
-            currPoly.setVertexIndices(vertex); // Устанавливаем вершины
-            polygons.add(currPoly); // Добавляем треугольник в список
-        }
+            // Добавляем вершины треугольника
+            vertexIndices.add(poly.getVertexIndices().get(0)); // Первая вершина
+            vertexIndices.add(poly.getVertexIndices().get(i)); // Текущая вершина
+            vertexIndices.add(poly.getVertexIndices().get(i + 1)); // Следующая вершина
 
-        // Создаем последний треугольник, если вершин больше трех
-        if (vertexNum > 3) {
-            ArrayList<Integer> vertex = new ArrayList<>();
-            vertex.add(poly.getVertexIndices().get(0)); // Первая вершина
-            vertex.add(poly.getVertexIndices().get(vertexNum - 2)); // Предпоследняя вершина
-            vertex.add(poly.getVertexIndices().get(vertexNum - 1)); // Последняя вершина
+            // Добавляем текстурные вершины треугольника
+            textureVertexIndices.add(poly.getTextureVertexIndices().get(0)); // Первая текстурная вершина
+            textureVertexIndices.add(poly.getTextureVertexIndices().get(i)); // Текущая текстурная вершина
+            textureVertexIndices.add(poly.getTextureVertexIndices().get(i + 1)); // Следующая текстурная вершина
 
-            Polygon currPoly = new Polygon(); // Новый треугольник
-            currPoly.setVertexIndices(vertex); // Устанавливаем вершины
-            polygons.add(currPoly); // Добавляем треугольник в список
+            // Добавляем нормали треугольника
+            normalIndices.add(poly.getNormalIndices().get(0)); // Первая нормаль
+            normalIndices.add(poly.getNormalIndices().get(i)); // Текущая нормаль
+            normalIndices.add(poly.getNormalIndices().get(i + 1)); // Следующая нормаль
+
+            // Создаем новый треугольный полигон
+            Polygon currPoly = new Polygon();
+            currPoly.setVertexIndices(vertexIndices);
+            currPoly.setTextureVertexIndices(textureVertexIndices);
+            currPoly.setNormalIndices(normalIndices);
+
+            // Добавляем треугольный полигон в список
+            polygons.add(currPoly);
         }
 
         return polygons; // Возвращаем список треугольников
     }
+
 
     /**
      * Выполняет триангуляцию модели, представленной списком полигонов.
