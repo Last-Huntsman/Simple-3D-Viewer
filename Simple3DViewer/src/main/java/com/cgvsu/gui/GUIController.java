@@ -1,4 +1,3 @@
-// Импортируем необходимые классы для работы с графикой, файловой системой, анимацией, моделями и интерфейсом
 package com.cgvsu.gui;
 
 import com.cgvsu.io.objReader.ObjReader;
@@ -20,6 +19,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 public class GUIController {
 
     // Инициализация камеры со стартовыми параметрами: позиция, цель, углы, и параметры проекции
-    private final Camera camera = new Camera(new Vector2f(0, 0), new Vector3f(40, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
+    private final Camera camera = new Camera(new Vector2f(0, 0), new Vector3f(100, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
     private final ModelsController modelController = new ModelsController(); // Контроллер для управления моделями
 
     // Константы для перемещения и вращения камеры
@@ -90,7 +90,6 @@ public class GUIController {
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         camera.moveForwardWithoutTrigger(TRANSLATION); // Перемещаем камеру вперед
-        mesh.scale = new Vector3f(3, 3, 3); // Пример изменения масштаба модели
         updateLabels(); // Обновляем метки
     }
 
@@ -149,11 +148,61 @@ public class GUIController {
         updateLabels();
     }
 
+    private double lastMouseX = -1;
+    private double lastMouseY = -1;
+
+    private void handleMousePressed(MouseEvent event) {
+        lastMouseX = event.getX();
+        lastMouseY = event.getY();
+    }
+
+    private void handleMouseRotation(MouseEvent event) {
+        if (lastMouseX == -1 || lastMouseY == -1) {
+            // Если координаты не заданы, игнорируем
+            return;
+        }
+
+        // Текущие координаты мыши
+        double currentMouseX = event.getX();
+        double currentMouseY = event.getY();
+
+        // Вычисляем разницу
+        double deltaX = currentMouseX - lastMouseX;
+        double deltaY = currentMouseY - lastMouseY;
+
+        // Обновляем координаты для следующего шага
+        lastMouseX = currentMouseX;
+        lastMouseY = currentMouseY;
+
+        // Чувствительность мыши
+        final float MOUSE_SENSITIVITY = 0.05f;
+
+        // Перевод разницы в углы
+        float yaw = (float) (-deltaX * MOUSE_SENSITIVITY);
+        float pitch = (float) (-deltaY * MOUSE_SENSITIVITY); // Инвертируем ось Y
+
+        // Поворачиваем камеру
+        camera.rotateWithoutTrigger(yaw, pitch);
+
+        // Обновляем интерфейс (если нужно)
+        updateLabels();
+    }
+
+    private void handleMouseReleased(MouseEvent event) {
+        lastMouseX = -1;
+        lastMouseY = -1;
+    }
+
+
     @FXML
     private void initialize() {
         // Привязка размеров холста к размерам контейнера
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
+
+        canvas.setOnMousePressed(this::handleMousePressed);
+        canvas.setOnMouseDragged(this::handleMouseRotation);
+        canvas.setOnMouseReleased(this::handleMouseReleased);
 
         // Создание таймлайна для обновления сцены
         Timeline timeline = new Timeline();
