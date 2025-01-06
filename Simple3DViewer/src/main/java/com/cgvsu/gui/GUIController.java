@@ -20,6 +20,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -193,6 +194,19 @@ public class GUIController {
         lastMouseY = -1;
     }
 
+    private void handleMouseScroll(ScrollEvent event) {
+        // Чувствительность зума
+        final float ZOOM_SENSITIVITY = 0.1f;
+
+        // Движение камеры: прокрутка вверх (положительное значение) приближает, вниз — отдаляет
+        float zoomAmount = -(float)(event.getDeltaY()) * ZOOM_SENSITIVITY;
+
+        // Изменение положения камеры вдоль её направления
+        camera.zoom(zoomAmount);
+
+        // Обновление интерфейса (если нужно)
+        updateLabels();
+    }
 
     @FXML
     private void initialize() {
@@ -203,6 +217,8 @@ public class GUIController {
         canvas.setOnMousePressed(this::handleMousePressed);
         canvas.setOnMouseDragged(this::handleMouseRotation);
         canvas.setOnMouseReleased(this::handleMouseReleased);
+
+        canvas.setOnScroll(event -> handleMouseScroll(event));
 
         // Создание таймлайна для обновления сцены
         Timeline timeline = new Timeline();

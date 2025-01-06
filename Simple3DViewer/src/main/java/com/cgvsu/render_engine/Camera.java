@@ -109,6 +109,14 @@ public class Camera {
         );
     }
 
+    public void zoom(float amount) {
+        // Вычисляем новый вектор позиции камеры, добавляя/убавляя её направление
+        Vector3f direction = calculateDirectionWithoutTrigger(); // Нормализуем направление камеры
+        direction.scale( amount);
+        position.add(direction);
+        target.add(direction);// Изменяем позицию камеры
+    }
+
     private Vector3f calculateDirectionWithoutTrigger() {
         float cosPitch = (float) Math.cos(Math.toRadians(rotation.y));
         float sinPitch = (float) Math.sin(Math.toRadians(rotation.y));
