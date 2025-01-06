@@ -1,5 +1,8 @@
 package com.cgvsu.Utils;
 
+import com.cgvsu.math.Baricentrics_Triangle.Barycentric;
+import com.cgvsu.math.Baricentrics_Triangle.Triangle;
+import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import javafx.geometry.Point2D;
@@ -8,167 +11,247 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
-import static com.cgvsu.render_engine.GraphicConveyor.vertexToPoint;
-
+// Класс для растеризации треугольников с учетом глубины (z-буфера).
 public class OverlayTexture {
 
-    public static void draw(
-            List<Vector3f> vertices,                 // Вершины треугольника (x, y, z)
-            List<Vector2f> textureCoords,            // Текстурные координаты (u, v)
-            Image texture,                          // Изображение текстуры
-            double[][] zBuffer,                     // Z-буфер
-            PixelWriter pixelWriter                 // PixelWriter для записи пикселей
-    ) {
-        // Проверка корректности входных данных
-        if (vertices.size() != 3 || textureCoords.size() != 3) {
-            throw new IllegalArgumentException("Должно быть ровно 3 вершины и 3 текстурные координаты.");
-        }
+    // Интерфейс для записи пикселей на экран.
+    private PixelWriter pixelWriter;
 
-        // Сортируем вершины по Y и если необходимо, по X
-        vertices.sort((v1, v2) -> Double.compare(v1.getY(), v2.getY()));
+    public OverlayTexture(PixelWriter pixelWriter) {
+        this.pixelWriter = pixelWriter;
+    }
 
-        Vector3f v1 = vertices.get(0), v2 = vertices.get(1), v3 = vertices.get(2);
-        Point2D t1 = vertexToPoint(vertices.get(0)), t2 = vertexToPoint(vertices.get(1)), t3 = vertexToPoint(vertices.get(2));
 
-        // Пропускаем треугольники, лежащие на одной горизонтальной линии
-        if (v1.getY() == v2.getY() && v1.getY() == v3.getY()) return;
+    // Сеттер для изменения PixelWriter.
+    public void setPixelWriter(PixelWriter pixelWriter) {
+        this.pixelWriter = pixelWriter;
+    }
 
-        // Разделяем треугольник на верхний и нижний
-        if (v2.getY() == v3.getY()) {
-            drawFlatBottom(v1, v2, v3, t1, t2, t3, texture, zBuffer, pixelWriter);
-        } else if (v1.getY() == v2.getY()) {
-            drawFlatTop(v1, v2, v3, t1, t2, t3, texture, zBuffer, pixelWriter);
+    // Сортировка вершин треугольника по оси Y (если равны — по оси X).
+    private List<Point2D> sortedVertices(final Triangle t) {
+        final List<Point2D> vertices = new ArrayList<>();
+        vertices.add(t.getPoint1());
+        vertices.add(t.getPoint2());
+        vertices.add(t.getPoint3());
+
+        // Сортируем вершины: сначала по Y, затем по X.
+        vertices.sort(Comparator.comparing(Point2D::getY).thenComparing(Point2D::getX));
+        return vertices;
+    }
+
+    // Отрисовка "плоского" треугольника (верхняя или нижняя стороны параллельны оси X).
+    private void drawFlat(final Triangle t, final Point2D lone, final Point2D flat1, final Point2D flat2,
+                          final double zLone, final double zFlat1, final double zFlat2, final double[][] zBuffer) {
+        // Координаты "одинокой" вершины (которая отличается по Y).
+        final double lx = lone.getX();
+        final double ly = lone.getY();
+
+        // Разницы по X и Y для двух других вершин.
+        final double deltaFlatX1 = flat1.getX() - lx;
+        final double deltaFlatY1 = flat1.getY() - ly;
+        final double deltaZ1 = zFlat1 - zLone;
+
+        final double deltaFlatX2 = flat2.getX() - lx;
+        final double deltaFlatY2 = flat2.getY() - ly;
+        final double deltaZ2 = zFlat2 - zLone;
+
+        // Вычисляем угловые коэффициенты для X и Z.
+        double deltaX1 = deltaFlatX1 / deltaFlatY1;
+        double deltaX2 = deltaFlatX2 / deltaFlatY2;
+        double deltaZ1Normalized = deltaZ1 / deltaFlatY1;
+        double deltaZ2Normalized = deltaZ2 / deltaFlatY2;
+
+        final double flatY = flat1.getY(); // Y-координата "плоских" вершин.
+        if (Utils_for_trianglerasterisation.moreThan(ly, flatY)) {
+            // Это нижний треугольник.
+            drawBottom(t, lone, flatY, deltaX1, deltaX2, deltaZ1Normalized, deltaZ2Normalized, zLone, zBuffer);
         } else {
-            // Разбиваем треугольник на два плоских
-            Vector3f v4 = interpolateVertex(v1, v2, v3);
-            Point2D t4 = interpolateTexCoord(t1, t2, t3);
-
-            drawFlatBottom(v1, v2, v4, t1, t2, t4, texture, zBuffer, pixelWriter);
-            drawFlatTop(v2, v4, v3, t2, t4, t3, texture, zBuffer, pixelWriter);
+            // Это верхний треугольник.
+            drawTop(t, lone, flatY, deltaX1, deltaX2, deltaZ1Normalized, deltaZ2Normalized, zLone, zBuffer);
         }
     }
 
-    // Метод для растеризации нижнего плоского треугольника
-    private static void drawFlatBottom(Vector3f v1, Vector3f v2, Vector3f v3,
-                                       Point2D t1, Point2D t2, Point2D t3,
-                                       Image texture, double[][] zBuffer, PixelWriter pixelWriter) {
-        double invSlope1 = (v2.getX() - v1.getX()) / (v2.getY() - v1.getY());
-        double invSlope2 = (v3.getX() - v1.getX()) / (v3.getY() - v1.getY());
+    // Отрисовка верхнего плоского треугольника.
+    private void drawTop(final Triangle t, final Point2D v, final double maxY, final double dx1, final double dx2,
+                         final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
+        double x1 = v.getX(); // Начальная X-координата первой стороны.
+        double x2 = x1;       // Начальная X-координата второй стороны.
+        double z1 = zStart;   // Начальная глубина первой стороны.
+        double z2 = zStart;   // Начальная глубина второй стороны.
 
-        double xStart = v1.getX();
-        double xEnd = v1.getX();
+        // Проходим по строкам от начальной Y до верхней Y.
+        for (int y = (int) v.getY(); y <= maxY; y++) {
+            drawHLine(t, (int) x1, (int) x2, y, z1, z2, zBuffer);
 
-        for (int y = (int) Math.ceil(v1.getY()); y <= (int) Math.ceil(v2.getY()); y++) {
-            drawHLine((int) Math.ceil(xStart), (int) Math.ceil(xEnd), y, v1, v2, v3, t1, t2, t3, texture, zBuffer, pixelWriter);
-            xStart += invSlope1;
-            xEnd += invSlope2;
+            // Сдвигаем координаты и глубину для следующей строки.
+            x1 += dx1;
+            x2 += dx2;
+            z1 += dz1;
+            z2 += dz2;
         }
     }
 
-    // Метод для растеризации верхнего плоского треугольника
-    private static void drawFlatTop(Vector3f v1, Vector3f v2, Vector3f v3,
-                                    Point2D t1, Point2D t2, Point2D t3,
-                                    Image texture, double[][] zBuffer, PixelWriter pixelWriter) {
-        double invSlope1 = (v1.getX() - v3.getX()) / (v1.getY() - v3.getY());
-        double invSlope2 = (v2.getX() - v3.getX()) / (v2.getY() - v3.getY());
+    // Отрисовка нижнего плоского треугольника.
+    private void drawBottom(final Triangle t, final Point2D v, final double minY, final double dx1, final double dx2,
+                            final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
+        double x1 = v.getX(); // Начальная X-координата первой стороны.
+        double x2 = x1;       // Начальная X-координата второй стороны.
+        double z1 = zStart;   // Начальная глубина первой стороны.
+        double z2 = zStart;   // Начальная глубина второй стороны.
 
-        double xStart = v3.getX();
-        double xEnd = v3.getX();
+        // Проходим по строкам от начальной Y до нижней Y.
+        for (int y = (int) v.getY(); y > minY; y--) {
+            drawHLine(t, (int) x1, (int) x2, y, z1, z2, zBuffer);
 
-        for (int y = (int) Math.ceil(v3.getY()); y > (int) Math.ceil(v1.getY()); y--) {
-            drawHLine((int) Math.ceil(xStart), (int) Math.ceil(xEnd), y, v1, v2, v3, t1, t2, t3, texture, zBuffer, pixelWriter);
-            xStart -= invSlope1;
-            xEnd -= invSlope2;
+            // Сдвигаем координаты и глубину для следующей строки.
+            x1 -= dx1;
+            x2 -= dx2;
+            z1 -= dz1;
+            z2 -= dz2;
         }
     }
 
-    /// Метод для рисования горизонтальной линии
-    private static void drawHLine(int xStart, int xEnd, int y,
-                                  Vector3f v1, Vector3f v2, Vector3f v3,
-                                  Point2D t1, Point2D t2, Point2D t3,
-                                  Image texture, double[][] zBuffer, PixelWriter pixelWriter) {
-        for (int x = xStart; x <= xEnd; x++) {
-            // Вычисление барицентрических координат для текущего пикселя
-            Point2D bary = getBarycentricCoordinates(v1, v2, v3, x, y);
+    // Отрисовка одной горизонтальной линии между двумя X-координатами.
+    private void drawHLine(final Triangle t, final int x1, final int x2, final int y,
+                           final double z1, final double z2, final double[][] zBuffer) {
+        double currentZ = z1; // Начальная глубина.
+        double dz = (z2 - z1) / (x2 - x1); // Интерполяция глубины.
 
-            // Пропускаем пиксели, которые находятся вне треугольника
-            if (bary.getX() < 0 || bary.getY() < 0 || bary.getX() + bary.getY() > 1) continue;
-
-            // Интерполяция текстурных координат
-            Point2D texCoord = interpolateTextureCoords(bary, t1, t2, t3);
-
-            // Ограничиваем текстурные координаты в диапазоне [0, 1]
-            texCoord = new Point2D(Math.min(Math.max(texCoord.getX(), 0), 1),
-                    Math.min(Math.max(texCoord.getY(), 0), 1));
-
-            // Интерполяция глубины
-            double z = interpolateDepth(bary, v1.getZ(), v2.getZ(), v3.getZ());
-
-            // Проверка индексов для zBuffer
+        // Проходим по пикселям от x1 до x2.
+        for (int x = x1; x <= x2; x++) {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
-                // Если текущая глубина больше, чем в zBuffer, обновляем пиксель
-                if (z > zBuffer[x][y]) {
-                    zBuffer[x][y] = z;
-
-                    // Получаем цвет из текстуры
-                    Color color = getTextureColor(texture, texCoord);
-
-                    // Записываем пиксель в изображение
-                    pixelWriter.setColor(x, y, color);
+                if (currentZ > zBuffer[x][y]) {
+                    // Если пиксель ближе, чем текущий в z-буфере, обновляем.
+                    zBuffer[x][y] = currentZ;
+                    Barycentric barycentric = t.barycentrics(x, y);
+                    pixelWriter.setColor(x, y, interpolateColor(barycentric, t));
                 }
             }
+            currentZ += dz; // Увеличиваем глубину.
+        }
+    }
+
+    public static Color getPixelColor(Image image, int x, int y) {
+        // Получаем PixelReader из изображения.
+        PixelReader pixelReader = image.getPixelReader();
+        if (pixelReader == null) {
+            throw new IllegalArgumentException("PixelReader не доступен для изображения");
+        }
+
+        // Проверяем, что координаты находятся в пределах изображения.
+        if (x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight()) {
+            throw new IndexOutOfBoundsException("Координаты пикселя вне границ изображения");
+        }
+
+        // Возвращаем цвет пикселя.
+        return pixelReader.getColor(x, y);
+    }
+
+    // Основной метод для отрисовки треугольника.
+    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector2f> texCoords, Image image, double[][] zBuffer) {
+
+        Objects.requireNonNull(resultVectors);
+        Objects.requireNonNull(texCoords);
+        Objects.requireNonNull(image);
+        Objects.requireNonNull(zBuffer);
+        Objects.requireNonNull(pixelWriter);
+
+        // Извлекаем вершины треугольника.
+        Vector3f v11 = resultVectors.get(0);
+        Vector3f v22 = resultVectors.get(1);
+        Vector3f v33 = resultVectors.get(2);
+
+        double z1 = v11.getZ();
+        double z2 = v22.getZ();
+        double z3 = v33.getZ();
+
+        // Преобразуем координаты вершин в `Point2D` для работы с растеризацией.
+        Point2D p1 = new Point2D(v11.getX(), v11.getY());
+        Point2D p2 = new Point2D(v22.getX(), v22.getY());
+        Point2D p3 = new Point2D(v33.getX(), v33.getY());
+
+
+        // Создаем треугольник из вершин и текстуры.
+        Triangle t = new Triangle(p1, p2, p3, image, texCoords);
+
+        // Сортируем вершины треугольника по Y (и X для одинаковых Y).
+        List<Point2D> vertices = sortedVertices(t);
+        Point2D v1 = vertices.get(0);
+        Point2D v2 = vertices.get(1);
+        Point2D v3 = vertices.get(2);
+
+        // Определяем глубину для каждой вершины.
+        double depth1 = v1.equals(p1) ? z1 : v1.equals(p2) ? z2 : z3;
+        double depth2 = v2.equals(p1) ? z1 : v2.equals(p2) ? z2 : z3;
+        double depth3 = v3.equals(p1) ? z1 : v3.equals(p2) ? z2 : z3;
+
+        // Если треугольник уже "плоский", обрабатываем сразу.
+        if (Utils_for_trianglerasterisation.equals(v2.getY(), v3.getY())) {
+            drawFlat(t, v1, v2, v3, depth1, depth2, depth3, zBuffer);
+            return;
+        }
+
+        if (Utils_for_trianglerasterisation.equals(v1.getY(), v2.getY())) {
+            drawFlat(t, v3, v1, v2, depth3, depth1, depth2, zBuffer);
+            return;
+        }
+
+        // Разделяем треугольник на два "плоских".
+        double x4 = v1.getX() + ((v2.getY() - v1.getY()) / (v3.getY() - v1.getY())) * (v3.getX() - v1.getX());
+        double z4 = depth1 + ((v2.getY() - v1.getY()) / (v3.getY() - v1.getY())) * (depth3 - depth1);
+        Point2D v4 = new Point2D(x4, v2.getY());
+
+        // Отрисовываем две части треугольника.
+        if (Utils_for_trianglerasterisation.moreThan(x4, v2.getX())) {
+            drawFlat(t, v1, v2, v4, depth1, depth2, z4, zBuffer);
+            drawFlat(t, v3, v2, v4, depth3, depth2, z4, zBuffer);
+        } else {
+            drawFlat(t, v1, v4, v2, depth1, z4, depth2, zBuffer);
+            drawFlat(t, v3, v4, v2, depth3, z4, depth2, zBuffer);
         }
     }
 
 
-    // Вспомогательные методы
+    // Метод для интерполяции цвета с использованием барицентрических координат
+    public static Color interpolateColor(Barycentric barycentric, Triangle t) {
 
-    // Метод для интерполяции вершины для разбивки треугольника
-    private static Vector3f interpolateVertex(Vector3f v1, Vector3f v2, Vector3f v3) {
-        float alpha = (v2.getY() - v1.getY()) / (v3.getY() - v1.getY());
-        return new Vector3f(
-                v1.getX() + alpha * (v3.getX() - v1.getX()),
-                v2.getY(),
-                v1.getZ() + alpha * (v3.getZ() - v1.getZ())
-        );
+        Vector2f texCoord1 = t.getTexCoords().get(0);
+        Vector2f texCoord2 = t.getTexCoords().get(1);
+        Vector2f texCoord3 = t.getTexCoords().get(2); // Текстурные координаты вершин
+
+
+        // Интерполяция текстурных координат
+        double u = barycentric.getLambda1() * texCoord1.getX() +
+                barycentric.getLambda2() * texCoord2.getX() +
+                barycentric.getLambda3() * texCoord3.getX();
+        double v = barycentric.getLambda1() * texCoord1.getY() +
+                barycentric.getLambda2() * texCoord2.getY() +
+                barycentric.getLambda3() * texCoord3.getY();
+
+        // Преобразование в пиксельные координаты
+        int texWidth = (int) t.getImage().getWidth();
+        int texHeight = (int) t.getImage().getHeight();
+
+        int xTex = (int) (u * texWidth);
+        int yTex = (int) (v * texHeight);
+
+        // Получаем PixelReader для чтения пикселей изображения
+        PixelReader pixelReader = t.getImage().getPixelReader();
+
+        // Проверка, что координаты находятся в пределах изображения
+        if (xTex < 0) xTex = 0;
+        if (yTex < 0) yTex = 0;
+        if (xTex >= texWidth) xTex = texWidth - 1;
+        if (yTex >= texHeight) yTex = texHeight - 1;
+
+        // Возвращаем цвет пикселя из текстуры
+        return pixelReader.getColor(xTex, yTex);
     }
 
-    // Метод для интерполяции текстурных координат для разбивки треугольника
-    private static Point2D interpolateTexCoord(Point2D t1, Point2D t2, Point2D t3) {
-        float alpha = (float) ((t2.getY() - t1.getY()) / (t3.getY() - t1.getY()));
-        return new Point2D(
-                t1.getX() + alpha * (t3.getX() - t1.getX()),
-                t2.getY() + alpha * (t3.getY() - t1.getY())
-        );
-    }
-
-    // Метод для интерполяции текстуры
-    private static Color getTextureColor(Image texture, Point2D textureCoord) {
-        PixelReader pixelReader = texture.getPixelReader();
-        int tx = (int) (textureCoord.getX() * texture.getWidth());
-        int ty = (int) (textureCoord.getY() * texture.getHeight());
-        return pixelReader.getColor(tx, ty);
-    }
-
-    // Метод для интерполяции барицентрических координат
-    private static Point2D getBarycentricCoordinates(Vector3f v1, Vector3f v2, Vector3f v3, double x, double y) {
-        double denominator = (v2.getY() - v3.getY()) * (v1.getX() - v3.getX()) + (v3.getX() - v2.getX()) * (v1.getY() - v3.getY());
-        double a = ((v2.getY() - v3.getY()) * (x - v3.getX()) + (v3.getX() - v2.getX()) * (y - v3.getY())) / denominator;
-        double b = ((v3.getY() - v1.getY()) * (x - v3.getX()) + (v1.getX() - v3.getX()) * (y - v3.getY())) / denominator;
-        return new Point2D(a, b);
-    }
-
-    // Метод для интерполяции глубины
-    private static double interpolateDepth(Point2D baryCoords, double z1, double z2, double z3) {
-        return z1 * baryCoords.getX() + z2 * baryCoords.getY() + z3 * (1 - baryCoords.getX() - baryCoords.getY());
-    }
-    // Метод для интерполяции текстурных координат с использованием барицентрических координат
-    private static Point2D interpolateTextureCoords(Point2D baryCoords, Point2D t1, Point2D t2, Point2D t3) {
-        double u = t1.getX() * baryCoords.getX() + t2.getX() * baryCoords.getY() + t3.getX() * (1 - baryCoords.getX() - baryCoords.getY());
-        double v = t1.getY() * baryCoords.getX() + t2.getY() * baryCoords.getY() + t3.getY() * (1 - baryCoords.getX() - baryCoords.getY());
-        return new Point2D(u, v);
-    }
 
 }
