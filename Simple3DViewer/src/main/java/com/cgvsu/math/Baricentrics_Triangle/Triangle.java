@@ -2,6 +2,7 @@ package com.cgvsu.math.Baricentrics_Triangle;
 
 import com.cgvsu.Utils.color_for_triangle_rasterisation.Texture;
 import com.cgvsu.math.vectors.Vector2f;
+import com.cgvsu.model.Model;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 
@@ -37,19 +38,18 @@ public class Triangle {
         this.texture = texture;
     }
 
-    public Triangle(Point2D point1, Point2D point2, Point2D point3, Image image, ArrayList<Vector2f> texCoords) {
+    public Triangle(Point2D point1, Point2D point2, Point2D point3, Image image, Model model, int polygonInd) {
 
         // Проверка на null-значения для вершин и текстуры.
         Objects.requireNonNull(point1);
         Objects.requireNonNull(point2);
         Objects.requireNonNull(point3);
         Objects.requireNonNull(image);
-        Objects.requireNonNull(texCoords);
+
         this.point1 = point1;
         this.point2 = point2;
         this.point3 = point3;
         this.image = image;
-        this.texCoords = texCoords;
     }
 
     public ArrayList<Vector2f> getTexCoords() {

@@ -5,6 +5,7 @@ import com.cgvsu.math.Baricentrics_Triangle.Triangle;
 import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.model.Model;
 import javafx.geometry.Point2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -14,16 +15,19 @@ import javafx.scene.paint.Color;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 
 // Класс для растеризации треугольников с учетом глубины (z-буфера).
-public class OverlayTexture {
+public class RenderUtils {
 
     // Интерфейс для записи пикселей на экран.
     private PixelWriter pixelWriter;
+    private Color filling;
+    private double shadow;
 
-    public OverlayTexture(PixelWriter pixelWriter) {
+    public RenderUtils(PixelWriter pixelWriter, Color filling, double shadow) {
         this.pixelWriter = pixelWriter;
+        this.filling = filling;
+        this.shadow = shadow;
     }
 
 
@@ -153,13 +157,7 @@ public class OverlayTexture {
     }
 
     // Основной метод для отрисовки треугольника.
-    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector2f> texCoords, Image image, double[][] zBuffer) {
-
-        Objects.requireNonNull(resultVectors);
-        Objects.requireNonNull(texCoords);
-        Objects.requireNonNull(image);
-        Objects.requireNonNull(zBuffer);
-        Objects.requireNonNull(pixelWriter);
+    public void draw(Model model, int polygonInd, ArrayList<Vector3f> resultVectors, Image image, double[][] zBuffer, boolean TextureFlag, boolean LightingFlag) {
 
         // Извлекаем вершины треугольника.
         Vector3f v11 = resultVectors.get(0);
@@ -175,9 +173,12 @@ public class OverlayTexture {
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
 
-
-        // Создаем треугольник из вершин и текстуры.
-        Triangle t = new Triangle(p1, p2, p3, image, texCoords);
+        if (TextureFlag) {
+            // Создаем треугольник из вершин и текстуры.
+            Triangle t = new Triangle(p1, p2, p3, image, model, polygonInd);
+        } else {
+            Triangle t = new Triangle(p1,p2,p3,model,polygonInd);
+        }
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).
         List<Point2D> vertices = sortedVertices(t);
