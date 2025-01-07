@@ -1,17 +1,17 @@
 package com.cgvsu.render_engine;
 
 import com.cgvsu.Utils.FindNormals;
-import com.cgvsu.Utils.OverlayTexture;
 import com.cgvsu.Utils.PictureProcess;
+import com.cgvsu.Utils.RenderUtils;
 import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.cgvsu.render_engine.GraphicConveyor.multiplyMatrix4ByVector3;
 import static com.cgvsu.render_engine.GraphicConveyor.vertexToBord;
@@ -39,7 +39,7 @@ public class RenderEngine {
             final Model mesh,
             final int width,
             final int height, Image texture) {
-        OverlayTexture overlayTexture = new OverlayTexture(graphicsContext.getPixelWriter());
+        RenderUtils renderUtils = new RenderUtils(graphicsContext.getPixelWriter(), Color.BLACK, 1);
 
         // Создание модельной матрицы.
         Matrix4x4 modelMatrix = mesh.getModelMatrix();
@@ -84,26 +84,18 @@ public class RenderEngine {
                 Vector3f vertex = mesh.vertices.get(
                         mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
 
-                // Преобразование вершины в формат Vector3f (можно опустить, если структура совпадает).
-                Vector3f vertexVecmath = new Vector3f(vertex.x, vertex.y, vertex.z);
                 // Добавление преобразованной вершины в список.
-                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertexVecmath), width, height));
+                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height));
             }
 
             if (nVerticesInPolygon == 3) { /// Нужно будет оптимизировать перевод координат в точку
 //                PictureProcess.showTriangle(graphicsContext, resultVectors, zBuffer);
-                if (texture != null && mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && true) {
-                    overlayTexture.draw(
+                //ВНИМАНИЕ!!! требуется реализация случаев при которых метод вызывается
+                if (mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && true) {
+                    renderUtils.draw(mesh, polygonInd,
                             resultVectors,
-                            new ArrayList<>(List.of(
-                                    mesh.textureVertices.get(mesh.polygons.get(polygonInd).getTextureVertexIndices().get(0)),
-                                    mesh.textureVertices.get(mesh.polygons.get(polygonInd).getTextureVertexIndices().get(1)),
-                                    mesh.textureVertices.get(mesh.polygons.get(polygonInd).getTextureVertexIndices().get(2))
-                            )),
                             texture,
-                            zBuffer
-
-                    );
+                            zBuffer, false, false);
                 }
             }
 
