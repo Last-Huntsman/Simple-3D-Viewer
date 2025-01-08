@@ -22,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -256,7 +257,7 @@ public class GUIController {
 
             // Рендеринг модели, если она загружена
             if (mesh != null) {
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,texture);
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,texture, true,true,true, Color.GREEN, 0.5);
             }
         });
         return frame;
@@ -291,7 +292,7 @@ public class GUIController {
              texture = textureImage;
 
             // Печать для проверки
-            System.out.println("Текстура загружена: " + file.getName());
+//            System.out.println("Текстура загружена: " + file.getName());
 
         } catch (Exception exception) {
             // Обработка ошибок при загрузке изображения

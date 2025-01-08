@@ -1,6 +1,9 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Utils.*;
+import com.cgvsu.Utils.PictureProcess;
+import com.cgvsu.Utils.TextureRasterisator;
+import com.cgvsu.Utils.TriangleRasterisator;
+import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
@@ -22,6 +25,7 @@ public class RenderEngine {
 
 
     TextureRasterisator textureRasterisator;
+    TriangleRasterisator triangleRasterisator;
 
     /**
      * Метод для отрисовки 3D-модели на 2D-канвасе.
@@ -32,16 +36,13 @@ public class RenderEngine {
      * @param width           Ширина канваса.
      * @param height          Высота канваса.
      */
-    public void render(
-            final GraphicsContext graphicsContext,
-            final Camera camera,
-            final Model mesh,
-            final int width,
-            final int height, Image texture) {
-        if(texture!=null) {
-             textureRasterisator = new TextureRasterisator(texture, graphicsContext.getPixelWriter(), 0.5 , camera.getPosition());
+    public void render(final GraphicsContext graphicsContext, final Camera camera, final Model mesh, final int width, final int height, Image texture, boolean flagTexture, boolean flagGrid, boolean flagLighting, Color color, double shadow) {
+        if (texture != null && flagTexture) {
+            textureRasterisator = new TextureRasterisator(texture, graphicsContext.getPixelWriter(), shadow, camera.getPosition(), flagLighting);
+        } else {
+            triangleRasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), color, shadow, camera.getPosition(), flagLighting);
         }
-        TriangleRasterisator triangleRasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera.getPosition());
+
         // Триангуляция и расчет нормалей
         mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
 //        mesh.normals = FindNormals.findNormals(mesh);
@@ -86,35 +87,31 @@ public class RenderEngine {
 
                 // Получение координат вершины из модели.
                 Vector3f vertex = mesh.vertices.get(polygon.getVertexIndices().get(vertexInPolygonInd));
-                Vector3f mirVertex = modelMatrix.mul(vertex);
-
-                polygonVertex.add(mirVertex);
-                polygonTexture.add(mesh.textureVertices.get(polygon.getTextureVertexIndices().get(vertexInPolygonInd)));
-                polygonNormals.add(mesh.normals.get(polygon.getNormalIndices().get(vertexInPolygonInd)));
+                if (flagLighting) {
+                    Vector3f mirVertex = modelMatrix.mul(vertex);
+                    polygonVertex.add(mirVertex);
+                    polygonNormals.add(mesh.normals.get(polygon.getNormalIndices().get(vertexInPolygonInd)));
+                }
+                if (flagTexture) {
+                    polygonTexture.add(mesh.textureVertices.get(polygon.getTextureVertexIndices().get(vertexInPolygonInd)));
+                }
 
                 resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height));
             }
 
 
             if (nVerticesInPolygon == 3) {
-
-                /// Нужно будет оптимизировать перевод координат в точку
-                //ВНИМАНИЕ!!! требуется реализация случаев при которых метод вызывается
-                if (mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && texture!=null && true) {
-                    textureRasterisator.draw(resultVectors, polygonTexture, polygonVertex,
-                            polygonNormals,
-                            zBuffer, true);
+                if (texture != null && flagTexture && polygonTexture.size() == 3) {
+                    textureRasterisator.draw(resultVectors, polygonTexture, polygonVertex, polygonNormals, zBuffer);
+                } else {
+                    triangleRasterisator.draw(resultVectors,
+                            polygonVertex, polygonNormals,
+                            zBuffer,
+                            true);
                 }
-
-//                if(true) {
-//                    triangleRasterisator.draw(resultVectors,
-//                            polygonVertex, polygonNormals,
-//                            zBuffer,
-//                            true);
-//                }
             }
-
-            if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
+            //Сетка полигональная
+            if (nVerticesInPolygon > 1 && flagGrid) {
                 PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
             }
 

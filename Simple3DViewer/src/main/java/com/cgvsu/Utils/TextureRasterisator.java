@@ -20,19 +20,20 @@ public class TextureRasterisator {
 
 
     // Интерфейс для записи пикселей на экран.
-    private PixelWriter pixelWriter;
-    private double shadow ;
-    private Vector3f cameraPosition;
-    private  Image image;
-
+    private final PixelWriter pixelWriter;
+    private final double shadow;
+    private final Vector3f cameraPosition;
+    private final Image image;
+    private final boolean flagLighting;
 
 
     // Конструктор для инициализации PixelWriter.
-    public TextureRasterisator(Image image,PixelWriter pixelWriter, double shadow, Vector3f cameraPosition) {
+    public TextureRasterisator(Image image, PixelWriter pixelWriter, double shadow, Vector3f cameraPosition, boolean flagLighting) {
         this.pixelWriter = pixelWriter;
         this.shadow = shadow;
         this.cameraPosition = cameraPosition;
-        this.image=image;
+        this.image = image;
+        this.flagLighting = flagLighting;
 
     }
 
@@ -134,44 +135,48 @@ public class TextureRasterisator {
                     Barycentric barycentric = t.barycentrics(x, y);
 
                     if (barycentric.isInside()) {
-                        // Интерполяция нормали в точке с использованием барицентрических координат.
-                        Vector3f interpolatedNormal = barycentric.interpolate(
-                                t.getPolygonNormals().get(0),
-                                t.getPolygonNormals().get(1),
-                                t.getPolygonNormals().get(2)
-                        );
-                        Vector3f interpolatedVertex = barycentric.interpolate(
-                                t.getPolygonVertex().get(0),
-                                t.getPolygonVertex().get(1),
-                                t.getPolygonVertex().get(2)
-                        );
                         Vector2f interpolatedTexture = barycentric.interpolate(
                                 t.getPolygonTextures().get(0),
                                 t.getPolygonTextures().get(1),
                                 t.getPolygonTextures().get(2)
                         );
-
-                        // Нормализуем интерполированную нормаль.
-                        interpolatedNormal.normalize();
-
-                        // Вычисляем направление света (свет идёт из источника в точку).
-                        Vector3f lightDirection = new Vector3f(cameraPosition);
-                        lightDirection.sub(interpolatedVertex);
-                        lightDirection.normalize();
-
-                        // Вычисляем коэффициент яркости.
-                        double l = Math.max(0, interpolatedNormal.dot(lightDirection));
-
-                        // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
-                        // Коэффициент фонового освещения, можно настраивать.
-
                         Color baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
-                        Color shadedColor = calculateShadedColor(baseColor, l, shadow);
+                        // Интерполяция нормали в точке с использованием барицентрических координат.
+                        if (flagLighting) {
+                            Vector3f interpolatedNormal = barycentric.interpolate(
+                                    t.getPolygonNormals().get(0),
+                                    t.getPolygonNormals().get(1),
+                                    t.getPolygonNormals().get(2)
+                            );
+                            Vector3f interpolatedVertex = barycentric.interpolate(
+                                    t.getPolygonVertex().get(0),
+                                    t.getPolygonVertex().get(1),
+                                    t.getPolygonVertex().get(2)
+                            );
+
+
+                            // Нормализуем интерполированную нормаль.
+                            interpolatedNormal.normalize();
+
+                            // Вычисляем направление света (свет идёт из источника в точку).
+                            Vector3f lightDirection = new Vector3f(cameraPosition);
+                            lightDirection.sub(interpolatedVertex);
+                            lightDirection.normalize();
+
+                            // Вычисляем коэффициент яркости.
+                            double l = Math.max(0, interpolatedNormal.dot(lightDirection));
+
+                            // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
+                            // Коэффициент фонового освещения, можно настраивать.
+
+
+                            baseColor = calculateShadedColor(baseColor, l, shadow);
+                        }
 
 
                         // Обновляем z-буфер и устанавливаем цвет.
                         zBuffer[x][y] = currentZ;
-                        pixelWriter.setColor(x, y, shadedColor);
+                        pixelWriter.setColor(x, y, baseColor);
 
                     }
                 }
@@ -183,7 +188,7 @@ public class TextureRasterisator {
 
 
     // Основной метод для отрисовки треугольника.
-    public void draw(ArrayList<Vector3f> resultVectors,ArrayList<Vector2f> polygonTexture, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> plygonNormals, double[][] zBuffer, boolean LightingFlag) {
+    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector2f> polygonTexture, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> polygonNormals, double[][] zBuffer) {
 
         Vector3f v11 = resultVectors.get(0);
         Vector3f v22 = resultVectors.get(1);
@@ -198,7 +203,11 @@ public class TextureRasterisator {
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
         Triangle t;
-        t = new Triangle(p1, p2, p3, polygonVertex, plygonNormals, polygonTexture);
+        if (flagLighting) {
+            t = new Triangle(p1, p2, p3, polygonVertex, polygonNormals, polygonTexture);
+        } else {
+            t = new Triangle(p1, p2, p3, polygonTexture);
+        }
 
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).
@@ -250,6 +259,7 @@ public class TextureRasterisator {
                 baseColor.getOpacity()
         );
     }
+
     public Color getColor(Vector2f v) {
 
         // Преобразование в пиксельные координаты
@@ -271,10 +281,6 @@ public class TextureRasterisator {
         // Возвращаем цвет пикселя из текстуры
         return pixelReader.getColor(xTex, yTex);
     }
-
-
-
-
 
 
 }

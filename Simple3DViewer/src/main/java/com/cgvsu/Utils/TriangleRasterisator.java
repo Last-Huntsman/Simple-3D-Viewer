@@ -3,10 +3,7 @@ package com.cgvsu.Utils;
 import com.cgvsu.math.Baricentrics_Triangle.Barycentric;
 import com.cgvsu.math.Baricentrics_Triangle.Triangle;
 import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
-import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector3f;
-import com.cgvsu.model.Model;
-import com.cgvsu.render_engine.Camera;
 import javafx.geometry.Point2D;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
@@ -22,28 +19,19 @@ public class TriangleRasterisator {
     // Интерфейс для записи пикселей на экран.
     private PixelWriter pixelWriter;
     private Color filling;
-    private double shadow ;
+    private double shadow;
     private Vector3f cameraPosition;
-
+    private final boolean flagLighting;
 
 
     // Конструктор для инициализации PixelWriter.
-    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition) {
+    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition, boolean flagLighting) {
         this.pixelWriter = pixelWriter;
         this.filling = filling;
         this.shadow = shadow;
         this.cameraPosition = cameraPosition;
+        this.flagLighting = flagLighting;
 
-    }
-
-    // Геттер для PixelWriter.
-    public PixelWriter getPixelWriter() {
-        return pixelWriter;
-    }
-
-    // Сеттер для изменения PixelWriter.
-    public void setPixelWriter(PixelWriter pixelWriter) {
-        this.pixelWriter = pixelWriter;
     }
 
     // Сортировка вершин треугольника по оси Y (если равны — по оси X).
@@ -140,43 +128,45 @@ public class TriangleRasterisator {
         for (int x = x1; x <= x2; x++) {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
                 if (currentZ > zBuffer[x][y]) {
-                    // Если пиксель ближе, чем текущий в z-буфере, обновляем.
-                    Barycentric barycentric = t.barycentrics(x, y);
+                    Color baseColor = filling;
 
-                    if (barycentric.isInside()) {
-                        // Интерполяция нормали в точке с использованием барицентрических координат.
-                        Vector3f interpolatedNormal = barycentric.interpolate(
-                                t.getPolygonNormals().get(0),
-                                t.getPolygonNormals().get(1),
-                                t.getPolygonNormals().get(2)
-                        );
-                        Vector3f interpolatedVertex = barycentric.interpolate(
-                                t.getPolygonVertex().get(0),
-                                t.getPolygonVertex().get(1),
-                                t.getPolygonVertex().get(2)
-                        );
+                    if (flagLighting) {
 
-                        // Нормализуем интерполированную нормаль.
-                        interpolatedNormal.normalize();
+                        Barycentric barycentric = t.barycentrics(x, y);
+                        if (barycentric.isInside()) {
+                            // Интерполяция нормали в точке с использованием барицентрических координат.
+                            Vector3f interpolatedNormal = barycentric.interpolate(
+                                    t.getPolygonNormals().get(0),
+                                    t.getPolygonNormals().get(1),
+                                    t.getPolygonNormals().get(2)
+                            );
+                            Vector3f interpolatedVertex = barycentric.interpolate(
+                                    t.getPolygonVertex().get(0),
+                                    t.getPolygonVertex().get(1),
+                                    t.getPolygonVertex().get(2)
+                            );
 
-                        // Вычисляем направление света (свет идёт из источника в точку).
-                        Vector3f lightDirection = new Vector3f(cameraPosition);
-                        lightDirection.sub(interpolatedVertex);
-                        lightDirection.normalize();
+                            // Нормализуем интерполированную нормаль.
+                            interpolatedNormal.normalize();
 
-                        // Вычисляем коэффициент яркости.
-                        double l = Math.max(0, interpolatedNormal.dot(lightDirection));
+                            // Вычисляем направление света (свет идёт из источника в точку).
+                            Vector3f lightDirection = new Vector3f(cameraPosition);
+                            lightDirection.sub(interpolatedVertex);
+                            lightDirection.normalize();
 
-                        // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
-                        // Коэффициент фонового освещения, можно настраивать.
-                        Color baseColor = filling; // Основной цвет полигона.
-                        Color shadedColor = calculateShadedColor(baseColor, l, shadow);
+                            // Вычисляем коэффициент яркости.
+                            double l = Math.max(0, interpolatedNormal.dot(lightDirection));
 
-                        // Обновляем z-буфер и устанавливаем цвет.
-                        zBuffer[x][y] = currentZ;
-                        pixelWriter.setColor(x, y, shadedColor);
-//                        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
+                            // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
+                            // Коэффициент фонового освещения, можно настраивать.
+
+                            baseColor = calculateShadedColor(baseColor, l, shadow);
+                        }
                     }
+                    // Обновляем z-буфер и устанавливаем цвет.
+                    zBuffer[x][y] = currentZ;
+                    pixelWriter.setColor(x, y, baseColor);
+
                 }
             }
             currentZ += dz; // Увеличиваем глубину.
@@ -185,7 +175,7 @@ public class TriangleRasterisator {
     }
 
     // Основной метод для отрисовки треугольника.
-    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> plygonNormals, double[][] zBuffer, boolean LightingFlag) {
+    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> polygonNormals, double[][] zBuffer, boolean LightingFlag) {
 
         Vector3f v11 = resultVectors.get(0);
         Vector3f v22 = resultVectors.get(1);
@@ -200,8 +190,11 @@ public class TriangleRasterisator {
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
         Triangle t;
-        t = new Triangle(p1, p2, p3,  plygonNormals,polygonVertex);
-
+        if (flagLighting) {
+            t = new Triangle(p1, p2, p3, polygonNormals, polygonVertex);
+        } else {
+            t = new Triangle(p1, p2, p3);
+        }
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).
         List<Point2D> vertices = sortedVertices(t);
