@@ -583,13 +583,11 @@ public class Matrix4x4 {
 
     }
 
-    public final void mul(Vector3f var) {
+    public final Vector3f mul(Vector3f var) {
         float var1 = this.elements[0] * var.x + this.elements[1] * var.y + this.elements[2] * var.z + this.elements[3] * 1;
         float var2 = this.elements[4] * var.x + this.elements[5] * var.y + this.elements[6] * var.z + this.elements[7] * 1;
         float var3 = this.elements[8] * var.x + this.elements[9] * var.y + this.elements[10] * var.z + this.elements[11] * 1;
-        var.x = var1;
-        var.y = var2;
-        var.z = var3;
+        return new Vector3f(var1,var2,var3);
     }
 
     public final void mul(Vector4f var) {

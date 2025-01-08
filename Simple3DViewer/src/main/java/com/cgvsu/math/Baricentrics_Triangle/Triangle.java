@@ -19,9 +19,7 @@ public class Triangle {
     private Point2D point2;
     private Point2D point3;
 
-    // Текстура, связанная с треугольником.
-
-    private Image image;
+    // Текстура, связанная с треугольником
 
     private ArrayList<Vector3f> polygonNormals;
     private ArrayList<Vector2f> polygonTextures;
@@ -54,20 +52,20 @@ public class Triangle {
         this.polygonVertex = polygonVertex;
     }
 
-    public Triangle(Point2D point1, Point2D point2, Point2D point3, Image image, ArrayList<Vector3f> polygonNormals, ArrayList<Vector2f> polygonTextures) {
+    public Triangle(Point2D point1, Point2D point2, Point2D point3,ArrayList<Vector3f>polygonVertex, ArrayList<Vector3f> polygonNormals, ArrayList<Vector2f> polygonTextures) {
 
         // Проверка на null-значения для вершин и текстуры.
         Objects.requireNonNull(point1);
         Objects.requireNonNull(point2);
         Objects.requireNonNull(point3);
-        Objects.requireNonNull(image);
+
 
         this.point1 = point1;
         this.point2 = point2;
         this.point3 = point3;
-        this.image = image;
         this.polygonTextures = polygonTextures;
         this.polygonNormals = polygonNormals;
+        this.polygonVertex = polygonVertex;
     }
 
 
@@ -158,8 +156,6 @@ public class Triangle {
         return new Barycentric(l1, l2, l3);
     }
 
-    public Image getImage() {
-        return image;
-    }
+
 
 }
