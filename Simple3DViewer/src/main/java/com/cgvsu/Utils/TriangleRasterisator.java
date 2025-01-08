@@ -21,29 +21,17 @@ public class TriangleRasterisator {
     // Интерфейс для записи пикселей на экран.
     private PixelWriter pixelWriter;
     private Color filling;
-    private double shadow = 1;
-    private Camera camera;
-    //    private  Matrix4x4 modelMatrix;
-    private Matrix4x4 projection_and_viewMatrix;
+    private double shadow ;
+    private Vector3f cameraPosition;
+
 
 
     // Конструктор для инициализации PixelWriter.
-    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Camera camera, Model mesh) {
+    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition) {
         this.pixelWriter = pixelWriter;
         this.filling = filling;
         this.shadow = shadow;
-        this.camera = camera;
-        // Создание модельной матрицы.
-        // Создание модельной матрицы.
-//        modelMatrix = mesh.getModelMatrix();
-        // Получение матрицы вида из объекта камеры.
-        Matrix4x4 viewMatrix = camera.getViewMatrix();
-        // Получение матрицы проекции из объекта камеры.
-        Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
-
-        // Объединение (умножение)  видовой и проекционной.
-        projection_and_viewMatrix = new Matrix4x4(projectionMatrix);
-        projection_and_viewMatrix.mul(viewMatrix);
+        this.cameraPosition = cameraPosition;
 
     }
 
@@ -171,7 +159,7 @@ public class TriangleRasterisator {
                         interpolatedNormal.normalize();
 
                         // Вычисляем направление света (свет идёт из источника в точку).
-                        Vector3f lightDirection = new Vector3f(camera.getPosition());
+                        Vector3f lightDirection = new Vector3f(cameraPosition);
                         lightDirection.sub(interpolatedVertex);
                         lightDirection.normalize();
 
