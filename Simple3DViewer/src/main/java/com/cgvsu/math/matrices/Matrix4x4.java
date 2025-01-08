@@ -456,23 +456,59 @@ public class Matrix4x4 {
         this.elements[15] = var2.elements[15] * var1;
     }
 
+    // Метод умножения матрицы на другую матрицу (перемножение двух 4x4 матриц).
     public final void mul(Matrix4x4 var) {
+        // Перемножение каждой строки первой матрицы на каждый столбец второй матрицы и сохранение результата в текущей матрице.
+
+        // Умножаем первую строку текущей матрицы на первый столбец второй матрицы
         float var1 = this.elements[0] * var.elements[0] + this.elements[1] * var.elements[4] + this.elements[2] * var.elements[8] + this.elements[3] * var.elements[12];
+
+        // Умножаем первую строку текущей матрицы на второй столбец второй матрицы
         float var2 = this.elements[0] * var.elements[1] + this.elements[1] * var.elements[5] + this.elements[2] * var.elements[9] + this.elements[3] * var.elements[13];
+
+        // Умножаем первую строку текущей матрицы на третий столбец второй матрицы
         float var3 = this.elements[0] * var.elements[2] + this.elements[1] * var.elements[6] + this.elements[2] * var.elements[10] + this.elements[3] * var.elements[14];
+
+        // Умножаем первую строку текущей матрицы на четвертый столбец второй матрицы
         float var4 = this.elements[0] * var.elements[3] + this.elements[1] * var.elements[7] + this.elements[2] * var.elements[11] + this.elements[3] * var.elements[15];
+
+        // Умножаем вторую строку текущей матрицы на первый столбец второй матрицы
         float var5 = this.elements[4] * var.elements[0] + this.elements[5] * var.elements[4] + this.elements[6] * var.elements[8] + this.elements[7] * var.elements[12];
+
+        // Умножаем вторую строку текущей матрицы на второй столбец второй матрицы
         float var6 = this.elements[4] * var.elements[1] + this.elements[5] * var.elements[5] + this.elements[6] * var.elements[9] + this.elements[7] * var.elements[13];
+
+        // Умножаем вторую строку текущей матрицы на третий столбец второй матрицы
         float var7 = this.elements[4] * var.elements[2] + this.elements[5] * var.elements[6] + this.elements[6] * var.elements[10] + this.elements[7] * var.elements[14];
+
+        // Умножаем вторую строку текущей матрицы на четвертый столбец второй матрицы
         float var8 = this.elements[4] * var.elements[3] + this.elements[5] * var.elements[7] + this.elements[6] * var.elements[11] + this.elements[7] * var.elements[15];
+
+        // Умножаем третью строку текущей матрицы на первый столбец второй матрицы
         float var9 = this.elements[8] * var.elements[0] + this.elements[9] * var.elements[4] + this.elements[10] * var.elements[8] + this.elements[11] * var.elements[12];
+
+        // Умножаем третью строку текущей матрицы на второй столбец второй матрицы
         float var10 = this.elements[8] * var.elements[1] + this.elements[9] * var.elements[5] + this.elements[10] * var.elements[9] + this.elements[11] * var.elements[13];
+
+        // Умножаем третью строку текущей матрицы на третий столбец второй матрицы
         float var11 = this.elements[8] * var.elements[2] + this.elements[9] * var.elements[6] + this.elements[10] * var.elements[10] + this.elements[11] * var.elements[14];
+
+        // Умножаем третью строку текущей матрицы на четвертый столбец второй матрицы
         float var12 = this.elements[8] * var.elements[3] + this.elements[9] * var.elements[7] + this.elements[10] * var.elements[11] + this.elements[11] * var.elements[15];
+
+        // Умножаем четвертую строку текущей матрицы на первый столбец второй матрицы
         float var13 = this.elements[12] * var.elements[0] + this.elements[13] * var.elements[4] + this.elements[14] * var.elements[8] + this.elements[15] * var.elements[12];
+
+        // Умножаем четвертую строку текущей матрицы на второй столбец второй матрицы
         float var14 = this.elements[12] * var.elements[1] + this.elements[13] * var.elements[5] + this.elements[14] * var.elements[9] + this.elements[15] * var.elements[13];
+
+        // Умножаем четвертую строку текущей матрицы на третий столбец второй матрицы
         float var15 = this.elements[12] * var.elements[2] + this.elements[13] * var.elements[6] + this.elements[14] * var.elements[10] + this.elements[15] * var.elements[14];
+
+        // Умножаем четвертую строку текущей матрицы на четвертый столбец второй матрицы
         float var16 = this.elements[12] * var.elements[3] + this.elements[13] * var.elements[7] + this.elements[14] * var.elements[11] + this.elements[15] * var.elements[15];
+
+        // Сохраняем полученные результаты в элементы текущей матрицы.
         this.elements[0] = var1;
         this.elements[1] = var2;
         this.elements[2] = var3;
@@ -490,6 +526,7 @@ public class Matrix4x4 {
         this.elements[14] = var15;
         this.elements[15] = var16;
     }
+
 
     public final void mul(Matrix4x4 var1, Matrix4x4 var2) {
         if (this != var1 && this != var2) {

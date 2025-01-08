@@ -4,6 +4,7 @@ import com.cgvsu.math.Baricentrics_Triangle.Barycentric;
 import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
 
 import com.cgvsu.math.Baricentrics_Triangle.Triangle;
+import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
@@ -26,13 +27,28 @@ public class TriangleRasterisator {
     private Color filling;
     private double shadow=1;
     private  Camera camera;
+//    private  Matrix4x4 modelMatrix;
+    private Matrix4x4 projection_and_viewMatrix;
+
 
     // Конструктор для инициализации PixelWriter.
-    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Camera camera) {
+    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Camera camera, Model mesh) {
         this.pixelWriter = pixelWriter;
         this.filling = filling;
         this.shadow = shadow;
         this.camera=camera;
+        // Создание модельной матрицы.
+        // Создание модельной матрицы.
+//        modelMatrix = mesh.getModelMatrix();
+        // Получение матрицы вида из объекта камеры.
+        Matrix4x4 viewMatrix = camera.getViewMatrix();
+        // Получение матрицы проекции из объекта камеры.
+        Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
+
+        // Объединение (умножение)  видовой и проекционной.
+        projection_and_viewMatrix = new Matrix4x4(projectionMatrix);
+        projection_and_viewMatrix.mul(viewMatrix);
+
     }
     // Геттер для PixelWriter.
     public PixelWriter getPixelWriter() {
@@ -169,7 +185,7 @@ public class TriangleRasterisator {
                         // Обновляем z-буфер и устанавливаем цвет.
                         zBuffer[x][y] = currentZ;
                         pixelWriter.setColor(x, y, shadedColor);
-                        
+//                        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
                     }
                 }
             }
