@@ -24,6 +24,7 @@ public class Triangle {
 
     private ArrayList<Vector3f> polygonNormals;
     private ArrayList<Vector2f> polygonTextures;
+    private ArrayList<Vector3f> polygonVertex;
 
 
     public ArrayList<Vector3f> getPolygonNormals() {
@@ -34,8 +35,12 @@ public class Triangle {
         return polygonTextures;
     }
 
+    public ArrayList<Vector3f> getPolygonVertex() {
+        return polygonVertex;
+    }
+
     // Конструктор для инициализации треугольника и его текстуры.
-    public Triangle(Point2D point1, Point2D point2, Point2D point3, ArrayList<Vector3f> polygonNormals) {
+    public Triangle(Point2D point1, Point2D point2, Point2D point3, ArrayList<Vector3f> polygonNormals,ArrayList<Vector3f> polygonVertex) {
 
         // Проверка на null-значения для вершин и текстуры.
         Objects.requireNonNull(point1);
@@ -45,6 +50,7 @@ public class Triangle {
         this.point2 = point2;
         this.point3 = point3;
         this.polygonNormals=polygonNormals;
+        this.polygonVertex = polygonVertex;
     }
 
     public Triangle(Point2D point1, Point2D point2, Point2D point3, Image image, ArrayList<Vector3f> polygonNormals, ArrayList<Vector2f> polygonTextures) {

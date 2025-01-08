@@ -1,6 +1,8 @@
 package com.cgvsu.math.Baricentrics_Triangle;
 
 
+import com.cgvsu.math.vectors.Vector3f;
+
 // Класс для представления барицентрических координат точки внутри треугольника.
 public class Barycentric {
 
@@ -62,4 +64,13 @@ public class Barycentric {
     public boolean isInside() {
         return inside;
     }
+
+    public Vector3f interpolate(Vector3f p1, Vector3f p2, Vector3f normal3) {
+        return new Vector3f(
+                (float) (lambda1 * p1.x + lambda2 * p2.x + lambda3 * normal3.x),
+                (float) (lambda1 * p1.y + lambda2 * p2.y + lambda3 * normal3.y),
+                (float) (lambda1 * p1.z + lambda2 * p2.z + lambda3 * normal3.z)
+        );
+    }
+
 }
