@@ -33,6 +33,7 @@ public class Barycentric {
         this.inside = computeInside();
     }
 
+
     // Геттер для лямбда1 (первая барицентрическая координата).
     public double getLambda1() {
         return lambda1;

@@ -10,6 +10,7 @@ import java.util.Locale;
 
 public class Model implements Cloneable {
 
+
     public ArrayList<Vector3f> vertices = new ArrayList<>();
     public ArrayList<Vector2f> textureVertices = new ArrayList<>();
     public ArrayList<Vector3f> normals = new ArrayList<>();

@@ -13,6 +13,7 @@ import java.util.Objects;
 // Также хранит текстуру для наложения на треугольник.
 public class Triangle {
 
+
     // Вершины треугольника.
     private Point2D point1;
     private Point2D point2;

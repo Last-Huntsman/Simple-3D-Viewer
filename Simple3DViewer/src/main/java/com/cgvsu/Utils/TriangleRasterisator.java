@@ -18,6 +18,7 @@ import java.util.List;
 // Класс для растеризации треугольников с учетом глубины (z-буфера).
 public class TriangleRasterisator {
 
+
     // Интерфейс для записи пикселей на экран.
     private PixelWriter pixelWriter;
     private Color filling;

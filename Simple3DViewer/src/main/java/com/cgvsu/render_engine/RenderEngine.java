@@ -41,7 +41,7 @@ public class RenderEngine {
             final int width,
             final int height, Image texture) {
 //        RenderUtils renderUtils = new RenderUtils(graphicsContext.getPixelWriter(), Color.BLACK, 1);
-        TriangleRasterisator rasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera, mesh);
+        TriangleRasterisator rasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera.getPosition());
         // Триангуляция и расчет нормалей
         mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
         mesh.normals = FindNormals.findNormals(mesh);
