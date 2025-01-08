@@ -1,9 +1,6 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Utils.FindNormals;
-import com.cgvsu.Utils.PictureProcess;
-import com.cgvsu.Utils.RenderUtils;
-import com.cgvsu.Utils.Triangulation;
+import com.cgvsu.Utils.*;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
@@ -12,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.cgvsu.render_engine.GraphicConveyor.multiplyMatrix4ByVector3;
 import static com.cgvsu.render_engine.GraphicConveyor.vertexToBord;
@@ -39,7 +37,12 @@ public class RenderEngine {
             final Model mesh,
             final int width,
             final int height, Image texture) {
-        RenderUtils renderUtils = new RenderUtils(graphicsContext.getPixelWriter(), Color.BLACK, 1);
+//        RenderUtils renderUtils = new RenderUtils(graphicsContext.getPixelWriter(), Color.BLACK, 1);
+        TriangleRasterisator rasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera);
+       // Триангуляция и расчет нормалей
+        mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
+        mesh.normals = FindNormals.findNormals(mesh);
+        this.mesh = mesh;
 
         // Создание модельной матрицы.
         Matrix4x4 modelMatrix = mesh.getModelMatrix();
@@ -48,16 +51,12 @@ public class RenderEngine {
         // Получение матрицы проекции из объекта камеры.
         Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
 
-        this.mesh = mesh;
-
         // Объединение (умножение) матриц модельной, видовой и проекционной.
         Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(modelMatrix.elements);
-
         modelViewProjectionMatrix.mul(projectionMatrix); // Умножение на матрицу вида.
         modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу проекции.
 
-        mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
-        mesh.normals = FindNormals.findNormals(mesh);
+
 
 
         double[][] zBuffer = new double[width][height];
@@ -91,12 +90,24 @@ public class RenderEngine {
             if (nVerticesInPolygon == 3) { /// Нужно будет оптимизировать перевод координат в точку
 //                PictureProcess.showTriangle(graphicsContext, resultVectors, zBuffer);
                 //ВНИМАНИЕ!!! требуется реализация случаев при которых метод вызывается
-                if (mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && true) {
-                    renderUtils.draw(mesh, polygonInd,
-                            resultVectors,
-                            texture,
-                            zBuffer, false, false);
-                }
+//                if (mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && true) {
+//                    renderUtils.draw(mesh, polygonInd,
+//                            resultVectors,
+//                            texture,
+//                            zBuffer, false, false);
+//                }
+                rasterisator.draw(resultVectors,
+                        new ArrayList<>(List.of(
+                                mesh.normals.get(mesh.polygons.get(polygonInd).getNormalIndices().get(0)),
+                                mesh.normals.get(mesh.polygons.get(polygonInd).getNormalIndices().get(1)),
+                                mesh.normals.get(mesh.polygons.get(polygonInd).getNormalIndices().get(2)
+                                ))),
+
+
+
+
+                        zBuffer,
+                        true);
             }
 
             if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
