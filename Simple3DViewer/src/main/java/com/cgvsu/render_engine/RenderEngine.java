@@ -1,17 +1,21 @@
 package com.cgvsu.render_engine;
 
 import com.cgvsu.Utils.FindNormals;
-import com.cgvsu.Utils.PictureProcess;
 import com.cgvsu.Utils.TriangleRasterisator;
 import com.cgvsu.Utils.Triangulation;
+import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import com.cgvsu.model.Model;
+import com.cgvsu.model.Polygon;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import static com.cgvsu.render_engine.GraphicConveyor.multiplyMatrix4ByVector3;
+import static com.cgvsu.render_engine.GraphicConveyor.vertexToBord;
 
 /**
  * Класс для рендеринга 3D-моделей на 2D-канвас с использованием матриц преобразований.
@@ -43,17 +47,17 @@ public class RenderEngine {
         mesh.normals = FindNormals.findNormals(mesh);
         this.mesh = mesh;
 
-//        // Создание модельной матрицы.
-//        Matrix4x4 modelMatrix = mesh.getModelMatrix();
-//        // Получение матрицы вида из объекта камеры.
-//        Matrix4x4 viewMatrix = camera.getViewMatrix();
-//        // Получение матрицы проекции из объекта камеры.
-//        Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
-//
-//        // Объединение (умножение) матриц модельной, видовой и проекционной.
-//        Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(projectionMatrix);
-//        modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу вида.
-//        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
+        // Создание модельной матрицы.
+        Matrix4x4 modelMatrix = mesh.getModelMatrix();
+        // Получение матрицы вида из объекта камеры.
+        Matrix4x4 viewMatrix = camera.getViewMatrix();
+        // Получение матрицы проекции из объекта камеры.
+        Matrix4x4 projectionMatrix = camera.getProjectionMatrix();
+
+        // Объединение (умножение) матриц модельной, видовой и проекционной.
+        Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(projectionMatrix);
+        modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу вида.
+        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
 
 
         double[][] zBuffer = new double[width][height];
@@ -70,31 +74,27 @@ public class RenderEngine {
         for (int polygonInd = 0; polygonInd < nPolygons; ++polygonInd) {
 
             // Количество вершин в текущем полигоне.
-            final int nVerticesInPolygon = mesh.polygons.get(polygonInd).getVertexIndices().size();
-            // Список для хранения преобразованных экранных координат вершин полигона.
-//            ArrayList<Vector3f> resultVectors = new ArrayList<>();
-//            // Перебор всех вершин текущего полигона.
-//            for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
-//
-//                // Получение координат вершины из модели.
-//                Vector3f vertex = mesh.vertices.get(
-//                        mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
-//
-//                // Добавление преобразованной вершины в список.
-//                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height));
-//            }
-            ArrayList<Vector3f> PolygonVertex = new ArrayList<>();
-            ArrayList<Vector3f> PolygonNormals = new ArrayList<>();
-            ArrayList<Vector3f> PolygonTextureVertex = new ArrayList<>();
 
+            final Polygon polygon = mesh.polygons.get(polygonInd);
+            final int nVerticesInPolygon = polygon.getVertexIndices().size();
+            // Список для хранения преобразованных экранных координат вершин полигона.
+            ArrayList<Vector3f> resultVectors = new ArrayList<>();
+            ArrayList<Vector3f> polygonNormals = new ArrayList<>();
+            ArrayList<Vector2f> polygonTexture = new ArrayList<>();
+            ArrayList<Vector3f> polygonVertex = new ArrayList<>();
             // Перебор всех вершин текущего полигона.
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
 
                 // Получение координат вершины из модели.
-                Vector3f vertex = mesh.vertices.get(
-                        mesh.polygons.get(polygonInd).getVertexIndices().get(vertexInPolygonInd));
+                Vector3f vertex = mesh.vertices .get(
+                       polygon.getVertexIndices().get(vertexInPolygonInd));
 
+                polygonVertex.add(vertex);
+                polygonTexture.add(mesh.textureVertices.get(polygon.getTextureVertexIndices().get(vertexInPolygonInd)));
+                polygonVertex.add(mesh.vertices.get(polygon.getVertexIndices().get(vertexInPolygonInd)));
+                polygonNormals.add(mesh.normals.get(polygon.getNormalIndices().get(vertexInPolygonInd)));
 
+                resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height));
             }
 
 
@@ -107,20 +107,8 @@ public class RenderEngine {
 //                            texture,
 //                            zBuffer, false, false);
 //                }
-                rasterisator.draw(new ArrayList<>(List.of(
-                                mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(0)),
-                                mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(1)),
-                                mesh.vertices.get(mesh.polygons.get(polygonInd).getVertexIndices().get(2))
-
-                        ))
-                        ,
-                        new ArrayList<>(List.of(
-                                mesh.normals.get(mesh.polygons.get(polygonInd).getNormalIndices().get(0)),
-                                mesh.normals.get(mesh.polygons.get(polygonInd).getNormalIndices().get(1)),
-                                mesh.normals.get(mesh.polygons.get(polygonInd).getNormalIndices().get(2)
-                                ))),
-
-
+                rasterisator.draw(resultVectors,
+                        polygonVertex,polygonNormals,
                         zBuffer,
                         true);
             }
