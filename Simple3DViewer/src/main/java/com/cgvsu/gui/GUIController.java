@@ -91,7 +91,6 @@ public class GUIController {
     @FXML
     public void handleCameraForward(ActionEvent actionEvent) {
         camera.moveForwardWithoutTrigger(TRANSLATION); // Перемещаем камеру вперед
-        mesh.scale.x = 4;
         updateLabels(); // Обновляем метки
     }
 

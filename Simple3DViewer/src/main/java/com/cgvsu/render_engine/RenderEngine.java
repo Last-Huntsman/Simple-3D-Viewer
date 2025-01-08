@@ -24,7 +24,6 @@ public class RenderEngine {
 
     private Model mesh;
 
-
     /**
      * Метод для отрисовки 3D-модели на 2D-канвасе.
      *
@@ -120,4 +119,11 @@ public class RenderEngine {
 
     }
 
+    public Model getMesh() {
+        return mesh;
+    }
+
+    public void setMesh(Model mesh) {
+        this.mesh = mesh;
+    }
 }
