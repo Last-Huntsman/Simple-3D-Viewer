@@ -200,7 +200,7 @@ public class TriangleRasterisator {
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
         Triangle t;
-        t = new Triangle(p1, p2, p3, polygonVertex, plygonNormals);
+        t = new Triangle(p1, p2, p3,  plygonNormals,polygonVertex);
 
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).

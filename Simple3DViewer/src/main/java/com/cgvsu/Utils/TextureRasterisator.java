@@ -3,11 +3,11 @@ package com.cgvsu.Utils;
 import com.cgvsu.math.Baricentrics_Triangle.Barycentric;
 import com.cgvsu.math.Baricentrics_Triangle.Triangle;
 import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
-import com.cgvsu.math.matrices.Matrix4x4;
+import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
-import com.cgvsu.model.Model;
-import com.cgvsu.render_engine.Camera;
 import javafx.geometry.Point2D;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
@@ -16,34 +16,24 @@ import java.util.Comparator;
 import java.util.List;
 
 // Класс для растеризации треугольников с учетом глубины (z-буфера).
-public class RenderUtils{
+public class TextureRasterisator {
 
 
     // Интерфейс для записи пикселей на экран.
     private PixelWriter pixelWriter;
-    private Color filling;
     private double shadow ;
     private Vector3f cameraPosition;
+    private  Image image;
 
 
 
     // Конструктор для инициализации PixelWriter.
-    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition) {
+    public TextureRasterisator(Image image,PixelWriter pixelWriter, double shadow, Vector3f cameraPosition) {
         this.pixelWriter = pixelWriter;
-        this.filling = filling;
         this.shadow = shadow;
         this.cameraPosition = cameraPosition;
+        this.image=image;
 
-    }
-
-    // Геттер для PixelWriter.
-    public PixelWriter getPixelWriter() {
-        return pixelWriter;
-    }
-
-    // Сеттер для изменения PixelWriter.
-    public void setPixelWriter(PixelWriter pixelWriter) {
-        this.pixelWriter = pixelWriter;
     }
 
     // Сортировка вершин треугольника по оси Y (если равны — по оси X).
@@ -155,6 +145,11 @@ public class RenderUtils{
                                 t.getPolygonVertex().get(1),
                                 t.getPolygonVertex().get(2)
                         );
+                        Vector2f interpolatedTexture = barycentric.interpolate(
+                                t.getPolygonTextures().get(0),
+                                t.getPolygonTextures().get(1),
+                                t.getPolygonTextures().get(2)
+                        );
 
                         // Нормализуем интерполированную нормаль.
                         interpolatedNormal.normalize();
@@ -169,13 +164,15 @@ public class RenderUtils{
 
                         // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
                         // Коэффициент фонового освещения, можно настраивать.
-                        Color baseColor = interpolateColor(barycentric,t); // Основной цвет полигона.
+
+                        Color baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
                         Color shadedColor = calculateShadedColor(baseColor, l, shadow);
+
 
                         // Обновляем z-буфер и устанавливаем цвет.
                         zBuffer[x][y] = currentZ;
                         pixelWriter.setColor(x, y, shadedColor);
-//                        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
+
                     }
                 }
             }
@@ -184,8 +181,9 @@ public class RenderUtils{
 
     }
 
+
     // Основной метод для отрисовки треугольника.
-    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> plygonNormals, double[][] zBuffer, boolean LightingFlag) {
+    public void draw(ArrayList<Vector3f> resultVectors,ArrayList<Vector2f> polygonTexture, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> plygonNormals, double[][] zBuffer, boolean LightingFlag) {
 
         Vector3f v11 = resultVectors.get(0);
         Vector3f v22 = resultVectors.get(1);
@@ -200,7 +198,7 @@ public class RenderUtils{
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
         Triangle t;
-        t = new Triangle(p1, p2, p3, polygonVertex, plygonNormals);
+        t = new Triangle(p1, p2, p3, polygonVertex, plygonNormals, polygonTexture);
 
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).
@@ -252,37 +250,17 @@ public class RenderUtils{
                 baseColor.getOpacity()
         );
     }
-
-
-
-
-
-    // Метод для интерполяции цвета с использованием барицентрических координат
-    public static Color interpolateColor(Barycentric barycentric, Triangle t) {
-        // Проходим по пикселям от x1 до x2.
-
-//        Vector2f texCoord1 = t.getTexCoords().get(0);
-//        Vector2f texCoord2 = t.getTexCoords().get(1);
-//        Vector2f texCoord3 = t.getTexCoords().get(2); // Текстурные координаты вершин
-//
-
-        // Интерполяция текстурных координат
-        double u = barycentric.getLambda1() * texCoord1.getX() +
-                barycentric.getLambda2() * texCoord2.getX() +
-                barycentric.getLambda3() * texCoord3.getX();
-        double v = barycentric.getLambda1() * texCoord1.getY() +
-                barycentric.getLambda2() * texCoord2.getY() +
-                barycentric.getLambda3() * texCoord3.getY();
+    public Color getColor(Vector2f v) {
 
         // Преобразование в пиксельные координаты
-        int texWidth = (int) t.getImage().getWidth();
-        int texHeight = (int) t.getImage().getHeight();
+        int texWidth = (int) image.getWidth();
+        int texHeight = (int) image.getHeight();
 
-        int xTex = (int) (u * texWidth);
-        int yTex = (int) (v * texHeight);
+        int xTex = (int) (v.x * texWidth);
+        int yTex = (int) (v.y * texHeight);
 
         // Получаем PixelReader для чтения пикселей изображения
-        PixelReader pixelReader = t.getImage().getPixelReader();
+        PixelReader pixelReader = image.getPixelReader();
 
         // Проверка, что координаты находятся в пределах изображения
         if (xTex < 0) xTex = 0;
@@ -293,20 +271,10 @@ public class RenderUtils{
         // Возвращаем цвет пикселя из текстуры
         return pixelReader.getColor(xTex, yTex);
     }
-    public static Color getPixelColor(Image image, int x, int y) {
-        // Получаем PixelReader из изображения.
-        PixelReader pixelReader = image.getPixelReader();
-        if (pixelReader == null) {
-            throw new IllegalArgumentException("PixelReader не доступен для изображения");
-        }
 
-        // Проверяем, что координаты находятся в пределах изображения.
-        if (x < 0 || y < 0 || x >= image.getWidth() || y >= image.getHeight()) {
-            throw new IndexOutOfBoundsException("Координаты пикселя вне границ изображения");
-        }
 
-        // Возвращаем цвет пикселя.
-        return pixelReader.getColor(x, y);
-    }
+
+
+
 
 }
