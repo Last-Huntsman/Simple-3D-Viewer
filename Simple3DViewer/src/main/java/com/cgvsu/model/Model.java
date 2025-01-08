@@ -27,9 +27,9 @@ public class Model implements Cloneable {
 
     public Matrix4x4 getModelMatrix() {
         Matrix4x4 res;
-        res = getScaleMatrix();
+        res= getTransformMatrix();
         res.mul(getRotateMatrix());
-        res.mul(getTransformMatrix());
+        res.mul(getScaleMatrix());
         return res;
     }
 
