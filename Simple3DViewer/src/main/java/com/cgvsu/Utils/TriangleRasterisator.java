@@ -1,10 +1,17 @@
 package com.cgvsu.Utils;
 
+import com.cgvsu.math.Baricentrics_Triangle.Barycentric;
 import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
-import com.cgvsu.Utils.color_for_triangle_rasterisation.Texture;
+
 import com.cgvsu.math.Baricentrics_Triangle.Triangle;
+import com.cgvsu.math.vectors.Vector2f;
+import com.cgvsu.math.vectors.Vector3f;
+import com.cgvsu.model.Model;
+import com.cgvsu.render_engine.Camera;
 import javafx.geometry.Point2D;
+import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,12 +23,17 @@ public class TriangleRasterisator {
 
     // Интерфейс для записи пикселей на экран.
     private PixelWriter pixelWriter;
+    private Color filling;
+    private double shadow=1;
+    private  Camera camera;
 
     // Конструктор для инициализации PixelWriter.
-    public TriangleRasterisator(PixelWriter pixelWriter) {
+    public TriangleRasterisator(PixelWriter pixelWriter, Color filling, double shadow, Camera camera) {
         this.pixelWriter = pixelWriter;
+        this.filling = filling;
+        this.shadow = shadow;
+        this.camera=camera;
     }
-
     // Геттер для PixelWriter.
     public PixelWriter getPixelWriter() {
         return pixelWriter;
@@ -127,24 +139,63 @@ public class TriangleRasterisator {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
                 if (currentZ > zBuffer[x][y]) {
                     // Если пиксель ближе, чем текущий в z-буфере, обновляем.
-                    zBuffer[x][y] = currentZ;
-                    pixelWriter.setColor(x, y, t.getTexture().get(t.barycentrics( new Point2D(x, y))).convertToJFXColor());
+                    Barycentric barycentric = t.barycentrics(x, y);
+
+                    if (barycentric.isInside()) {
+                        // Интерполяция нормали в точке с использованием барицентрических координат.
+                        Vector3f interpolatedNormal = interpolateNormal(
+                                t.getPolygonNormals().get(0),
+                                t.getPolygonNormals().get(1),
+                                t.getPolygonNormals().get(2),
+                                barycentric
+                        );
+
+                        // Нормализуем интерполированную нормаль.
+                        interpolatedNormal.normalize();
+
+                        // Вычисляем направление света (свет идёт из источника в точку).
+                        Vector3f lightDirection = new Vector3f(camera.getPosition());
+                        lightDirection.sub(new Vector3f(x, y, (float) currentZ));
+                        lightDirection.normalize();
+
+                        // Вычисляем коэффициент яркости.
+                        double l = Math.max(0, interpolatedNormal.dot(lightDirection));
+
+                        // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
+                         // Коэффициент фонового освещения, можно настраивать.
+                        Color baseColor = filling; // Основной цвет полигона.
+                        Color shadedColor = calculateShadedColor(baseColor, l, shadow);
+
+                        // Обновляем z-буфер и устанавливаем цвет.
+                        zBuffer[x][y] = currentZ;
+                        pixelWriter.setColor(x, y, shadedColor);
+                        
+                    }
                 }
             }
             currentZ += dz; // Увеличиваем глубину.
         }
+
     }
 
     // Основной метод для отрисовки треугольника.
-    public void draw(Point2D p1, double z1, Point2D p2, double z2, Point2D p3, double z3,
-                     Texture texture, double[][] zBuffer) {
-        Objects.requireNonNull(p1);
-        Objects.requireNonNull(p2);
-        Objects.requireNonNull(p3);
+    public void draw( ArrayList<Vector3f> resultVectors, ArrayList<Vector3f> PolygonNormals,  double[][] zBuffer, boolean LightingFlag) {
 
+        Vector3f v11 = resultVectors.get(0);
+        Vector3f v22 = resultVectors.get(1);
+        Vector3f v33 = resultVectors.get(2);
 
-        // Создаем треугольник из вершин и текстуры.
-        Triangle t = new Triangle(p1, p2, p3, texture);
+        double z1 = v11.getZ();
+        double z2 = v22.getZ();
+        double z3 = v33.getZ();
+
+        // Преобразуем координаты вершин в `Point2D` для работы с растеризацией.
+        Point2D p1 = new Point2D(v11.getX(), v11.getY());
+        Point2D p2 = new Point2D(v22.getX(), v22.getY());
+        Point2D p3 = new Point2D(v33.getX(), v33.getY());
+        Triangle t;
+        t = new Triangle(p1, p2, p3, PolygonNormals);
+
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).
         List<Point2D> vertices = sortedVertices(t);
@@ -182,4 +233,24 @@ public class TriangleRasterisator {
             drawFlat(t, v3, v4, v2, depth3, z4, depth2, zBuffer);
         }
     }
+    private Vector3f interpolateNormal(Vector3f normal1, Vector3f normal2, Vector3f normal3, Barycentric barycentric) {
+        return new Vector3f(
+                (float) (barycentric.getLambda1() * normal1.x + barycentric.getLambda2() * normal2.x + barycentric.getLambda3() * normal3.x),
+                (float) (barycentric.getLambda1() * normal1.y + barycentric.getLambda2() * normal2.y + barycentric.getLambda3() * normal3.y),
+                (float) (barycentric.getLambda1() * normal1.z + barycentric.getLambda2() * normal2.z + barycentric.getLambda3() * normal3.z)
+        );
+    }
+    private Color calculateShadedColor(Color baseColor, double l, double k) {
+        double red = baseColor.getRed() * ((1 - k) + k * l);
+        double green = baseColor.getGreen() * ((1 - k) + k * l);
+        double blue = baseColor.getBlue() * ((1 - k) + k * l);
+        return new Color(
+                Math.min(1.0, red),
+                Math.min(1.0, green),
+                Math.min(1.0, blue),
+                baseColor.getOpacity()
+        );
+    }
+
+
 }

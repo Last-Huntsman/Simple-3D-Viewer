@@ -1,6 +1,5 @@
 package com.cgvsu.Utils;
 
-import com.cgvsu.Utils.color_for_triangle_rasterisation.MonotoneTexture;
 import com.cgvsu.math.vectors.Vector3f;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,19 +11,6 @@ import static com.cgvsu.render_engine.GraphicConveyor.vertexToPoint;
 
 
 public class PictureProcess {
-
-
-    public static void showTriangle(GraphicsContext gc, final ArrayList<Vector3f> vertices, final double[][] zBuffer) {
-
-            // Создание растеризатора для отрисовки треугольника
-            TriangleRasterisator tr = new TriangleRasterisator(gc.getPixelWriter());
-            // Создание однотонной текстуры (используется для закраски треугольника)
-            MonotoneTexture mt = new MonotoneTexture(Color.BLACK);
-            // Отрисовка треугольника с помощью растеризатора
-            tr.draw(vertexToPoint(vertices.get(0)), vertices.get(0).z, vertexToPoint(vertices.get(1)), vertices.get(1).z,vertexToPoint(vertices.get(2)), vertices.get(2).z,  mt,zBuffer);
-
-
-    }
 
     /**
      * Растеризует многоугольник с использованием z-буфера для устранения наложения.
