@@ -11,8 +11,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AffineTests {
+
     @Test
     public void testAffineScaleX() throws IOException {
         Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");

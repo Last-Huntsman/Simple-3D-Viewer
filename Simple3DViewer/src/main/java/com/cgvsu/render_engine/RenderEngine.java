@@ -1,6 +1,8 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Utils.*;
+import com.cgvsu.Utils.FindNormals;
+import com.cgvsu.Utils.TriangleRasterisator;
+import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
@@ -20,8 +22,8 @@ import static com.cgvsu.render_engine.GraphicConveyor.vertexToBord;
  */
 public class RenderEngine {
 
+    private Model mesh;
 
-    TextureRasterisator textureRasterisator;
 
     /**
      * Метод для отрисовки 3D-модели на 2D-канвасе.
@@ -38,13 +40,12 @@ public class RenderEngine {
             final Model mesh,
             final int width,
             final int height, Image texture) {
-        if(texture!=null) {
-             textureRasterisator = new TextureRasterisator(texture, graphicsContext.getPixelWriter(), 0.5 , camera.getPosition());
-        }
-        TriangleRasterisator triangleRasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera.getPosition());
+//        RenderUtils renderUtils = new RenderUtils(graphicsContext.getPixelWriter(), Color.BLACK, 1);
+        TriangleRasterisator rasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera.getPosition());
         // Триангуляция и расчет нормалей
         mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
-//        mesh.normals = FindNormals.findNormals(mesh);
+        mesh.normals = FindNormals.findNormals(mesh);
+        this.mesh = mesh;
 
         // Создание модельной матрицы.
         Matrix4x4 modelMatrix = mesh.getModelMatrix();
@@ -55,9 +56,8 @@ public class RenderEngine {
 
         // Объединение (умножение) матриц модельной, видовой и проекционной.
         Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(projectionMatrix);
-        modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу вида.
-        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
-
+        modelViewProjectionMatrix.mul(viewMatrix);
+        modelViewProjectionMatrix.mul(modelMatrix);
 
         double[][] zBuffer = new double[width][height];
         for (int x = 0; x < width; x++) {
@@ -85,38 +85,36 @@ public class RenderEngine {
             for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
 
                 // Получение координат вершины из модели.
-                Vector3f vertex = mesh.vertices.get(polygon.getVertexIndices().get(vertexInPolygonInd));
-                Vector3f mirVertex = modelMatrix.mul(vertex);
+                Vector3f vertex = mesh.vertices .get(
+                       polygon.getVertexIndices().get(vertexInPolygonInd));
 
-                polygonVertex.add(mirVertex);
+                polygonVertex.add(vertex);
                 polygonTexture.add(mesh.textureVertices.get(polygon.getTextureVertexIndices().get(vertexInPolygonInd)));
+                polygonVertex.add(mesh.vertices.get(polygon.getVertexIndices().get(vertexInPolygonInd)));
                 polygonNormals.add(mesh.normals.get(polygon.getNormalIndices().get(vertexInPolygonInd)));
 
                 resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height));
             }
 
 
-            if (nVerticesInPolygon == 3) {
-
-                /// Нужно будет оптимизировать перевод координат в точку
+            if (nVerticesInPolygon == 3) { /// Нужно будет оптимизировать перевод координат в точку
+//                PictureProcess.showTriangle(graphicsContext, resultVectors, zBuffer);
                 //ВНИМАНИЕ!!! требуется реализация случаев при которых метод вызывается
-                if (mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && texture!=null && true) {
-                    textureRasterisator.draw(resultVectors, polygonTexture, polygonVertex,
-                            polygonNormals,
-                            zBuffer, true);
-                }
-
-//                if(true) {
-//                    triangleRasterisator.draw(resultVectors,
-//                            polygonVertex, polygonNormals,
-//                            zBuffer,
-//                            true);
+//                if (mesh.polygons.get(polygonInd).getTextureVertexIndices().size() == 3 && true) {
+//                    renderUtils.draw(mesh, polygonInd,
+//                            resultVectors,
+//                            texture,
+//                            zBuffer, false, false);
 //                }
+                rasterisator.draw(resultVectors,
+                        polygonVertex,polygonNormals,
+                        zBuffer,
+                        true);
             }
 
-            if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
-                PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
-            }
+//            if (nVerticesInPolygon > 1 && true) { // Не убирайте true - это будут флаги
+//                PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
+//            }
 
         }
 
