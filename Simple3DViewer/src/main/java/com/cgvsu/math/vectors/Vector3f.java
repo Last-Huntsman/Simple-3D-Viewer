@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Класс Vector3X для работы с трехмерными векторами.
  */
-public final class Vector3f {
+public  class Vector3f {
 
     public float x, y, z;
 
@@ -61,89 +61,89 @@ public final class Vector3f {
         return "(" + this.x + ", " + this.y + ", " + this.z + ")";
     }
 
-    public final void set(float x, float y, float z){
+    public  void set(float x, float y, float z){
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public final void set(float[] var) {
+    public  void set(float[] var) {
         this.x = var[0];
         this.y = var[1];
         this.z = var[2];
     }
 
-    public final void set(Vector3f var) {
+    public  void set(Vector3f var) {
         this.x = var.x;
         this.y = var.y;
         this.z = var.z;
     }
 
-    public final void get(float[] var) {
+    public  void get(float[] var) {
         var[0] = this.x;
         var[1] = this.y;
         var[2] = this.z;
     }
 
-    public final void get(Vector3f var) {
+    public  void get(Vector3f var) {
         var.x = this.x;
         var.y = this.y;
         var.z = this.z;
     }
 
-    public final void add(Vector3f var1, Vector3f var2) {
+    public  void add(Vector3f var1, Vector3f var2) {
         this.x = var1.x + var2.x;
         this.y = var1.y + var2.y;
         this.z = var1.z + var2.z;
     }
 
-    public final void add(Vector3f var1) {
+    public  void add(Vector3f var1) {
         this.x += var1.x;
         this.y += var1.y;
         this.z += var1.z;
     }
 
-    public final void sub(Vector3f var1, Vector3f var2) {
+    public  void sub(Vector3f var1, Vector3f var2) {
         this.x = var1.x - var2.x;
         this.y = var1.y - var2.y;
         this.z = var1.z - var2.z;
     }
 
-    public final void sub(Vector3f var) {
+    public  void sub(Vector3f var) {
         this.x -= var.x;
         this.y -= var.y;
         this.z -= var.z;
     }
 
-    public final void negate(Vector3f var) {
+    public  void negate(Vector3f var) {
         this.x = -var.x;
         this.y = -var.y;
         this.z = -var.z;
     }
 
-    public final void negate() {
+    public  void negate() {
         this.x = -this.x;
         this.y = -this.y;
         this.z = -this.z;
     }
 
-    public final void scale(float var1, Vector3f var2) {
+    public  void scale(float var1, Vector3f var2) {
         this.x = var1 * var2.x;
         this.y = var1 * var2.y;
         this.z = var1 * var2.z;
     }
 
-    public final void scale(float var) {
+    public  void scale(float var) {
         this.x *= var;
         this.y *= var;
         this.z *= var;
     }
 
-    public final float length() {
+    public  float length() {
         return (float)Math.sqrt((double)(this.x * this.x + this.y * this.y + this.z * this.z));
     }
 
-    public final void cross(Vector3f var1, Vector3f var2) {
+    public  void cross(Vector3f var1, Vector3f var2) {
         float var3 = var1.y * var2.z - var1.z * var2.y;
         float var4 = var2.x * var1.z - var2.z * var1.x;
         this.z = var1.x * var2.y - var1.y * var2.x;
@@ -151,7 +151,7 @@ public final class Vector3f {
         this.y = var4;
     }
 
-    public final void cross(Vector3f var) {
+    public  void cross(Vector3f var) {
         float var1 = this.y * var.z - this.z * var.y;
         float var2 = this.z * var.x - this.x * var.z;
         float var3 = this.x * var.y - this.y * var.x;
@@ -160,25 +160,25 @@ public final class Vector3f {
         this.z = var3;
     }
 
-    public final float dot(Vector3f var1) {
+    public  float dot(Vector3f var1) {
         return this.x * var1.x + this.y * var1.y + this.z * var1.z;
     }
 
-    public final void normalize(Vector3f var1) {
+    public  void normalize(Vector3f var1) {
         float var2 = (float)(1.0 / Math.sqrt((double)(var1.x * var1.x + var1.y * var1.y + var1.z * var1.z)));
         this.x = var1.x * var2;
         this.y = var1.y * var2;
         this.z = var1.z * var2;
     }
 
-    public final void normalize() {
+    public  void normalize() {
         float var1 = (float)(1.0 / Math.sqrt((double)(this.x * this.x + this.y * this.y + this.z * this.z)));
         this.x *= var1;
         this.y *= var1;
         this.z *= var1;
     }
 
-    public final float angle(Vector3f var) {
+    public  float angle(Vector3f var) {
         double var2 = (double)(this.dot(var) / (this.length() * var.length()));
         if (var2 < -1.0) {
             var2 = -1.0;
@@ -203,7 +203,7 @@ public final class Vector3f {
     }
 
     public boolean equals(Vector3f other) {
-        final float eps = 1e-7f;
+         float eps = 1e-7f;
         return Math.abs(x - other.x) < eps && Math.abs(y - other.y) < eps && Math.abs(z - other.z) < eps;
     }
 
