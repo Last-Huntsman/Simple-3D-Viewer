@@ -1,9 +1,9 @@
 package com.cgvsu.math.Baricentrics_Triangle;
 
-import com.cgvsu.Utils.color_for_triangle_rasterisation.Texture;
 import com.cgvsu.math.vectors.Vector2f;
-import com.cgvsu.model.Model;
+import com.cgvsu.math.vectors.Vector3f;
 import javafx.geometry.Point2D;
+import javafx.scene.Camera;
 import javafx.scene.image.Image;
 
 import java.util.ArrayList;
@@ -19,26 +19,35 @@ public class Triangle {
     private Point2D point3;
 
     // Текстура, связанная с треугольником.
-    private Texture texture;
+
     private Image image;
-    private ArrayList<Vector2f> texCoords;
+
+    private ArrayList<Vector3f> polygonNormals;
+    private ArrayList<Vector2f> polygonTextures;
+
+
+    public ArrayList<Vector3f> getPolygonNormals() {
+        return polygonNormals;
+    }
+
+    public ArrayList<Vector2f> getPolygonTextures() {
+        return polygonTextures;
+    }
 
     // Конструктор для инициализации треугольника и его текстуры.
-    public Triangle(Point2D point1, Point2D point2, Point2D point3, Texture texture) {
+    public Triangle(Point2D point1, Point2D point2, Point2D point3, ArrayList<Vector3f> polygonNormals) {
 
         // Проверка на null-значения для вершин и текстуры.
         Objects.requireNonNull(point1);
         Objects.requireNonNull(point2);
         Objects.requireNonNull(point3);
-        Objects.requireNonNull(texture);
-
         this.point1 = point1;
         this.point2 = point2;
         this.point3 = point3;
-        this.texture = texture;
+        this.polygonNormals=polygonNormals;
     }
 
-    public Triangle(Point2D point1, Point2D point2, Point2D point3, Image image, Model model, int polygonInd) {
+    public Triangle(Point2D point1, Point2D point2, Point2D point3, Image image, ArrayList<Vector3f> polygonNormals, ArrayList<Vector2f> polygonTextures) {
 
         // Проверка на null-значения для вершин и текстуры.
         Objects.requireNonNull(point1);
@@ -50,21 +59,10 @@ public class Triangle {
         this.point2 = point2;
         this.point3 = point3;
         this.image = image;
+        this.polygonTextures = polygonTextures;
+        this.polygonNormals = polygonNormals;
     }
 
-    public ArrayList<Vector2f> getTexCoords() {
-        return texCoords;
-    }
-
-    // Получить текстуру, связанную с треугольником.
-    public Texture getTexture() {
-        return texture;
-    }
-
-    // Установить новую текстуру для треугольника.
-    public void setTexture(Texture texture) {
-        this.texture = texture;
-    }
 
     // Геттер для первой вершины треугольника.
     public Point2D getPoint1() {
