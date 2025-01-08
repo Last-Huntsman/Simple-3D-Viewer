@@ -33,18 +33,6 @@ public class Matrix3x3 {
         this.elements[8] = var[8];
     }
 
-    public Matrix3x3(Matrix3x3 var) {
-        this.elements[0] = var.elements[0];
-        this.elements[1] = var.elements[1];
-        this.elements[2] = var.elements[2];
-        this.elements[3] = var.elements[3];
-        this.elements[4] = var.elements[4];
-        this.elements[5] = var.elements[5];
-        this.elements[6] = var.elements[6];
-        this.elements[7] = var.elements[7];
-        this.elements[8] = var.elements[8];
-    }
-
     public Matrix3x3() {
         this.elements = new float[] {
                 0, 0, 0,
@@ -257,9 +245,7 @@ public class Matrix3x3 {
         try {
             Matrix3x3 var2 = (Matrix3x3)var;
             return this.elements[0] == var2.elements[0] && this.elements[1] == var2.elements[1] && this.elements[2] == var2.elements[2] && this.elements[3] == var2.elements[3] && this.elements[4] == var2.elements[4] && this.elements[5] == var2.elements[5] && this.elements[6] == var2.elements[6] && this.elements[7] == var2.elements[7] && this.elements[8] == var2.elements[8];
-        } catch (ClassCastException var4) {
-            return false;
-        } catch (NullPointerException var5) {
+        } catch (ClassCastException | NullPointerException var4) {
             return false;
         }
     }

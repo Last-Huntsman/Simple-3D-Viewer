@@ -527,7 +527,6 @@ public class Matrix4x4 {
         this.elements[15] = var16;
     }
 
-
     public final void mul(Matrix4x4 var1, Matrix4x4 var2) {
         if (this != var1 && this != var2) {
             this.elements[0] = var1.elements[0] * var2.elements[0] + var1.elements[1] * var2.elements[4] + var1.elements[2] * var2.elements[8] + var1.elements[3] * var2.elements[12];
@@ -609,7 +608,6 @@ public class Matrix4x4 {
         float var4 = this.elements[12] * var.x + this.elements[13] * var.y + this.elements[14] * var.z + this.elements[15] * var.w;
         return new Vector4f(var1, var2, var3, var4);
     }
-
 
     public int hashCode() {
         long var1 = 1L;
