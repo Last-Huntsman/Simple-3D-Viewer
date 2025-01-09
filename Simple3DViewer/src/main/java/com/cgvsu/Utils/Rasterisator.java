@@ -39,7 +39,7 @@ public class Rasterisator {
         this.image = image;
         this.flagLighting = flagLighting;
         this.flagTexture = flagTexture;
-        this.filling=Color.WHITE;
+        this.filling = Color.WHITE;
     }
 
     public Rasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition, boolean flagLighting) {
@@ -65,8 +65,7 @@ public class Rasterisator {
     }
 
     // Отрисовка "плоского" треугольника (верхняя или нижняя стороны параллельны оси X).
-    private void drawFlat(final Triangle t, final Point2D lone, final Point2D flat1, final Point2D flat2,
-                          final double zLone, final double zFlat1, final double zFlat2, final double[][] zBuffer) {
+    private void drawFlat(final Triangle t, final Point2D lone, final Point2D flat1, final Point2D flat2, final double zLone, final double zFlat1, final double zFlat2, final double[][] zBuffer) {
         // Координаты "одинокой" вершины (которая отличается по Y).
         final double lx = lone.getX();
         final double ly = lone.getY();
@@ -97,8 +96,7 @@ public class Rasterisator {
     }
 
     // Отрисовка верхнего плоского треугольника.
-    private void drawTop(final Triangle t, final Point2D v, final double maxY, final double dx1, final double dx2,
-                         final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
+    private void drawTop(final Triangle t, final Point2D v, final double maxY, final double dx1, final double dx2, final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
         double x1 = v.getX(); // Начальная X-координата первой стороны.
         double x2 = x1;       // Начальная X-координата второй стороны.
         double z1 = zStart;   // Начальная глубина первой стороны.
@@ -117,8 +115,7 @@ public class Rasterisator {
     }
 
     // Отрисовка нижнего плоского треугольника.
-    private void drawBottom(final Triangle t, final Point2D v, final double minY, final double dx1, final double dx2,
-                            final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
+    private void drawBottom(final Triangle t, final Point2D v, final double minY, final double dx1, final double dx2, final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
         double x1 = v.getX(); // Начальная X-координата первой стороны.
         double x2 = x1;       // Начальная X-координата второй стороны.
         double z1 = zStart;   // Начальная глубина первой стороны.
@@ -137,41 +134,27 @@ public class Rasterisator {
     }
 
     // Отрисовка одной горизонтальной линии между двумя X-координатами.
-    private void drawHLine(final Triangle t, final int x1, final int x2, final int y,
-                           final double z1, final double z2, final double[][] zBuffer) {
+    private void drawHLine(final Triangle t, final int x1, final int x2, final int y, final double z1, final double z2, final double[][] zBuffer) {
         double currentZ = z1; // Начальная глубина.
         double dz = (z2 - z1) / (x2 - x1); // Интерполяция глубины.
 
         // Проходим по пикселям от x1 до x2.
         for (int x = x1; x <= x2; x++) {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
-                if (currentZ > zBuffer[x][y]  ) {
+                if (currentZ > zBuffer[x][y]) {
                     Barycentric barycentric = t.barycentrics(x, y);
-
                     Color baseColor = filling;
                     // Если пиксель ближе, чем текущий в z-буфере, обновляем.
 
 
                     if (flagTexture && t.getPolygonTextures().size() == 3 && barycentric.isInside()) {
-                        Vector2f interpolatedTexture = barycentric.interpolate(
-                                t.getPolygonTextures().get(0),
-                                t.getPolygonTextures().get(1),
-                                t.getPolygonTextures().get(2)
-                        );
+                        Vector2f interpolatedTexture = barycentric.interpolate(t.getPolygonTextures().get(0), t.getPolygonTextures().get(1), t.getPolygonTextures().get(2));
 
                         baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
                     }
                     if (flagLighting) {
-                        Vector3f interpolatedNormal = barycentric.interpolate(
-                                t.getPolygonNormals().get(0),
-                                t.getPolygonNormals().get(1),
-                                t.getPolygonNormals().get(2)
-                        );
-                        Vector3f interpolatedVertex = barycentric.interpolate(
-                                t.getPolygonVertex().get(0),
-                                t.getPolygonVertex().get(1),
-                                t.getPolygonVertex().get(2)
-                        );
+                        Vector3f interpolatedNormal = barycentric.interpolate(t.getPolygonNormals().get(0), t.getPolygonNormals().get(1), t.getPolygonNormals().get(2));
+                        Vector3f interpolatedVertex = barycentric.interpolate(t.getPolygonVertex().get(0), t.getPolygonVertex().get(1), t.getPolygonVertex().get(2));
 
 
                         // Нормализуем интерполированную нормаль.
@@ -192,7 +175,7 @@ public class Rasterisator {
                         baseColor = calculateShadedColor(baseColor, l, shadow);
                     }
                     // Обновляем z-буфер и устанавливаем цвет.
-                    if(barycentric.isInside()) {
+                    if (barycentric.isInside()) {
                         zBuffer[x][y] = currentZ;
                         pixelWriter.setColor(x, y, baseColor);
                     }
@@ -278,12 +261,7 @@ public class Rasterisator {
         double red = baseColor.getRed() * ((1 - k) + k * l);
         double green = baseColor.getGreen() * ((1 - k) + k * l);
         double blue = baseColor.getBlue() * ((1 - k) + k * l);
-        return new Color(
-                Math.min(1.0, red),
-                Math.min(1.0, green),
-                Math.min(1.0, blue),
-                baseColor.getOpacity()
-        );
+        return new Color(Math.min(1.0, red), Math.min(1.0, green), Math.min(1.0, blue), baseColor.getOpacity());
     }
 
     public Color getColor(Vector2f v) {

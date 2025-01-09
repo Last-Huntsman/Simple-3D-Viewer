@@ -1,8 +1,8 @@
 package com.cgvsu.render_engine;
 
 import com.cgvsu.Utils.FindNormals;
-import com.cgvsu.Utils.PictureProcess;
 import com.cgvsu.Utils.Rasterisator;
+import com.cgvsu.Utils.Rendering_the_grid;
 import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
@@ -42,10 +42,10 @@ public class RenderEngine {
             rasterisator = new Rasterisator(graphicsContext.getPixelWriter(), color, shadow, camera.getPosition(), flagLighting);
         }
 
-        // Триангуляция и расчет нормалей
-        mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
-        mesh.normals = FindNormals.findNormals(mesh);
-
+//
+//        // Триангуляция и расчет нормалей
+//        mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
+//        mesh.normals = FindNormals.findNormals(mesh);
         // Создание модельной матрицы.
         Matrix4x4 modelMatrix = mesh.getModelMatrix();
         // Получение матрицы вида из объекта камеры.
@@ -104,10 +104,11 @@ public class RenderEngine {
                 rasterisator.draw(resultVectors, polygonTexture, polygonVertex, polygonNormals, zBuffer);
 
             }
-            //Сетка полигональная
-//            if (nVerticesInPolygon > 1 && flagGrid) {
-//                PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
-//            }
+
+//            Сетка полигональная
+            if (nVerticesInPolygon > 1 && flagGrid) {
+                Rendering_the_grid.DrawGrid(graphicsContext, resultVectors, zBuffer);
+            }
 
         }
 
