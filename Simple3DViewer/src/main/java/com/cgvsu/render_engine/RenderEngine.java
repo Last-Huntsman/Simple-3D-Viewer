@@ -1,8 +1,7 @@
 package com.cgvsu.render_engine;
 
 import com.cgvsu.Utils.PictureProcess;
-import com.cgvsu.Utils.TextureRasterisator;
-import com.cgvsu.Utils.TriangleRasterisator;
+import com.cgvsu.Utils.Rasterisator;
 import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
@@ -24,8 +23,7 @@ import static com.cgvsu.render_engine.GraphicConveyor.vertexToBord;
 public class RenderEngine {
 
 
-    TextureRasterisator textureRasterisator;
-    TriangleRasterisator triangleRasterisator;
+    Rasterisator rasterisator;
 
     /**
      * Метод для отрисовки 3D-модели на 2D-канвасе.
@@ -38,9 +36,9 @@ public class RenderEngine {
      */
     public void render(final GraphicsContext graphicsContext, final Camera camera, final Model mesh, final int width, final int height, Image texture, boolean flagTexture, boolean flagGrid, boolean flagLighting, Color color, double shadow) {
         if (texture != null && flagTexture) {
-            textureRasterisator = new TextureRasterisator(texture, graphicsContext.getPixelWriter(), shadow, camera.getPosition(), flagLighting);
+            rasterisator = new Rasterisator(texture, graphicsContext.getPixelWriter(), shadow, camera.getPosition(), flagLighting, true);
         } else {
-            triangleRasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), color, shadow, camera.getPosition(), flagLighting);
+            rasterisator = new Rasterisator(graphicsContext.getPixelWriter(), color, shadow, camera.getPosition(), flagLighting);
         }
 
         // Триангуляция и расчет нормалей
@@ -101,19 +99,14 @@ public class RenderEngine {
 
 
             if (nVerticesInPolygon == 3) {
-                if (texture != null && flagTexture && polygonTexture.size() == 3) {
-                    textureRasterisator.draw(resultVectors, polygonTexture, polygonVertex, polygonNormals, zBuffer);
-                } else {
-                    triangleRasterisator.draw(resultVectors,
-                            polygonVertex, polygonNormals,
-                            zBuffer,
-                            true);
-                }
+
+                rasterisator.draw(resultVectors, polygonTexture, polygonVertex, polygonNormals, zBuffer);
+
             }
             //Сетка полигональная
-            if (nVerticesInPolygon > 1 && flagGrid) {
-                PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
-            }
+//            if (nVerticesInPolygon > 1 && flagGrid) {
+//                PictureProcess.rasterizePolygon(graphicsContext, resultVectors, zBuffer);
+//            }
 
         }
 

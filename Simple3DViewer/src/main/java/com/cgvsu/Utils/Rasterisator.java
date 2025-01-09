@@ -16,25 +16,40 @@ import java.util.Comparator;
 import java.util.List;
 
 // Класс для растеризации треугольников с учетом глубины (z-буфера).
-public class TextureRasterisator {
+public class Rasterisator {
 
 
     // Интерфейс для записи пикселей на экран.
     private final PixelWriter pixelWriter;
     private final double shadow;
     private final Vector3f cameraPosition;
-    private final Image image;
     private final boolean flagLighting;
+
+    private final Image image;
+
+    private final Color filling;
+    private boolean flagTexture;
 
 
     // Конструктор для инициализации PixelWriter.
-    public TextureRasterisator(Image image, PixelWriter pixelWriter, double shadow, Vector3f cameraPosition, boolean flagLighting) {
+    public Rasterisator(Image image, PixelWriter pixelWriter, double shadow, Vector3f cameraPosition, boolean flagLighting, boolean flagTexture) {
         this.pixelWriter = pixelWriter;
         this.shadow = shadow;
         this.cameraPosition = cameraPosition;
         this.image = image;
         this.flagLighting = flagLighting;
+        this.flagTexture = flagTexture;
+        this.filling=Color.WHITE;
+    }
 
+    public Rasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition, boolean flagLighting) {
+        this.pixelWriter = pixelWriter;
+        this.filling = filling;
+        this.shadow = shadow;
+        this.cameraPosition = cameraPosition;
+        this.flagLighting = flagLighting;
+        image = null;
+        flagTexture = false;
     }
 
     // Сортировка вершин треугольника по оси Y (если равны — по оси X).
@@ -131,54 +146,55 @@ public class TextureRasterisator {
         for (int x = x1; x <= x2; x++) {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
                 if (currentZ > zBuffer[x][y]) {
+                    Color baseColor = filling;
+
+
                     // Если пиксель ближе, чем текущий в z-буфере, обновляем.
                     Barycentric barycentric = t.barycentrics(x, y);
 
-                    if (barycentric.isInside()) {
+                    if (flagTexture && t.getPolygonTextures().size() == 3 && barycentric.isInside()) {
                         Vector2f interpolatedTexture = barycentric.interpolate(
                                 t.getPolygonTextures().get(0),
                                 t.getPolygonTextures().get(1),
                                 t.getPolygonTextures().get(2)
                         );
-                        Color baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
-                        // Интерполяция нормали в точке с использованием барицентрических координат.
-                        if (flagLighting) {
-                            Vector3f interpolatedNormal = barycentric.interpolate(
-                                    t.getPolygonNormals().get(0),
-                                    t.getPolygonNormals().get(1),
-                                    t.getPolygonNormals().get(2)
-                            );
-                            Vector3f interpolatedVertex = barycentric.interpolate(
-                                    t.getPolygonVertex().get(0),
-                                    t.getPolygonVertex().get(1),
-                                    t.getPolygonVertex().get(2)
-                            );
 
-
-                            // Нормализуем интерполированную нормаль.
-                            interpolatedNormal.normalize();
-
-                            // Вычисляем направление света (свет идёт из источника в точку).
-                            Vector3f lightDirection = new Vector3f(cameraPosition);
-                            lightDirection.sub(interpolatedVertex);
-                            lightDirection.normalize();
-
-                            // Вычисляем коэффициент яркости.
-                            double l = Math.max(0, interpolatedNormal.dot(lightDirection));
-
-                            // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
-                            // Коэффициент фонового освещения, можно настраивать.
-
-
-                            baseColor = calculateShadedColor(baseColor, l, shadow);
-                        }
-
-
-                        // Обновляем z-буфер и устанавливаем цвет.
-                        zBuffer[x][y] = currentZ;
-                        pixelWriter.setColor(x, y, baseColor);
-
+                        baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
                     }
+                    if (flagLighting) {
+                        Vector3f interpolatedNormal = barycentric.interpolate(
+                                t.getPolygonNormals().get(0),
+                                t.getPolygonNormals().get(1),
+                                t.getPolygonNormals().get(2)
+                        );
+                        Vector3f interpolatedVertex = barycentric.interpolate(
+                                t.getPolygonVertex().get(0),
+                                t.getPolygonVertex().get(1),
+                                t.getPolygonVertex().get(2)
+                        );
+
+
+                        // Нормализуем интерполированную нормаль.
+                        interpolatedNormal.normalize();
+
+                        // Вычисляем направление света (свет идёт из источника в точку).
+                        Vector3f lightDirection = new Vector3f(cameraPosition);
+                        lightDirection.sub(interpolatedVertex);
+                        lightDirection.normalize();
+
+                        // Вычисляем коэффициент яркости.
+                        double l = Math.max(0, interpolatedNormal.dot(lightDirection));
+
+                        // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
+                        // Коэффициент фонового освещения, можно настраивать.
+
+
+                        baseColor = calculateShadedColor(baseColor, l, shadow);
+                    }
+                    // Обновляем z-буфер и устанавливаем цвет.
+                    zBuffer[x][y] = currentZ;
+                    pixelWriter.setColor(x, y, baseColor);
+
                 }
             }
             currentZ += dz; // Увеличиваем глубину.
@@ -203,10 +219,18 @@ public class TextureRasterisator {
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
         Triangle t;
-        if (flagLighting) {
-            t = new Triangle(p1, p2, p3, polygonVertex, polygonNormals, polygonTexture);
+        if (flagTexture && polygonTexture.size() == 3) {
+            if (flagLighting) {
+                t = new Triangle(p1, p2, p3, polygonVertex, polygonNormals, polygonTexture);
+            } else {
+                t = new Triangle(p1, p2, p3, polygonTexture);
+            }
         } else {
-            t = new Triangle(p1, p2, p3, polygonTexture);
+            if (flagLighting) {
+                t = new Triangle(p1, p2, p3, polygonNormals, polygonVertex);
+            } else {
+                t = new Triangle(p1, p2, p3);
+            }
         }
 
 
