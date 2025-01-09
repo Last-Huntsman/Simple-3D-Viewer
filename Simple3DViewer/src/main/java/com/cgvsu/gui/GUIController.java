@@ -285,8 +285,6 @@ public class GUIController {
             for (FinishedModel finishedModel : modelController.getModels()) {
                 Model model = finishedModel.getModel();
                 Image texture = finishedModel.getRenderMode().getTexture();
-
-
                 renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, true, true, true, Color.RED, 0.5);
             }
         });
@@ -358,6 +356,7 @@ public class GUIController {
             mesh.normals = FindNormals.findNormals(mesh);
             String modelName = getModelName(fileName);
             meshes.add(mesh);
+            camera.rotateWithoutTrigger(0, 0);
 
             FinishedModel loadedModel = new FinishedModel(mesh, modelName, RenderModeFactory.grid(), false);
             modelController.addModel(loadedModel); // Добавление модели в контроллер
