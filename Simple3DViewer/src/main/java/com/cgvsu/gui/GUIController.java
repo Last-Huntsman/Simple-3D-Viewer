@@ -1,7 +1,5 @@
 package com.cgvsu.gui;
 
-import com.cgvsu.Utils.FindNormals;
-import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.io.objReader.ObjReader;
 import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
@@ -24,17 +22,19 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.image.Image;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GUIController {
 
@@ -46,8 +46,8 @@ public class GUIController {
     private static final float TRANSLATION = 0.5F; // Шаг перемещения камеры
     private static final float ROTATION_ANGLE = 1.0F; // Угол поворота камеры
 
-    private Model mesh; // Текущая загруженная модель
-    private Image texture;
+    private final List<Model> meshes = new ArrayList<>(); // Список загруженных моделей
+    private final List<Image> textures = new ArrayList<>();
 
     @FXML
     private AnchorPane anchorPane; // Контейнер для интерфейса
@@ -73,22 +73,33 @@ public class GUIController {
         Vector3f position = camera.getPosition(); // Позиция камеры
         Vector2f rotation = camera.getRotation(); // Углы поворота камеры
         Vector3f targetPosition = camera.getTarget(); // Целевая точка камеры
-        Vector3f modelPosition = mesh.position; // Позиция модели
-        Vector3f modelScale = mesh.scale; // Масштаб модели
-        Vector3f modelRotation = mesh.rotation; // Поворот модели
 
-        // Обновление текста в метках
+        // Обновление текста в метках камеры
         positionLabel.setText(String.format("Camera Position: (%.2f, %.2f, %.2f)",
                 position.x, position.y, position.z));
         rotationLabel.setText(String.format("Camera Rotation: (%.2f°, %.2f°)",
                 rotation.x, rotation.y));
         targetLabel.setText(String.format("Target Position: (%.2f, %.2f, %.2f)",
                 targetPosition.x, targetPosition.y, targetPosition.z));
-        modelLabel.setText(String.format("Model Position: (%.2f, %.2f, %.2f), Model Scale: (%.2f, %.2f, %.2f), Model Rotation: (%.2f°, %.2f°, %.2f°)",
-                modelPosition.x, modelPosition.y, modelPosition.z,
-                modelScale.x, modelScale.y, modelScale.z,
-                modelRotation.x, modelRotation.y, modelRotation.z));
+
+        // Обновление текста для всех загруженных моделей
+        StringBuilder modelInfo = new StringBuilder();
+        for (FinishedModel finishedModel : modelController.getModels()) {
+            Model mesh = finishedModel.getModel();
+            Vector3f modelPosition = mesh.position; // Позиция модели
+            Vector3f modelScale = mesh.scale; // Масштаб модели
+            Vector3f modelRotation = mesh.rotation; // Поворот модели
+
+            modelInfo.append(String.format("Model: %s, Position: (%.2f, %.2f, %.2f), Scale: (%.2f, %.2f, %.2f), Rotation: (%.2f°, %.2f°, %.2f°)\n",
+                    finishedModel.getName(),
+                    modelPosition.x, modelPosition.y, modelPosition.z,
+                    modelScale.x, modelScale.y, modelScale.z,
+                    modelRotation.x, modelRotation.y, modelRotation.z));
+        }
+
+        modelLabel.setText(modelInfo.toString());
     }
+
 
     // Методы для обработки перемещения камеры
     @FXML
@@ -119,6 +130,23 @@ public class GUIController {
     public void handleCameraUp(ActionEvent actionEvent) {
         camera.moveUpWithoutTrigger(TRANSLATION); // Камера движется вверх
         updateLabels();
+    }
+
+    @FXML
+    private void handleModelClick(MouseEvent event) {
+        double mouseX = event.getX();
+        double mouseY = event.getY();
+
+        for (FinishedModel finishedModel : modelController.getModels()) {
+            Model model = finishedModel.getModel();
+
+            // Проверка попадания клика в модель
+            if (isMouseOverModel(mouseX, mouseY, model)) {
+                modelController.setCurrent(finishedModel.getName());
+                updateLabels();
+                break;
+            }
+        }
     }
 
     @FXML
@@ -191,6 +219,18 @@ public class GUIController {
         // Обновляем интерфейс (если нужно)
         updateLabels();
     }
+    private boolean isMouseOverModel(double mouseX, double mouseY, Model model) {
+        // Проверяем, попадает ли мышь в область проекции модели
+        // Упростим задачу: проверим попадание в прямоугольник
+        Vector3f position = model.position; // Позиция модели в 3D
+        float size = 10.0f; // Условный размер модели для проверки
+
+        // Преобразуем координаты модели в 2D
+        Point projected = camera.projectTo2D(position, canvas.getWidth(), canvas.getHeight());
+
+        return mouseX >= projected.x - size && mouseX <= projected.x + size &&
+                mouseY >= projected.y - size && mouseY <= projected.y + size;
+    }
 
     private void handleMouseReleased(MouseEvent event) {
         lastMouseX = -1;
@@ -214,61 +254,41 @@ public class GUIController {
     @FXML
     private void initialize() {
         // Привязка размеров холста к размерам контейнера
-        anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
-        anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
+            anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
+            anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
-        canvas.setOnMousePressed(this::handleMousePressed);
-        canvas.setOnMouseDragged(this::handleMouseRotation);
-        canvas.setOnMouseReleased(this::handleMouseReleased);
+            canvas.setOnMousePressed(this::handleMousePressed);
+            canvas.setOnMouseDragged(this::handleMouseRotation);
+            canvas.setOnMouseReleased(this::handleMouseReleased);
+            canvas.setOnScroll(this::handleMouseScroll);
 
-        canvas.setOnScroll(event -> handleMouseScroll(event));
+            Timeline timeline = new Timeline();
+            timeline.setCycleCount(Animation.INDEFINITE);
 
-        // Создание таймлайна для обновления сцены
-        Timeline timeline = new Timeline();
-        timeline.setCycleCount(Animation.INDEFINITE); // Бесконечный цикл таймлайна
-
-        KeyFrame frame = getKeyFrame();
-
-        Path fileName = Path.of("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
-
-        try {
-            String fileContent = Files.readString(fileName); // Чтение файла модели
-            String modelName = getModelName(fileName);
-            mesh = ObjReader.read(fileContent); // Парсинг модели
-            // Триангуляция и расчет нормалей
-            mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
-            mesh.normals = FindNormals.findNormals(mesh);
-
-            FinishedModel loadedModel = new FinishedModel(mesh, modelName, RenderModeFactory.grid());
-            modelController.addModel(loadedModel); // Добавление модели в контроллер
-            modelController.addNameToNameSet(modelName);
-            updateLabels();
-        } catch (IOException ignored) {
+            KeyFrame frame = getKeyFrame();
+            timeline.getKeyFrames().add(frame);
+            timeline.play();
         }
 
-        timeline.getKeyFrames().add(frame); // Добавление кадра в таймлайн
-        timeline.play(); // Запуск анимации
-    }
 
     private KeyFrame getKeyFrame() {
-        RenderEngine renderEngine = new RenderEngine(); // Движок рендеринга
+        RenderEngine renderEngine = new RenderEngine();
 
-        // Обновление кадра каждые 15 миллисекунд
-        KeyFrame frame = new KeyFrame(Duration.millis(30), event -> {
+        return new KeyFrame(Duration.millis(15), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
 
-            canvas.getGraphicsContext2D().clearRect(0, 0, width, height); // Очистка холста
-            camera.setAspectRatio((float) (height / width)); // Обновление соотношения сторон
+            canvas.getGraphicsContext2D().clearRect(0, 0, width, height);
+            camera.setAspectRatio((float) (height / width));
 
-            // Рендеринг модели, если она загружена
-            if (mesh != null) {
-
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,texture, true,true,true, Color.GREEN, 0.5);
+            for (FinishedModel finishedModel : modelController.getModels()) {
+                Model model = finishedModel.getModel();
+                BufferedImage texture = finishedModel.getRenderMode().getTexture();
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture);
             }
         });
-        return frame;
     }
+
 
     // Обработчик открытия текстуры
     @FXML
@@ -296,10 +316,9 @@ public class GUIController {
         try {
             // Загружаем PNG изображение
             Image textureImage = new Image(file.toURI().toString());
-             texture = textureImage;
 
             // Печать для проверки
-//            System.out.println("Текстура загружена: " + file.getName());
+            System.out.println("Текстура загружена: " + file.getName());
 
         } catch (Exception exception) {
             // Обработка ошибок при загрузке изображения
@@ -330,7 +349,13 @@ public class GUIController {
         try {
             // Читаем содержимое файла и загружаем модель
             String fileContent = Files.readString(fileName);
-            mesh = ObjReader.read(fileContent);  // Парсим файл и создаем объект модели
+            Model mesh = ObjReader.read(fileContent);// Парсим файл и создаем объект модели
+            String modelName = getModelName(fileName);
+            meshes.add(mesh);
+
+            FinishedModel loadedModel = new FinishedModel(mesh, modelName, RenderModeFactory.grid(), false);
+            modelController.addModel(loadedModel); // Добавление модели в контроллер
+            modelController.addNameToNameSet(modelName);
             updateLabels(); // Обновляем отображаемую информацию об объекте
         } catch (IOException exception) {
             // Если возникла ошибка при чтении файла, она игнорируется
@@ -342,12 +367,12 @@ public class GUIController {
         // Создаем объект для записи модели в файл
         ObjWriter objWriter = new ObjWriter();
         // Устанавливаем текущую модель для сохранения
-        setCurrentModel(0);
+        //setCurrentModel(0);
 
         // Открываем диалоговое окно для выбора места сохранения
         FileChooser fileChooser = new FileChooser();
         // Устанавливаем имя файла по умолчанию
-        fileChooser.setInitialFileName(modelController.currentModel.getName());
+        fileChooser.setInitialFileName(modelController.getCurrent().getName());
         // Устанавливаем фильтр для отображения только файлов с расширением *.obj
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Model (*.obj)", "*.obj"));
         fileChooser.setTitle("Save model");
@@ -361,7 +386,7 @@ public class GUIController {
 
         try {
             // Пишем текущую модель в файл
-            objWriter.write(modelController.currentModel.model, filename);
+            objWriter.write(modelController.getCurrent().model, filename);
         } catch (Exception e) {
             // Если произошла ошибка, отображаем сообщение об ошибке
             showError("Error", "Error while writing file");
@@ -388,7 +413,7 @@ public class GUIController {
 
         try {
             // Пишем трансформированную модель в файл
-            objWriter.write(getTransformedModel(modelController.currentModel.model), filename);
+            objWriter.write(getTransformedModel(modelController.getCurrent().model), filename);
         } catch (Exception e) {
             // Если произошла ошибка, отображаем сообщение об ошибке
             showError("Error", "Error while writing file");
@@ -430,9 +455,9 @@ public class GUIController {
     }
 
     // Метод для установки текущей модели (по индексу)
-    private void setCurrentModel(int index) {
+    /*private void setCurrentModel(int index) {
         modelController.setCurrent(index); // Устанавливаем текущую модель в контроллере
-    }
+    }*/
 
     // Метод для отображения сообщения об ошибке
     private void showError(String title, String content) {
