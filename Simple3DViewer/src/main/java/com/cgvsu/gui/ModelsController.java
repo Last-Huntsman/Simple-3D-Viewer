@@ -10,19 +10,29 @@ import java.util.Set;
 
 public class ModelsController {
 
-    public FinishedModel currentModel;
-
+    private FinishedModel currentModel;
     private final List<FinishedModel> modelList = new ArrayList<>();
-
     private final Set<String> namesSet = new HashSet<>();
 
     public Set<String> getNamesSet() {
         return namesSet;
     }
 
-    public void setCurrent(int index) {
-        if (index >= 0 && index < modelList.size())
-            currentModel = modelList.get(index);
+    public void setCurrent(String modelName) {
+        for (FinishedModel model : modelList) {
+            if (model.getName().equals(modelName)) {
+                currentModel = model;
+                return;
+            }
+        }
+    }
+
+    public FinishedModel getCurrent() {
+        return currentModel;
+    }
+
+    public List<FinishedModel> getModels() {
+        return modelList;
     }
 
     public void addNameToNameSet(String name) {
@@ -31,5 +41,6 @@ public class ModelsController {
 
     public void addModel(FinishedModel finishedModel) {
         modelList.add(finishedModel);
+        namesSet.add(finishedModel.getName());
     }
 }

@@ -12,6 +12,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static com.cgvsu.render_engine.GraphicConveyor.multiplyMatrix4ByVector3;
@@ -38,7 +39,7 @@ public class RenderEngine {
             final Camera camera,
             final Model mesh,
             final int width,
-            final int height, Image texture) {
+            final int height, BufferedImage texture) {
 //        RenderUtils renderUtils = new RenderUtils(graphicsContext.getPixelWriter(), Color.BLACK, 1);
         TriangleRasterisator rasterisator = new TriangleRasterisator(graphicsContext.getPixelWriter(), Color.GREEN, 0.5, camera.getPosition());
         // Триангуляция и расчет нормалей

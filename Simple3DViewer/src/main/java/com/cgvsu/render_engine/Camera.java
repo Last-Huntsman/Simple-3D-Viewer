@@ -4,6 +4,8 @@ import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 
+import java.awt.*;
+
 // Класс Camera представляет камеру, используемую для отображения трехмерной сцены.
 public class Camera {
 
@@ -173,5 +175,28 @@ public class Camera {
         Vector3f res = new Vector3f(direction.z, 0, -direction.x); // Перпендикулярный вектор.
         res.normalize(); // Нормализуем вектор.
         return res;
+    }
+
+    public Point projectTo2D(Vector3f point3D, double screenWidth, double screenHeight) {
+        // Угол поля зрения в радианах
+        float fovRadians = (float) Math.toRadians(fov);
+
+        // Фактор масштабирования
+        float scale = (float) (1 / Math.tan(fovRadians / 2));
+
+        // Координаты из Vector3f
+        float x = point3D.x;
+        float y = point3D.y;
+        float z = point3D.z;
+
+        // Преобразование координат
+        float projectedX = x / (-z) * scale * aspectRatio;
+        float projectedY = y / (-z) * scale;
+
+        // Преобразование в координаты экрана
+        int screenX = (int) ((projectedX + 1) * 0.5 * screenWidth);
+        int screenY = (int) ((1 - projectedY) * 0.5 * screenHeight); // Инверсия Y-оси для экрана
+
+        return new Point(screenX, screenY);
     }
 }
