@@ -1,5 +1,7 @@
 package com.cgvsu.gui;
 
+import com.cgvsu.Utils.FindNormals;
+import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.io.objReader.ObjReader;
 import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
@@ -19,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -26,12 +29,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.scene.image.Image;
 
-
-import java.awt.image.BufferedImage;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,8 +49,7 @@ public class GUIController {
     private static final float ROTATION_ANGLE = 1.0F; // Угол поворота камеры
 
     private final List<Model> meshes = new ArrayList<>(); // Список загруженных моделей
-    private final List<Image> textures = new ArrayList<>();
-
+    private final List<Image> textures=new ArrayList<>();
     @FXML
     private AnchorPane anchorPane; // Контейнер для интерфейса
 
@@ -245,7 +243,7 @@ public class GUIController {
         final float ZOOM_SENSITIVITY = 0.1f;
 
         // Движение камеры: прокрутка вверх (положительное значение) приближает, вниз — отдаляет
-        float zoomAmount = -(float)(event.getDeltaY()) * ZOOM_SENSITIVITY;
+        float zoomAmount = -(float) (event.getDeltaY()) * ZOOM_SENSITIVITY;
 
         // Изменение положения камеры вдоль её направления
         camera.zoom(zoomAmount);
@@ -257,21 +255,21 @@ public class GUIController {
     @FXML
     private void initialize() {
         // Привязка размеров холста к размерам контейнера
-            anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
-            anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
+        anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
+        anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
-            canvas.setOnMousePressed(this::handleMousePressed);
-            canvas.setOnMouseDragged(this::handleMouseRotation);
-            canvas.setOnMouseReleased(this::handleMouseReleased);
-            canvas.setOnScroll(this::handleMouseScroll);
+        canvas.setOnMousePressed(this::handleMousePressed);
+        canvas.setOnMouseDragged(this::handleMouseRotation);
+        canvas.setOnMouseReleased(this::handleMouseReleased);
+        canvas.setOnScroll(this::handleMouseScroll);
 
-            Timeline timeline = new Timeline();
-            timeline.setCycleCount(Animation.INDEFINITE);
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(Animation.INDEFINITE);
 
-            KeyFrame frame = getKeyFrame();
-            timeline.getKeyFrames().add(frame);
-            timeline.play();
-        }
+        KeyFrame frame = getKeyFrame();
+        timeline.getKeyFrames().add(frame);
+        timeline.play();
+    }
 
 
     private KeyFrame getKeyFrame() {
@@ -289,7 +287,7 @@ public class GUIController {
                 Image texture = finishedModel.getRenderMode().getTexture();
 
 
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, true,true,true , Color.RED, 0.5 );
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, true, true, true, Color.RED, 0.5);
             }
         });
     }
@@ -321,7 +319,8 @@ public class GUIController {
         try {
             // Загружаем PNG изображение
             Image textureImage = new Image(file.toURI().toString());
-
+            textures.clear();
+            textures.add(textureImage);
             // Печать для проверки
             System.out.println("Текстура загружена: " + file.getName());
 
@@ -355,6 +354,8 @@ public class GUIController {
             // Читаем содержимое файла и загружаем модель
             String fileContent = Files.readString(fileName);
             Model mesh = ObjReader.read(fileContent);// Парсим файл и создаем объект модели
+            mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
+            mesh.normals = FindNormals.findNormals(mesh);
             String modelName = getModelName(fileName);
             meshes.add(mesh);
 
