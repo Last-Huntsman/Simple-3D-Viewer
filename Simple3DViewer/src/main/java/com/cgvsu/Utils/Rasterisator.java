@@ -145,12 +145,12 @@ public class Rasterisator {
         // Проходим по пикселям от x1 до x2.
         for (int x = x1; x <= x2; x++) {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
-                if (currentZ > zBuffer[x][y]) {
-                    Color baseColor = filling;
-
-
-                    // Если пиксель ближе, чем текущий в z-буфере, обновляем.
+                if (currentZ > zBuffer[x][y]  ) {
                     Barycentric barycentric = t.barycentrics(x, y);
+
+                    Color baseColor = filling;
+                    // Если пиксель ближе, чем текущий в z-буфере, обновляем.
+
 
                     if (flagTexture && t.getPolygonTextures().size() == 3 && barycentric.isInside()) {
                         Vector2f interpolatedTexture = barycentric.interpolate(
@@ -192,8 +192,10 @@ public class Rasterisator {
                         baseColor = calculateShadedColor(baseColor, l, shadow);
                     }
                     // Обновляем z-буфер и устанавливаем цвет.
-                    zBuffer[x][y] = currentZ;
-                    pixelWriter.setColor(x, y, baseColor);
+                    if(barycentric.isInside()) {
+                        zBuffer[x][y] = currentZ;
+                        pixelWriter.setColor(x, y, baseColor);
+                    }
 
                 }
             }
