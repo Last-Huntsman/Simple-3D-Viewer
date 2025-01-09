@@ -83,17 +83,20 @@ public class RenderEngine {
             ArrayList<Vector2f> polygonTexture = new ArrayList<>();
             ArrayList<Vector3f> polygonVertex = new ArrayList<>();
             // Перебор всех вершин текущего полигона.
-            for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; ++vertexInPolygonInd) {
+
+            for (int vertexInPolygonInd = 0; vertexInPolygonInd < nVerticesInPolygon; vertexInPolygonInd++) {
 
                 // Получение координат вершины из модели.
                 Vector3f vertex = mesh.vertices.get(polygon.getVertexIndices().get(vertexInPolygonInd));
-                if (flagLighting) {
-                    Vector3f mirVertex = modelMatrix.mul(vertex);
-                    polygonVertex.add(mirVertex);
-                    polygonNormals.add(mesh.normals.get(polygon.getNormalIndices().get(vertexInPolygonInd)));
-                }
-                if (flagTexture) {
-                    polygonTexture.add(mesh.textureVertices.get(polygon.getTextureVertexIndices().get(vertexInPolygonInd)));
+                if (nVerticesInPolygon == 3) {
+                    if (flagLighting) {
+                        Vector3f mirVertex = modelMatrix.mul(vertex);
+                        polygonVertex.add(mirVertex);
+                        polygonNormals.add(mesh.normals.get(polygon.getNormalIndices().get(vertexInPolygonInd)));
+                    }
+                    if (flagTexture) {
+                        polygonTexture.add(mesh.textureVertices.get(polygon.getTextureVertexIndices().get(vertexInPolygonInd)));
+                    }
                 }
 
                 resultVectors.add(vertexToBord(multiplyMatrix4ByVector3(modelViewProjectionMatrix, vertex), width, height));
