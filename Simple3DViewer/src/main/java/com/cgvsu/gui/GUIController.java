@@ -22,11 +22,14 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.scene.image.Image;
 
+
+import java.awt.image.BufferedImage;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -274,7 +277,7 @@ public class GUIController {
     private KeyFrame getKeyFrame() {
         RenderEngine renderEngine = new RenderEngine();
 
-        return new KeyFrame(Duration.millis(15), event -> {
+        return new KeyFrame(Duration.millis(40), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
 
@@ -283,8 +286,10 @@ public class GUIController {
 
             for (FinishedModel finishedModel : modelController.getModels()) {
                 Model model = finishedModel.getModel();
-                BufferedImage texture = finishedModel.getRenderMode().getTexture();
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture);
+                Image texture = finishedModel.getRenderMode().getTexture();
+
+
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, true,true,true , Color.RED, 0.5 );
             }
         });
     }
