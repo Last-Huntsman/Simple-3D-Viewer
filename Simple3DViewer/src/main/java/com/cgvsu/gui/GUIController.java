@@ -248,7 +248,7 @@ public class GUIController {
         RenderEngine renderEngine = new RenderEngine(); // Движок рендеринга
 
         // Обновление кадра каждые 15 миллисекунд
-        KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+        KeyFrame frame = new KeyFrame(Duration.millis(30), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
 

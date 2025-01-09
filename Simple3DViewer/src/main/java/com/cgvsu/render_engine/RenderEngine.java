@@ -1,5 +1,6 @@
 package com.cgvsu.render_engine;
 
+import com.cgvsu.Utils.FindNormals;
 import com.cgvsu.Utils.PictureProcess;
 import com.cgvsu.Utils.Rasterisator;
 import com.cgvsu.Utils.Triangulation;
@@ -43,7 +44,7 @@ public class RenderEngine {
 
         // Триангуляция и расчет нормалей
         mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
-//        mesh.normals = FindNormals.findNormals(mesh);
+        mesh.normals = FindNormals.findNormals(mesh);
 
         // Создание модельной матрицы.
         Matrix4x4 modelMatrix = mesh.getModelMatrix();
