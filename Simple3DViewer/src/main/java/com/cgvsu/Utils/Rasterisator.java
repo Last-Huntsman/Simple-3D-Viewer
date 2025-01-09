@@ -6,6 +6,7 @@ import com.cgvsu.math.Baricentrics_Triangle.Utils_for_trianglerasterisation;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.PixelWriter;
@@ -284,6 +285,60 @@ public class Rasterisator {
 
         // Возвращаем цвет пикселя из текстуры
         return pixelReader.getColor(xTex, yTex);
+    }
+    public void drawTriangle(GraphicsContext graphicsContext, ArrayList<Vector3f> vertices, double[][] zBuffer                      ) {
+        // Проверяем, что передано ровно три вершины.
+        if (vertices.size() != 3) {
+            throw new IllegalArgumentException("Треугольник должен содержать ровно три вершины.");
+        }
+
+        // Получаем координаты вершин.
+        double x1 = vertices.get(0).x;
+        double y1 = vertices.get(0).y;
+
+
+        double x2 = vertices.get(1).x;
+        double y2 = vertices.get(1).y;
+
+
+        double x3 = vertices.get(2).x;
+        double y3 = vertices.get(2).y;
+
+
+
+        // Настройка цвета для треугольника
+        graphicsContext.setFill(filling);
+
+        // Создаём массивы координат для отрисовки треугольника.
+        double[] xPoints = {x1, x2, x3};
+        double[] yPoints = {y1, y2, y3};
+
+        // Отрисовываем треугольник.
+        graphicsContext.fillPolygon(xPoints, yPoints, 3);
+
+        // Обновление z-буфера для каждой вершины (простой подход).
+        updateZBuffer(zBuffer, vertices);
+    }
+
+    /**
+     * Обновляет z-буфер на основе координат вершин.
+     *
+     * @param zBuffer  z-буфер для управления глубиной.
+     * @param vertices вершины треугольника.
+     */
+    private void updateZBuffer(double[][] zBuffer, ArrayList<Vector3f> vertices) {
+        for (Vector3f vertex : vertices) {
+            int x = (int) Math.round(vertex.x);
+            int y = (int) Math.round(vertex.y);
+            double z = vertex.z;
+
+            // Проверяем, что координаты находятся в пределах экрана.
+            if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
+                if (z > zBuffer[x][y]) {
+                    zBuffer[x][y] = z;
+                }
+            }
+        }
     }
 
 

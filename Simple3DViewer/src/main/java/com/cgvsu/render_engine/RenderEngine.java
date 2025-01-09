@@ -1,9 +1,7 @@
 package com.cgvsu.render_engine;
 
-import com.cgvsu.Utils.FindNormals;
 import com.cgvsu.Utils.Rasterisator;
 import com.cgvsu.Utils.Rendering_the_grid;
-import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
@@ -104,9 +102,11 @@ public class RenderEngine {
 
 
             if (nVerticesInPolygon == 3) {
-
-                rasterisator.draw(resultVectors, polygonTexture, polygonVertex, polygonNormals, zBuffer);
-
+                if (texture != null || flagTexture || flagGrid || flagLighting) {
+                    rasterisator.draw(resultVectors, polygonTexture, polygonVertex, polygonNormals, zBuffer);
+                } else {
+                    rasterisator.drawTriangle(graphicsContext, resultVectors, zBuffer);
+                }
             }
 
 //            Сетка полигональная
