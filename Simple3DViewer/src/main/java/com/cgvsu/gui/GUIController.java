@@ -1,5 +1,7 @@
 package com.cgvsu.gui;
 
+import com.cgvsu.Utils.FindNormals;
+import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.io.objReader.ObjReader;
 import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
@@ -22,6 +24,7 @@ import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -232,6 +235,10 @@ public class GUIController {
             String fileContent = Files.readString(fileName); // Чтение файла модели
             String modelName = getModelName(fileName);
             mesh = ObjReader.read(fileContent); // Парсинг модели
+            // Триангуляция и расчет нормалей
+            mesh.polygons = Triangulation.triangulateModel(mesh.polygons);
+            mesh.normals = FindNormals.findNormals(mesh);
+
             FinishedModel loadedModel = new FinishedModel(mesh, modelName, RenderModeFactory.grid());
             modelController.addModel(loadedModel); // Добавление модели в контроллер
             modelController.addNameToNameSet(modelName);
@@ -247,7 +254,7 @@ public class GUIController {
         RenderEngine renderEngine = new RenderEngine(); // Движок рендеринга
 
         // Обновление кадра каждые 15 миллисекунд
-        KeyFrame frame = new KeyFrame(Duration.millis(15), event -> {
+        KeyFrame frame = new KeyFrame(Duration.millis(30), event -> {
             double width = canvas.getWidth();
             double height = canvas.getHeight();
 
@@ -256,7 +263,8 @@ public class GUIController {
 
             // Рендеринг модели, если она загружена
             if (mesh != null) {
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,texture);
+
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, mesh, (int) width, (int) height,texture, true,true,true, Color.GREEN, 0.5);
             }
         });
         return frame;
@@ -291,7 +299,7 @@ public class GUIController {
              texture = textureImage;
 
             // Печать для проверки
-            System.out.println("Текстура загружена: " + file.getName());
+//            System.out.println("Текстура загружена: " + file.getName());
 
         } catch (Exception exception) {
             // Обработка ошибок при загрузке изображения

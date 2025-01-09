@@ -16,24 +16,40 @@ import java.util.Comparator;
 import java.util.List;
 
 // Класс для растеризации треугольников с учетом глубины (z-буфера).
-public class TextureRasterisator {
+public class Rasterisator {
 
 
     // Интерфейс для записи пикселей на экран.
-    private PixelWriter pixelWriter;
-    private double shadow ;
-    private Vector3f cameraPosition;
-    private  Image image;
+    private final PixelWriter pixelWriter;
+    private final double shadow;
+    private final Vector3f cameraPosition;
+    private final boolean flagLighting;
 
+    private final Image image;
+
+    private final Color filling;
+    private boolean flagTexture;
 
 
     // Конструктор для инициализации PixelWriter.
-    public TextureRasterisator(Image image,PixelWriter pixelWriter, double shadow, Vector3f cameraPosition) {
+    public Rasterisator(Image image, PixelWriter pixelWriter, double shadow, Vector3f cameraPosition, boolean flagLighting, boolean flagTexture) {
         this.pixelWriter = pixelWriter;
         this.shadow = shadow;
         this.cameraPosition = cameraPosition;
-        this.image=image;
+        this.image = image;
+        this.flagLighting = flagLighting;
+        this.flagTexture = flagTexture;
+        this.filling = Color.WHITE;
+    }
 
+    public Rasterisator(PixelWriter pixelWriter, Color filling, double shadow, Vector3f cameraPosition, boolean flagLighting) {
+        this.pixelWriter = pixelWriter;
+        this.filling = filling;
+        this.shadow = shadow;
+        this.cameraPosition = cameraPosition;
+        this.flagLighting = flagLighting;
+        image = null;
+        flagTexture = false;
     }
 
     // Сортировка вершин треугольника по оси Y (если равны — по оси X).
@@ -49,8 +65,7 @@ public class TextureRasterisator {
     }
 
     // Отрисовка "плоского" треугольника (верхняя или нижняя стороны параллельны оси X).
-    private void drawFlat(final Triangle t, final Point2D lone, final Point2D flat1, final Point2D flat2,
-                          final double zLone, final double zFlat1, final double zFlat2, final double[][] zBuffer) {
+    private void drawFlat(final Triangle t, final Point2D lone, final Point2D flat1, final Point2D flat2, final double zLone, final double zFlat1, final double zFlat2, final double[][] zBuffer) {
         // Координаты "одинокой" вершины (которая отличается по Y).
         final double lx = lone.getX();
         final double ly = lone.getY();
@@ -81,8 +96,7 @@ public class TextureRasterisator {
     }
 
     // Отрисовка верхнего плоского треугольника.
-    private void drawTop(final Triangle t, final Point2D v, final double maxY, final double dx1, final double dx2,
-                         final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
+    private void drawTop(final Triangle t, final Point2D v, final double maxY, final double dx1, final double dx2, final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
         double x1 = v.getX(); // Начальная X-координата первой стороны.
         double x2 = x1;       // Начальная X-координата второй стороны.
         double z1 = zStart;   // Начальная глубина первой стороны.
@@ -101,8 +115,7 @@ public class TextureRasterisator {
     }
 
     // Отрисовка нижнего плоского треугольника.
-    private void drawBottom(final Triangle t, final Point2D v, final double minY, final double dx1, final double dx2,
-                            final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
+    private void drawBottom(final Triangle t, final Point2D v, final double minY, final double dx1, final double dx2, final double dz1, final double dz2, final double zStart, final double[][] zBuffer) {
         double x1 = v.getX(); // Начальная X-координата первой стороны.
         double x2 = x1;       // Начальная X-координата второй стороны.
         double z1 = zStart;   // Начальная глубина первой стороны.
@@ -121,8 +134,7 @@ public class TextureRasterisator {
     }
 
     // Отрисовка одной горизонтальной линии между двумя X-координатами.
-    private void drawHLine(final Triangle t, final int x1, final int x2, final int y,
-                           final double z1, final double z2, final double[][] zBuffer) {
+    private void drawHLine(final Triangle t, final int x1, final int x2, final int y, final double z1, final double z2, final double[][] zBuffer) {
         double currentZ = z1; // Начальная глубина.
         double dz = (z2 - z1) / (x2 - x1); // Интерполяция глубины.
 
@@ -130,26 +142,20 @@ public class TextureRasterisator {
         for (int x = x1; x <= x2; x++) {
             if (x >= 0 && x < zBuffer.length && y >= 0 && y < zBuffer[0].length) {
                 if (currentZ > zBuffer[x][y]) {
-                    // Если пиксель ближе, чем текущий в z-буфере, обновляем.
                     Barycentric barycentric = t.barycentrics(x, y);
+                    Color baseColor = filling;
+                    // Если пиксель ближе, чем текущий в z-буфере, обновляем.
 
-                    if (barycentric.isInside()) {
-                        // Интерполяция нормали в точке с использованием барицентрических координат.
-                        Vector3f interpolatedNormal = barycentric.interpolate(
-                                t.getPolygonNormals().get(0),
-                                t.getPolygonNormals().get(1),
-                                t.getPolygonNormals().get(2)
-                        );
-                        Vector3f interpolatedVertex = barycentric.interpolate(
-                                t.getPolygonVertex().get(0),
-                                t.getPolygonVertex().get(1),
-                                t.getPolygonVertex().get(2)
-                        );
-                        Vector2f interpolatedTexture = barycentric.interpolate(
-                                t.getPolygonTextures().get(0),
-                                t.getPolygonTextures().get(1),
-                                t.getPolygonTextures().get(2)
-                        );
+
+                    if (flagTexture && t.getPolygonTextures().size() == 3 && barycentric.isInside()) {
+                        Vector2f interpolatedTexture = barycentric.interpolate(t.getPolygonTextures().get(0), t.getPolygonTextures().get(1), t.getPolygonTextures().get(2));
+
+                        baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
+                    }
+                    if (flagLighting) {
+                        Vector3f interpolatedNormal = barycentric.interpolate(t.getPolygonNormals().get(0), t.getPolygonNormals().get(1), t.getPolygonNormals().get(2));
+                        Vector3f interpolatedVertex = barycentric.interpolate(t.getPolygonVertex().get(0), t.getPolygonVertex().get(1), t.getPolygonVertex().get(2));
+
 
                         // Нормализуем интерполированную нормаль.
                         interpolatedNormal.normalize();
@@ -165,15 +171,15 @@ public class TextureRasterisator {
                         // Применяем коэффициент освещения \( rgb' = rgb * (1 - k) + rgb * k * l \).
                         // Коэффициент фонового освещения, можно настраивать.
 
-                        Color baseColor = getColor(interpolatedTexture); // Основной цвет полигона.
-                        Color shadedColor = calculateShadedColor(baseColor, l, shadow);
 
-
-                        // Обновляем z-буфер и устанавливаем цвет.
-                        zBuffer[x][y] = currentZ;
-                        pixelWriter.setColor(x, y, shadedColor);
-
+                        baseColor = calculateShadedColor(baseColor, l, shadow);
                     }
+                    // Обновляем z-буфер и устанавливаем цвет.
+                    if (barycentric.isInside()) {
+                        zBuffer[x][y] = currentZ;
+                        pixelWriter.setColor(x, y, baseColor);
+                    }
+
                 }
             }
             currentZ += dz; // Увеличиваем глубину.
@@ -183,7 +189,7 @@ public class TextureRasterisator {
 
 
     // Основной метод для отрисовки треугольника.
-    public void draw(ArrayList<Vector3f> resultVectors,ArrayList<Vector2f> polygonTexture, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> plygonNormals, double[][] zBuffer, boolean LightingFlag) {
+    public void draw(ArrayList<Vector3f> resultVectors, ArrayList<Vector2f> polygonTexture, ArrayList<Vector3f> polygonVertex, ArrayList<Vector3f> polygonNormals, double[][] zBuffer) {
 
         Vector3f v11 = resultVectors.get(0);
         Vector3f v22 = resultVectors.get(1);
@@ -198,7 +204,19 @@ public class TextureRasterisator {
         Point2D p2 = new Point2D(v22.getX(), v22.getY());
         Point2D p3 = new Point2D(v33.getX(), v33.getY());
         Triangle t;
-        t = new Triangle(p1, p2, p3, polygonVertex, plygonNormals, polygonTexture);
+        if (flagTexture && polygonTexture.size() == 3) {
+            if (flagLighting) {
+                t = new Triangle(p1, p2, p3, polygonVertex, polygonNormals, polygonTexture);
+            } else {
+                t = new Triangle(p1, p2, p3, polygonTexture);
+            }
+        } else {
+            if (flagLighting) {
+                t = new Triangle(p1, p2, p3, polygonNormals, polygonVertex);
+            } else {
+                t = new Triangle(p1, p2, p3);
+            }
+        }
 
 
         // Сортируем вершины треугольника по Y (и X для одинаковых Y).
@@ -243,13 +261,9 @@ public class TextureRasterisator {
         double red = baseColor.getRed() * ((1 - k) + k * l);
         double green = baseColor.getGreen() * ((1 - k) + k * l);
         double blue = baseColor.getBlue() * ((1 - k) + k * l);
-        return new Color(
-                Math.min(1.0, red),
-                Math.min(1.0, green),
-                Math.min(1.0, blue),
-                baseColor.getOpacity()
-        );
+        return new Color(Math.min(1.0, red), Math.min(1.0, green), Math.min(1.0, blue), baseColor.getOpacity());
     }
+
     public Color getColor(Vector2f v) {
 
         // Преобразование в пиксельные координаты
@@ -271,10 +285,6 @@ public class TextureRasterisator {
         // Возвращаем цвет пикселя из текстуры
         return pixelReader.getColor(xTex, yTex);
     }
-
-
-
-
 
 
 }

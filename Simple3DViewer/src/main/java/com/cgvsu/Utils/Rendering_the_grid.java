@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import static com.cgvsu.render_engine.GraphicConveyor.vertexToPoint;
 
 
-public class PictureProcess {
+public class Rendering_the_grid {
 
     /**
      * Растеризует многоугольник с использованием z-буфера для устранения наложения.
@@ -19,7 +19,7 @@ public class PictureProcess {
      * @param vertices        список вершин многоугольника
      * @param zBuffer         z-буфер для управления глубиной
      */
-    public static void rasterizePolygon(final GraphicsContext graphicsContext,  final ArrayList<Vector3f> vertices,  final double[][] zBuffer) {
+    public static void DrawGrid(final GraphicsContext graphicsContext, final ArrayList<Vector3f> vertices, final double[][] zBuffer) {
 
         // Преобразование координат вершин многоугольника
         int nVertices = vertices.size();
@@ -53,9 +53,10 @@ public class PictureProcess {
             final GraphicsContext graphicsContext,
             final Point2D p1,
             final Point2D p2,
-            final double z1,
-            final double z2,
+            double z1,
+            double z2,
             final double[][] zBuffer) {
+
 
         // Преобразование координат в целочисленные значения
         int x1 = (int) Math.round(p1.getX());
@@ -70,7 +71,7 @@ public class PictureProcess {
         int sy = y1 < y2 ? 1 : -1;
 
         int err = dx - dy;
-        double dz = (z2 - z1) / Math.max(dx, dy); // Изменение глубины на шаг
+        double dz = ((z2 - z1) / Math.max(dx, dy))+0.00000001; // Изменение глубины на шаг
         double currentZ = z1; // Начальная глубина
 
         // Основной цикл алгоритма Брезенхема
@@ -80,7 +81,7 @@ public class PictureProcess {
                 // Обновление z-буфера и рисование точки, если она ближе
                 if (currentZ > zBuffer[x1][y1]) {
                     zBuffer[x1][y1] = currentZ;
-                    graphicsContext.setStroke(Color.RED);
+                    graphicsContext.setStroke(Color.BLACK);
                     graphicsContext.strokeRect(x1, y1, 1, 1);
                 }
             }
