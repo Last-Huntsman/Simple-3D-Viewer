@@ -1,5 +1,6 @@
 package com.cgvsu.gui;
 
+import com.cgvsu.Utils.Eraser;
 import com.cgvsu.Utils.FindNormals;
 import com.cgvsu.Utils.Triangulation;
 import com.cgvsu.io.objReader.ObjReader;
@@ -42,6 +43,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
@@ -62,7 +64,13 @@ public class GUIController {
     @FXML
     private AnchorPane anchorPane; // Контейнер для интерфейса
     @FXML
-    private CheckBox usePoligonMesh, useTexture, useLight;
+    private CheckBox usePoligonMesh, useTexture, useLight, newFileCheckBox, hangingNormalsCheckBox, hangingTexturesCheckBox,
+            hangingPolygonsCheckBox;
+    @FXML
+    private TextField vertexIndicesField;
+    @FXML
+    private Button deleteVerticesButton;
+
 
     @FXML
     private Canvas canvas; // Холст для рендеринга сцены
@@ -85,9 +93,10 @@ public class GUIController {
 
     // Обновление текстовых меток, отображающих параметры камеры и модели
     private void updateLabels() {
-        Vector3f position = camera.getPosition(); // Позиция камеры
+        Vector3f position = camera.getPosition();// Позиция камеры
         Vector2f rotation = camera.getRotation(); // Углы поворота камеры
         Vector3f targetPosition = camera.getTarget(); // Целевая точка камеры
+
 
         // Обновление текста в метках камеры
         positionLabel.setText(String.format("Camera Position: (%.2f, %.2f, %.2f)",
@@ -96,6 +105,16 @@ public class GUIController {
                 rotation.x, rotation.y));
         targetLabel.setText(String.format("Target Position: (%.2f, %.2f, %.2f)",
                 targetPosition.x, targetPosition.y, targetPosition.z));
+
+        Label cameraInfoLabel = new Label(String.format(
+                "Camera Information:\n" +
+                        "Position: (%.2f, %.2f, %.2f)\n" +
+                        "Rotation: (%.2f°, %.2f°)\n" +
+                        "Target: (%.2f, %.2f, %.2f)",
+                camera.getPosition().x, camera.getPosition().y, camera.getPosition().z,
+                camera.getRotation().x, camera.getRotation().y,
+                camera.getTarget().x, camera.getTarget().y, camera.getTarget().z
+        ));
 
         // Создание содержимого для TitledPane1
         VBox titledPaneContent = new VBox();
@@ -541,6 +560,60 @@ public class GUIController {
         }
     }
 
+    @FXML
+    private void handleDeleteVertices() {
+        FinishedModel currentModel =modelController.getModels().get(0);
+        try {
+            // Получение индексов вершин из текстового поля
+            String indicesText = vertexIndicesField.getText();
+            List<Integer> indices = Arrays.stream(indicesText.split(","))
+                    .map(String::trim)
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+
+            // Получение флажков
+            boolean createNewFile = newFileCheckBox.isSelected();
+            boolean keepHangingNormalIndices = hangingNormalsCheckBox.isSelected();
+            boolean keepHangingTextureIndices = hangingTexturesCheckBox.isSelected();
+            boolean keepHangingPolygons = hangingPolygonsCheckBox.isSelected();
+
+            // Удаление вершин с использованием класса Eraser
+            Model modifiedModel = Eraser.vertexDelete(
+                    currentModel.model,   // Текущая модель (должна быть определена в контроллере)
+                    indices,
+                    createNewFile,
+                    keepHangingNormalIndices,
+                    keepHangingTextureIndices,
+                    keepHangingPolygons
+            );
+
+            // Если новый файл создаётся, обновляем отображение или сохраняем его
+            if (createNewFile) {
+                currentModel.model = modifiedModel;
+                // Обновить Canvas или другие элементы интерфейса, если требуется
+            } else {
+                // Обновить текущую модель
+                currentModel.model = modifiedModel;
+                // Обновить Canvas
+            }
+
+            // Отображение сообщения об успехе
+
+        } catch (NumberFormatException e) {
+            showMessage("Ошибка: Введите корректные индексы вершин через запятую.");
+        } catch (Exception e) {
+            showMessage("Ошибка при удалении вершин: " + e.getMessage());
+        }
+    }
+
+    private void showMessage(String message) {
+        // Пример простого отображения сообщения
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Сообщение");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
     // Метод для получения трансформированной модели (например, с учетом изменения масштаба, вращения, положения)
     private Model getTransformedModel(Model model) {
         Model newModel = new Model(); // Создаем новую модель
@@ -587,5 +660,6 @@ public class GUIController {
         alert.setContentText(content); // Устанавливаем текст ошибки
         alert.showAndWait(); // Показываем окно и ожидаем его закрытия
     }
+
 
 }

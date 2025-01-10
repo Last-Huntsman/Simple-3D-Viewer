@@ -1,4 +1,4 @@
-package com.cgvsu.io.objReader;
+package com.cgvsu.Utils;
 
 import com.cgvsu.model.Model;
 import com.cgvsu.model.Polygon;

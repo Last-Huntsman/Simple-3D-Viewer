@@ -109,27 +109,27 @@
                            </TitledPane>
                            <TitledPane fx:id="titledPane2" animated="false" expanded="false" prefWidth="321.0" text="Camera">
                              <content>
-                                 <VBox alignment="CENTER_LEFT" spacing="10">
-                                     <Label fx:id="positionLabel" text="Position: (0, 0, 0)" />
-                                     <Label fx:id="rotationLabel" text="Rotation: (0°, 0°)" />
-                                     <Label fx:id="targetLabel" text="Target: (0, 0, 0)" />
-                                 </VBox>
-                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="80.0" prefWidth="265.0">
+                                    <children>
+                                        <Label fx:id="positionLabel" text="Position: (0, 0, 0)" />
+                                        <Label fx:id="rotationLabel" text="Rotation: (0°, 0°)" AnchorPane.topAnchor="15.0" />
+                                        <Label fx:id="targetLabel" text="Target: (0, 0, 0)" AnchorPane.topAnchor="30.0" />
+                                    </children></AnchorPane>
                              </content>
                            </TitledPane>
                            <TitledPane fx:id="titlePane3" animated="false" expanded="false" prefWidth="321.0" text="Menu">
                              <content>
                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="132.0" prefWidth="319.0">
                                     <children>
-                                       <Button onAction="#onOpenModelMenuItemClick" layoutY="4.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="54.0" text="+">
+                                       <Button layoutY="4.0" mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" prefHeight="18.0" prefWidth="54.0" text="+">
                                           <font>
                                              <Font size="14.0" />
                                           </font>
                                        </Button>
                                        <Label text="Загрузить модель(ctrl + F)" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="-1.0" />
-                                       <Button  onAction="#onOpenTextureItemClick" mnemonicParsing="false" prefHeight="18.0" prefWidth="54.0" text="+" AnchorPane.topAnchor="25.0" />
+                                       <Button mnemonicParsing="false" onAction="#onOpenTextureItemClick" prefHeight="18.0" prefWidth="54.0" text="+" AnchorPane.topAnchor="25.0" />
                                        <Label text="Загрузить текстуру(ctrl + A)" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="25.0" />
-                                       <Button onAction="#saveModifiedModelFile" mnemonicParsing="false" text="Сохранить модель" AnchorPane.topAnchor="50.0" />
+                                       <Button mnemonicParsing="false" onAction="#saveModifiedModelFile" text="Сохранить модель" AnchorPane.topAnchor="50.0" />
                                     </children></AnchorPane>
                              </content>
                            </TitledPane>
@@ -149,6 +149,21 @@
                                     </children></AnchorPane>
                              </content>
                            </TitledPane>
+                            <TitledPane fx:id="titledPaneDeleteVertices" animated="false" expanded="false" prefWidth="321.0" text="Delete Vertices">
+                                <content>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="319.0">
+                                        <children>
+                                            <Label text="Indices to Delete (comma-separated):" AnchorPane.topAnchor="10.0" AnchorPane.leftAnchor="10.0" />
+                                            <TextField fx:id="vertexIndicesField" promptText="e.g., 1,2,3" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                                            <CheckBox fx:id="newFileCheckBox" mnemonicParsing="false" text="Create New File" AnchorPane.topAnchor="70.0" AnchorPane.leftAnchor="10.0" />
+                                            <CheckBox fx:id="hangingNormalsCheckBox" mnemonicParsing="false" text="Keep Hanging Normals" AnchorPane.topAnchor="100.0" AnchorPane.leftAnchor="10.0" />
+                                            <CheckBox fx:id="hangingTexturesCheckBox" mnemonicParsing="false" text="Keep Hanging Textures" AnchorPane.topAnchor="130.0" AnchorPane.leftAnchor="10.0" />
+                                            <CheckBox fx:id="hangingPolygonsCheckBox" mnemonicParsing="false" text="Keep Hanging Polygons" AnchorPane.topAnchor="160.0" AnchorPane.leftAnchor="10.0" />
+                                            <Button fx:id="deleteVerticesButton" mnemonicParsing="false" text="Delete" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" onAction="#handleDeleteVertices" />
+                                        </children>
+                                    </AnchorPane>
+                                </content>
+                            </TitledPane>
                         </children>
                      </VBox>
                   </children>
