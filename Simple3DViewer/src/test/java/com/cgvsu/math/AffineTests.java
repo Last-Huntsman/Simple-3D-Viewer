@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,8 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleX() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
+
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x * 2, vertex.y, vertex.z));
@@ -40,7 +42,7 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleY() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x, vertex.y * 2, vertex.z));
@@ -61,7 +63,7 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleZ() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x, vertex.y, vertex.z * 2));
@@ -82,7 +84,7 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleXY() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x * 2, vertex.y * 2, vertex.z));
@@ -103,7 +105,7 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleXZ() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x * 2, vertex.y, vertex.z * 2));
@@ -124,7 +126,7 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleYZ() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x, vertex.y * 2, vertex.z * 2));
@@ -145,7 +147,7 @@ public class AffineTests {
 
     @Test
     public void testAffineScaleXYZ() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(vertex.x * 2, vertex.y * 2, vertex.z * 2));
@@ -167,7 +169,7 @@ public class AffineTests {
     @Test
     public void testAffineRotationZ() throws IOException {
         float phi = (float) (Math.PI) / 4;
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(
@@ -193,7 +195,7 @@ public class AffineTests {
     @Test
     public void testAffineRotationY() throws IOException {
         float phi = (float) (Math.PI) / 4;
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(
@@ -219,7 +221,7 @@ public class AffineTests {
     @Test
     public void testAffineRotationX() throws IOException {
         float phi = (float) (Math.PI) / 4;
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(
@@ -244,7 +246,7 @@ public class AffineTests {
 
     @Test
     public void testAffineTransform() throws IOException {
-        Model model = ObjReader.read("./models/3DModels/CaracalCube/caracal_cube.obj");
+        Model model = ObjReader.read("Simple3DViewer/models/3DModels/CaracalCube/caracal_cube.obj");
         ArrayList<Vector3f> originVertices = new ArrayList<>();
         for (Vector3f vertex : model.vertices) {
             originVertices.add(new Vector3f(
