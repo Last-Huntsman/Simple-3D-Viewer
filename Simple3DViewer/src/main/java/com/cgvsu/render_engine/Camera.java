@@ -98,7 +98,7 @@ public class Camera {
     // Переместить камеру вправо.
     public void moveRightWithoutTrigger(float distance) {
         Vector3f direction = calculateRightVectorWithoutTrigger(); // Вычисляем вектор направления вправо.
-        direction.scale(distance); // Масштабируем вектор.
+        direction.scale(-distance); // Масштабируем вектор.
         position.add(direction); // Изменяем положение камеры.
         target.add(direction);   // Сдвигаем цель.
     }
@@ -110,7 +110,7 @@ public class Camera {
 
     // Переместить камеру вверх.
     public void moveUpWithoutTrigger(float distance) {
-        Vector3f up = new Vector3f(0, -1, 0); // Направление вверх (вдоль оси Y).
+        Vector3f up = new Vector3f(0, 1, 0); // Направление вверх (вдоль оси Y).
         up.scale(distance); // Масштабируем.
         position.add(up); // Изменяем положение камеры.
         target.add(up);   // Сдвигаем цель.
@@ -146,7 +146,7 @@ public class Camera {
     public void zoom(float amount) {
         // Вычисляем новое положение камеры, двигаясь в направлении текущего взгляда.
         Vector3f direction = calculateDirectionWithoutTrigger(); // Направление взгляда камеры.
-        direction.scale(amount); // Масштабируем вектор.
+        direction.scale(-amount); // Масштабируем вектор.
         position.add(direction); // Изменяем позицию камеры.
         target.add(direction);   // Сдвигаем цель.
     }
