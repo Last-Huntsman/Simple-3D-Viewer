@@ -29,6 +29,7 @@ public class Camera {
 
     // Дальняя плоскость отсечения.
     private final float farPlane;
+    private final String cameraName;
 
     // Конструктор камеры, инициализирующий все параметры.
     public Camera(
@@ -38,14 +39,16 @@ public class Camera {
             final float fov,
             final float aspectRatio,
             final float nearPlane,
-            final float farPlane) {
+            final float farPlane,
+            String cameraName) {
         this.rotation = rotation; // Угол поворота камеры.
         this.position = position; // Позиция камеры.
         this.target = target;     // Точка, на которую камера направлена.
         this.fov = fov;           // Угол обзора.
         this.aspectRatio = aspectRatio; // Соотношение сторон экрана.
         this.nearPlane = nearPlane; // Ближняя плоскость отсечения.
-        this.farPlane = farPlane;   // Дальняя плоскость отсечения.
+        this.farPlane = farPlane;
+        this.cameraName = cameraName;
     }
 
     // Получить текущее положение камеры.
@@ -198,5 +201,9 @@ public class Camera {
         int screenY = (int) ((1 - projectedY) * 0.5 * screenHeight);
 
         return new Point(screenX, screenY);
+    }
+
+    public String getName(){
+        return cameraName;
     }
 }

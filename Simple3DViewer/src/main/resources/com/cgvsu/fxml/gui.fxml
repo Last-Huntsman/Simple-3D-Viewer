@@ -133,7 +133,7 @@
                                     </children></AnchorPane>
                              </content>
                            </TitledPane>
-                           <TitledPane fx:id="titledPane4" animated="false" expanded="false" prefHeight="214.0" prefWidth="266.0" text="Model rendering, rasterization &amp; light">
+                           <TitledPane fx:id="titledPane4" animated="false" expanded="false" prefWidth="330.0" text="Model rendering, rasterization &amp; light">
                              <content>
                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
@@ -153,13 +153,13 @@
                                 <content>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="319.0">
                                         <children>
-                                            <Label text="Indices to Delete (comma-separated):" AnchorPane.topAnchor="10.0" AnchorPane.leftAnchor="10.0" />
-                                            <TextField fx:id="vertexIndicesField" promptText="e.g., 1,2,3" AnchorPane.topAnchor="30.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" />
-                                            <CheckBox fx:id="newFileCheckBox" mnemonicParsing="false" text="Create New File" AnchorPane.topAnchor="70.0" AnchorPane.leftAnchor="10.0" />
-                                            <CheckBox fx:id="hangingNormalsCheckBox" mnemonicParsing="false" text="Keep Hanging Normals" AnchorPane.topAnchor="100.0" AnchorPane.leftAnchor="10.0" />
-                                            <CheckBox fx:id="hangingTexturesCheckBox" mnemonicParsing="false" text="Keep Hanging Textures" AnchorPane.topAnchor="130.0" AnchorPane.leftAnchor="10.0" />
-                                            <CheckBox fx:id="hangingPolygonsCheckBox" mnemonicParsing="false" text="Keep Hanging Polygons" AnchorPane.topAnchor="160.0" AnchorPane.leftAnchor="10.0" />
-                                            <Button fx:id="deleteVerticesButton" mnemonicParsing="false" text="Delete" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" onAction="#handleDeleteVertices" />
+                                            <Label text="Indices to Delete (comma-separated):" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                            <TextField fx:id="vertexIndicesField" promptText="e.g., 1,2,3" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="30.0" />
+                                            <CheckBox fx:id="newFileCheckBox" mnemonicParsing="false" text="Create New File" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="70.0" />
+                                            <CheckBox fx:id="hangingNormalsCheckBox" mnemonicParsing="false" text="Keep Hanging Normals" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="100.0" />
+                                            <CheckBox fx:id="hangingTexturesCheckBox" mnemonicParsing="false" text="Keep Hanging Textures" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="130.0" />
+                                            <CheckBox fx:id="hangingPolygonsCheckBox" mnemonicParsing="false" text="Keep Hanging Polygons" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="160.0" />
+                                            <Button fx:id="deleteVerticesButton" mnemonicParsing="false" onAction="#handleDeleteVertices" text="Delete" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
                                         </children>
                                     </AnchorPane>
                                 </content>

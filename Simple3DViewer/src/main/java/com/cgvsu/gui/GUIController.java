@@ -8,6 +8,7 @@ import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import com.cgvsu.math.vectors.Vector4f;
 import com.cgvsu.model.FinishedModel;
@@ -18,7 +19,6 @@ import com.cgvsu.render_engine.RenderModeFactory;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -28,7 +28,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
@@ -45,12 +44,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
-
 public class GUIController {
 
     // Инициализация камеры со стартовыми параметрами: позиция, цель, углы, и параметры проекции
-    private final Camera camera = new Camera(new Vector2f(0, 0), new Vector3f(100, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100);
+    private final Camera camera = new Camera(new Vector2f(0, 0), new Vector3f(100, 0, 0), new Vector3f(0, 0, 0), 1.0F, 1, 0.01F, 100, "First");
+    private final CameraController cameraController = new CameraController();
     private final ModelsController modelController = new ModelsController(); // Контроллер для управления моделями
 
     // Константы для перемещения и вращения камеры
@@ -106,7 +104,7 @@ public class GUIController {
         targetLabel.setText(String.format("Target Position: (%.2f, %.2f, %.2f)",
                 targetPosition.x, targetPosition.y, targetPosition.z));
 
-        Label cameraInfoLabel = new Label(String.format(
+        /*Label cameraInfoLabel = new Label(String.format(
                 "Camera Information:\n" +
                         "Position: (%.2f, %.2f, %.2f)\n" +
                         "Rotation: (%.2f°, %.2f°)\n" +
@@ -114,12 +112,81 @@ public class GUIController {
                 camera.getPosition().x, camera.getPosition().y, camera.getPosition().z,
                 camera.getRotation().x, camera.getRotation().y,
                 camera.getTarget().x, camera.getTarget().y, camera.getTarget().z
-        ));
+        ));*/
 
         // Создание содержимого для TitledPane1
         VBox titledPaneContent = new VBox();
         titledPaneContent.setSpacing(10); // Задаем расстояние между элементами
 
+        for (Camera cam : cameraController.getCameras()) {
+            Vector3f camPosition = cam.getPosition();
+            Vector2f camRotation = cam.getRotation();
+            Vector3f camTarget = cam.getTarget();
+            Label cameraInfoLabel = new Label(String.format(
+                    "Camera: %s\nPosition: (%.2f, %.2f, %.2f)\nRotation: (%.2f°, %.2f°)\nTarget: (%.2f, %.2f, %.2f)",
+                    cam.getName(),
+                    camPosition.x, camPosition.y, camPosition.z,
+                    camRotation.x, camRotation.y,
+                    camTarget.x, camTarget.y, camTarget.z));
+
+            // Создание текстовых полей для ввода новых значений
+            TextField positionXField = new TextField(String.format("%.2f", camPosition.x));
+            TextField positionYField = new TextField(String.format("%.2f", camPosition.y));
+            TextField positionZField = new TextField(String.format("%.2f", camPosition.z));
+
+            TextField rotationXField = new TextField(String.format("%.2f", camRotation.x));
+            TextField rotationYField = new TextField(String.format("%.2f", camRotation.y));
+
+            TextField targetXField = new TextField(String.format("%.2f", camTarget.x));
+            TextField targetYField = new TextField(String.format("%.2f", camTarget.y));
+            TextField targetZField = new TextField(String.format("%.2f", camTarget.z));
+
+            // Кнопка для применения изменений
+            Button applyButton = new Button("Apply Changes");
+            Label finalCameraInfoLabel = cameraInfoLabel;
+            applyButton.setOnAction(event -> {
+                try {
+                    String posXText = positionXField.getText().replace(',', '.');
+                    String posYText = positionYField.getText().replace(',', '.');
+                    String posZText = positionZField.getText().replace(',', '.');
+
+                    String rotXText = rotationXField.getText().replace(',', '.');
+                    String rotYText = rotationYField.getText().replace(',', '.');
+
+                    String targetXText = targetXField.getText().replace(',', '.');
+                    String targetYText = targetYField.getText().replace(',', '.');
+                    String targetZText = targetZField.getText().replace(',', '.');
+
+                    // Применение новых значений из текстовых полей
+                    camPosition.set(
+                            Float.parseFloat(posXText),
+                            Float.parseFloat(posYText),
+                            Float.parseFloat(posZText)
+                    );
+
+                    camRotation.set(
+                            Float.parseFloat(rotXText),
+                            Float.parseFloat(rotYText)
+                    );
+
+                    camTarget.set(
+                            Float.parseFloat(targetXText),
+                            Float.parseFloat(targetYText),
+                            Float.parseFloat(targetZText)
+                    );
+
+                    // Обновляем текст в метке
+                    finalCameraInfoLabel.setText(String.format(
+                            "Camera: %s\nPosition: (%.2f, %.2f, %.2f)\nRotation: (%.2f°, %.2f°)\nTarget: (%.2f, %.2f, %.2f)",
+                            cam.getName(),
+                            camPosition.x, camPosition.y, camPosition.z,
+                            camRotation.x, camRotation.y,
+                            camTarget.x, camTarget.y, camTarget.z));
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid input: " + e.getMessage());
+                }
+            });
+        }
         // Обновление информации о всех загруженных моделях
         for (FinishedModel finishedModel : modelController.getModels()) {
             Model mesh = finishedModel.getModel();
@@ -397,6 +464,7 @@ public class GUIController {
         canvas.setOnMouseDragged(this::handleMouseRotation);
         canvas.setOnMouseReleased(this::handleMouseReleased);
         canvas.setOnScroll(this::handleMouseScroll);
+        cameraController.addCamera(camera);
 
         Timeline timeline = new Timeline();
         timeline.setCycleCount(Animation.INDEFINITE);
@@ -420,7 +488,7 @@ public class GUIController {
             for (FinishedModel finishedModel : modelController.getModels()) {
                 Model model = finishedModel.getModel();
                 Image texture = finishedModel.getRenderMode().getTexture();
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, useTexture.isSelected(), true, useLight.isSelected(), Color.RED, 0.5);
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, useTexture.isSelected(), usePoligonMesh.isSelected(), useLight.isSelected(), Color.RED, 0.5);
             }
         });
     }
