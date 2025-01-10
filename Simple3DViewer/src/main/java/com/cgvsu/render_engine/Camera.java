@@ -85,7 +85,7 @@ public class Camera {
     // Переместить камеру вперёд относительно текущего направления.
     public void moveForwardWithoutTrigger(float distance) {
         Vector3f direction = calculateDirectionWithoutTrigger(); // Вычисляем направление камеры.
-        direction.scale(-distance); // Умножаем направление на расстояние.
+        direction.scale(distance); // Умножаем направление на расстояние.
         position.add(direction); // Изменяем положение камеры.
         target.add(direction);   // Также сдвигаем точку цели.
     }
@@ -98,7 +98,7 @@ public class Camera {
     // Переместить камеру вправо.
     public void moveRightWithoutTrigger(float distance) {
         Vector3f direction = calculateRightVectorWithoutTrigger(); // Вычисляем вектор направления вправо.
-        direction.scale(-distance); // Масштабируем вектор.
+        direction.scale(distance); // Масштабируем вектор.
         position.add(direction); // Изменяем положение камеры.
         target.add(direction);   // Сдвигаем цель.
     }
@@ -110,7 +110,7 @@ public class Camera {
 
     // Переместить камеру вверх.
     public void moveUpWithoutTrigger(float distance) {
-        Vector3f up = new Vector3f(0, 1, 0); // Направление вверх (вдоль оси Y).
+        Vector3f up = new Vector3f(0, -1, 0); // Направление вверх (вдоль оси Y).
         up.scale(distance); // Масштабируем.
         position.add(up); // Изменяем положение камеры.
         target.add(up);   // Сдвигаем цель.
@@ -161,9 +161,9 @@ public class Camera {
 
         // Направление камеры.
         Vector3f res = new Vector3f(
-                -cosYaw * cosPitch, // X-компонента.
-                -sinPitch,          // Y-компонента.
-                sinYaw * cosPitch  // Z-компонента.
+                -cosYaw * cosPitch,
+                   -sinPitch,
+                sinYaw * cosPitch
         );
         res.normalize(); // Нормализуем вектор для единичной длины.
         return res;
