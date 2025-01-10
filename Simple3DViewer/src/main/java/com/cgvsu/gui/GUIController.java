@@ -52,7 +52,7 @@ public class GUIController {
     private final ModelsController modelController = new ModelsController(); // Контроллер для управления моделями
 
     // Константы для перемещения и вращения камеры
-    private static final float TRANSLATION = 0.5F; // Шаг перемещения камеры
+    private static final float TRANSLATION = -0.5F; // Шаг перемещения камеры
     private static final float ROTATION_ANGLE = 1.0F; // Угол поворота камеры
 
     private final List<Model> meshes = new ArrayList<>(); // Список загруженных моделей

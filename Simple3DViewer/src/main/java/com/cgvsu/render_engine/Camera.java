@@ -124,7 +124,7 @@ public class Camera {
     // Ограничить вертикальное вращение камеры.
     private void clampPitch() {
         // Угол поворота (pitch) ограничивается диапазоном [-90, 90] градусов.
-        rotation.y = Math.max(-90.0f, Math.min(90.0f, rotation.y));
+        rotation.y = Math.max(-89.0f, Math.min(89.0f, rotation.y));
     }
 
     // Вращение камеры без триггеров.
@@ -161,8 +161,8 @@ public class Camera {
 
         // Направление камеры.
         Vector3f res = new Vector3f(
-                cosYaw * cosPitch, // X-компонента.
-                sinPitch,          // Y-компонента.
+                -cosYaw * cosPitch, // X-компонента.
+                -sinPitch,          // Y-компонента.
                 sinYaw * cosPitch  // Z-компонента.
         );
         res.normalize(); // Нормализуем вектор для единичной длины.
@@ -195,7 +195,7 @@ public class Camera {
 
         // Преобразование в координаты экрана
         int screenX = (int) ((projectedX + 1) * 0.5 * screenWidth);
-        int screenY = (int) ((1 - projectedY) * 0.5 * screenHeight); // Инверсия Y-оси для экрана
+        int screenY = (int) ((1 - projectedY) * 0.5 * screenHeight);
 
         return new Point(screenX, screenY);
     }

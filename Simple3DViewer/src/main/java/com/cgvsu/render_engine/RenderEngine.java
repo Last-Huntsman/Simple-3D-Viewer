@@ -54,8 +54,7 @@ public class RenderEngine {
         // Объединение (умножение) матриц модельной, видовой и проекционной.
         Matrix4x4 modelViewProjectionMatrix = new Matrix4x4(projectionMatrix);
         modelViewProjectionMatrix.mul(viewMatrix); // Умножение на матрицу вида.
-        modelViewProjectionMatrix.
-                mul(modelMatrix); // Умножение на матрицу проекции.
+        modelViewProjectionMatrix.mul(modelMatrix); // Умножение на матрицу проекции.
 
 
         double[][] zBuffer = new double[width][height];
