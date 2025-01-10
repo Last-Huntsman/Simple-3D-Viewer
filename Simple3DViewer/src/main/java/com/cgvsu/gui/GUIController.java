@@ -7,6 +7,8 @@ import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
 import com.cgvsu.math.vectors.Vector4f;
 import com.cgvsu.model.FinishedModel;
 import com.cgvsu.model.Model;
@@ -21,10 +23,13 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.control.TitledPane;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -36,7 +41,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
 public class GUIController {
 
@@ -50,6 +58,8 @@ public class GUIController {
 
     private final List<Model> meshes = new ArrayList<>(); // Список загруженных моделей
     private final List<Image> textures=new ArrayList<>();
+
+    private List<TitledPane> titledPanes = new ArrayList<>();
     @FXML
     private AnchorPane anchorPane; // Контейнер для интерфейса
 
@@ -59,6 +69,9 @@ public class GUIController {
     // Метки для отображения информации о камере и модели
     @FXML
     private Label positionLabel;
+
+    @FXML
+    private TitledPane titledPane1, titledPane2, titlePane3, titledPane4;
 
     @FXML
     private Label rotationLabel;
@@ -83,23 +96,124 @@ public class GUIController {
         targetLabel.setText(String.format("Target Position: (%.2f, %.2f, %.2f)",
                 targetPosition.x, targetPosition.y, targetPosition.z));
 
-        // Обновление текста для всех загруженных моделей
-        StringBuilder modelInfo = new StringBuilder();
+        // Создание содержимого для TitledPane1
+        VBox titledPaneContent = new VBox();
+        titledPaneContent.setSpacing(10); // Задаем расстояние между элементами
+
+        // Обновление информации о всех загруженных моделях
         for (FinishedModel finishedModel : modelController.getModels()) {
             Model mesh = finishedModel.getModel();
             Vector3f modelPosition = mesh.position; // Позиция модели
             Vector3f modelScale = mesh.scale; // Масштаб модели
             Vector3f modelRotation = mesh.rotation; // Поворот модели
 
-            modelInfo.append(String.format("Model: %s, Position: (%.2f, %.2f, %.2f), Scale: (%.2f, %.2f, %.2f), Rotation: (%.2f°, %.2f°, %.2f°)\n",
+            // Создание текстовых полей для ввода новых значений
+            TextField positionXField = new TextField(String.format("%.2f", modelPosition.x));
+            TextField positionYField = new TextField(String.format("%.2f", modelPosition.y));
+            TextField positionZField = new TextField(String.format("%.2f", modelPosition.z));
+
+            TextField scaleXField = new TextField(String.format("%.2f", modelScale.x));
+            TextField scaleYField = new TextField(String.format("%.2f", modelScale.y));
+            TextField scaleZField = new TextField(String.format("%.2f", modelScale.z));
+
+            TextField rotationXField = new TextField(String.format("%.2f", modelRotation.x));
+            TextField rotationYField = new TextField(String.format("%.2f", modelRotation.y));
+            TextField rotationZField = new TextField(String.format("%.2f", modelRotation.z));
+
+            Label modelInfoLabel = new Label(String.format(
+                    "Model: %s\nPosition: (%.2f, %.2f, %.2f)\nScale: (%.2f, %.2f, %.2f)\nRotation: (%.2f°, %.2f°, %.2f°)",
                     finishedModel.getName(),
                     modelPosition.x, modelPosition.y, modelPosition.z,
                     modelScale.x, modelScale.y, modelScale.z,
                     modelRotation.x, modelRotation.y, modelRotation.z));
+
+            // Кнопка для применения изменений
+            Button applyButton = new Button("Apply Changes");
+            applyButton.setOnAction(event -> {
+                try {
+                    String positionXText = positionXField.getText().replace(',', '.');
+                    String positionYText = positionYField.getText().replace(',', '.');
+                    String positionZText = positionZField.getText().replace(',', '.');
+
+                    String scaleXText = scaleXField.getText().replace(',', '.');
+                    String scaleYText = scaleYField.getText().replace(',', '.');
+                    String scaleZText = scaleZField.getText().replace(',', '.');
+
+                    String rotationXText = rotationXField.getText().replace(',', '.');
+                    String rotationYText = rotationYField.getText().replace(',', '.');
+                    String rotationZText = rotationZField.getText().replace(',', '.');
+
+                    // Применение новых значений из текстовых полей
+                    modelPosition.set(
+                            Float.parseFloat(positionXText),
+                            Float.parseFloat(positionYText),
+                            Float.parseFloat(positionZText)
+                    );
+
+                    modelScale.set(
+                            Float.parseFloat(scaleXText),
+                            Float.parseFloat(scaleYText),
+                            Float.parseFloat(scaleZText)
+                    );
+
+                    modelRotation.set(
+                            Float.parseFloat(rotationXText),
+                            Float.parseFloat(rotationYText),
+                            Float.parseFloat(rotationZText)
+                    );
+
+                    // Применяем обновленные значения к модели
+                    mesh.position = modelPosition;
+                    mesh.scale = modelScale;
+                    mesh.rotation = modelRotation;
+
+                    // Обновляем метку модели с новыми значениями
+                    modelInfoLabel.setText(String.format(
+                            "Model: %s\nPosition: (%.2f, %.2f, %.2f)\nScale: (%.2f, %.2f, %.2f)\nRotation: (%.2f°, %.2f°, %.2f°)",
+                            finishedModel.getName(),
+                            modelPosition.x, modelPosition.y, modelPosition.z,
+                            modelScale.x, modelScale.y, modelScale.z,
+                            modelRotation.x, modelRotation.y, modelRotation.z));
+                } catch (NumberFormatException e) {
+                    // Обработка ошибок ввода
+                    System.out.println("Invalid input." + e.getMessage());
+                }
+            });
+
+            // Кнопка для сброса модели
+            Button resetButton = new Button("Reset");
+            resetButton.setOnAction(event -> {
+                // Восстанавливаем начальные значения модели
+                mesh.position = new Vector3f();
+                mesh.scale = new Vector3f();
+                mesh.rotation = new Vector3f();
+
+                // Обновляем текст в метке
+                modelInfoLabel.setText(String.format(
+                        "Model: %s\nPosition: (%.2f, %.2f, %.2f)\nScale: (%.2f, %.2f, %.2f)\nRotation: (%.2f°, %.2f°, %.2f°)",
+                        finishedModel.getName(),
+                        mesh.position.x, mesh.position.y, mesh.position.z,
+                        mesh.scale.x, mesh.scale.y, mesh.scale.z,
+                        mesh.rotation.x, mesh.rotation.y, mesh.rotation.z));
+            });
+
+            // Создание TitledPane для модели
+            TitledPane modelTitledPane = new TitledPane(finishedModel.getName(), new VBox(10,
+                    modelInfoLabel,
+                    new Label("Position:"), positionXField, positionYField, positionZField,
+                    new Label("Scale:"), scaleXField, scaleYField, scaleZField,
+                    new Label("Rotation:"), rotationXField, rotationYField, rotationZField,
+                    applyButton, resetButton));
+
+            // Добавление TitledPane для модели в общий список
+            titledPaneContent.getChildren().add(modelTitledPane);
         }
 
-        modelLabel.setText(modelInfo.toString());
+        // Устанавливаем содержимое в TitledPane1
+        titledPane1.setContent(titledPaneContent);
     }
+
+
 
 
     // Методы для обработки перемещения камеры
@@ -258,6 +372,7 @@ public class GUIController {
         anchorPane.prefWidthProperty().addListener((ov, oldValue, newValue) -> canvas.setWidth(newValue.doubleValue()));
         anchorPane.prefHeightProperty().addListener((ov, oldValue, newValue) -> canvas.setHeight(newValue.doubleValue()));
 
+        titledPanes = Arrays.asList(titledPane1, titledPane2, titlePane3, titledPane4);
         canvas.setOnMousePressed(this::handleMousePressed);
         canvas.setOnMouseDragged(this::handleMouseRotation);
         canvas.setOnMouseReleased(this::handleMouseReleased);

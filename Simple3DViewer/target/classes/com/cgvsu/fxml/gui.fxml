@@ -1,101 +1,138 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="anchorPane" xmlns:fx="http://javafx.com/fxml" fx:controller="com.cgvsu.gui.GUIController">
-    <MenuBar>
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.gui.GUIController">
+    <MenuBar prefHeight="26.0" prefWidth="1264.0">
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="F"/>
+                    <KeyCodeCombination alt="UP" code="F" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#saveModelFile" text="Save Model">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="G"/>
+                    <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#saveModifiedModelFile" text="Save Model">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="H"/>
+                    <KeyCodeCombination alt="UP" code="H" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
         </Menu>
         <Menu mnemonicParsing="false" text="Texture">
             <MenuItem mnemonicParsing="false" onAction="#onOpenTextureItemClick" text="Load Texture">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="DOWN" meta="UP" shift="UP" shortcut="UP" code="F"/>
+                    <KeyCodeCombination alt="UP" code="A" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
         </Menu>
         <Menu mnemonicParsing="false" text="Camera Options">
             <MenuItem mnemonicParsing="false" onAction="#handleCameraForward" text="Forward">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="W"/>
+                    <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraBackward" text="Backward">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="S"/>
+                    <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraLeft" text="Left">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="A"/>
+                    <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRight" text="Right">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="D"/>
+                    <KeyCodeCombination alt="UP" code="D" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraUp" text="Down">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="Q"/>
+                    <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraDown" text="Up">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="E"/>
+                    <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
         </Menu>
         <Menu mnemonicParsing="false" text="Camera Rotation">
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateLeft" text="Rotate Right">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="RIGHT"/>
+                    <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateRight" text="Rotate Left">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="LEFT"/>
+                    <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateUp" text="Rotate Up">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="UP"/>
+                    <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
             <MenuItem mnemonicParsing="false" onAction="#handleCameraRotateDown" text="Rotate Down">
                 <accelerator>
-                    <KeyCodeCombination alt="UP" control="UP" meta="UP" shift="UP" shortcut="UP" code="DOWN"/>
+                    <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
         </Menu>
 
-    </MenuBar>
-    <VBox spacing="10" alignment="BOTTOM_LEFT" layoutX="10" layoutY="40">
-        <Label fx:id="positionLabel" text="Camera Position: (0, 0, 0)" />
-        <Label fx:id="rotationLabel" text="Camera Rotation: (0°, 0°)" />
-        <Label fx:id="targetLabel" text="Target Position: (0, 0, 0)" />
-        <Label fx:id="modelLabel" text="Model Position: (0, 0, 0), Model Scale: (0, 0, 0), Model Rotation: (0, 0, 0)" />
-    </VBox>
-    <Canvas fx:id="canvas" width="1600" height="870"  AnchorPane.topAnchor="30.0"/>
+          </MenuBar>
+    <Canvas fx:id="canvas" height="870" width="1255.0" />
+   <ScrollPane layoutX="1255.0" layoutY="22.0" prefHeight="870.0" prefWidth="339.0">
+      <content>
+       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="1009.0" prefWidth="339.0">
+            <children>
+               <VBox layoutX="14.0" prefHeight="870.0" prefWidth="268.0" style="-fx-border-color: black;">
+                  <children>
+                     <Label alignment="CENTER" prefHeight="28.0" prefWidth="344.0" text="Inspector" textAlignment="RIGHT">
+                        <font>
+                           <Font size="18.0" />
+                        </font>
+                     </Label>
+                     <VBox prefHeight="980.0" prefWidth="266.0">
+                        <children>
+                           <TitledPane fx:id="titledPane1" animated="false" expanded="false" prefWidth="321.0" text="Models">
+                             <content>
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="76.0" prefWidth="319.0" />
+                             </content>
+                           </TitledPane>
+                           <TitledPane fx:id="titledPane2" animated="false" expanded="false" prefWidth="321.0" text="Camera">
+                             <content>
+                                 <VBox alignment="CENTER_LEFT" spacing="10">
+                                     <Label fx:id="positionLabel" text="Position: (0, 0, 0)" />
+                                     <Label fx:id="rotationLabel" text="Rotation: (0°, 0°)" />
+                                     <Label fx:id="targetLabel" text="Target: (0, 0, 0)" />
+                                 </VBox>
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                             </content>
+                           </TitledPane>
+                           <TitledPane fx:id="titlePane3" animated="false" expanded="false" prefWidth="321.0" text="Models in Scene">
+                             <content>
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="132.0" prefWidth="319.0" />
+                             </content>
+                           </TitledPane>
+                           <TitledPane fx:id="titledPane4" animated="false" expanded="false" prefWidth="321.0" text="Lights">
+                             <content>
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                             </content>
+                           </TitledPane>
+                        </children>
+                     </VBox>
+                  </children>
+               </VBox>
+            </children>
+         </AnchorPane>
+      </content>
+   </ScrollPane>
 </AnchorPane>
