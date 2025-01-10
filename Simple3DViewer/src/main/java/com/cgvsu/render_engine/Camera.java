@@ -85,7 +85,7 @@ public class Camera {
     // Переместить камеру вперёд относительно текущего направления.
     public void moveForwardWithoutTrigger(float distance) {
         Vector3f direction = calculateDirectionWithoutTrigger(); // Вычисляем направление камеры.
-        direction.scale(-distance); // Умножаем направление на расстояние.
+        direction.scale(distance); // Умножаем направление на расстояние.
         position.add(direction); // Изменяем положение камеры.
         target.add(direction);   // Также сдвигаем точку цели.
     }
@@ -124,7 +124,7 @@ public class Camera {
     // Ограничить вертикальное вращение камеры.
     private void clampPitch() {
         // Угол поворота (pitch) ограничивается диапазоном [-90, 90] градусов.
-        rotation.y = Math.max(-90.0f, Math.min(90.0f, rotation.y));
+        rotation.y = Math.max(-89.0f, Math.min(89.0f, rotation.y));
     }
 
     // Вращение камеры без триггеров.
@@ -146,7 +146,7 @@ public class Camera {
     public void zoom(float amount) {
         // Вычисляем новое положение камеры, двигаясь в направлении текущего взгляда.
         Vector3f direction = calculateDirectionWithoutTrigger(); // Направление взгляда камеры.
-        direction.scale(amount); // Масштабируем вектор.
+        direction.scale(-amount); // Масштабируем вектор.
         position.add(direction); // Изменяем позицию камеры.
         target.add(direction);   // Сдвигаем цель.
     }
@@ -161,9 +161,9 @@ public class Camera {
 
         // Направление камеры.
         Vector3f res = new Vector3f(
-                cosYaw * cosPitch, // X-компонента.
-                sinPitch,          // Y-компонента.
-                sinYaw * cosPitch  // Z-компонента.
+                -cosYaw * cosPitch,
+                   -sinPitch,
+                sinYaw * cosPitch
         );
         res.normalize(); // Нормализуем вектор для единичной длины.
         return res;
@@ -195,7 +195,7 @@ public class Camera {
 
         // Преобразование в координаты экрана
         int screenX = (int) ((projectedX + 1) * 0.5 * screenWidth);
-        int screenY = (int) ((1 - projectedY) * 0.5 * screenHeight); // Инверсия Y-оси для экрана
+        int screenY = (int) ((1 - projectedY) * 0.5 * screenHeight);
 
         return new Point(screenX, screenY);
     }

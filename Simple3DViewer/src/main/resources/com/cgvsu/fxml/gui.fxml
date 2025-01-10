@@ -53,12 +53,12 @@
                     <KeyCodeCombination alt="UP" code="D" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraUp" text="Down">
+            <MenuItem mnemonicParsing="false" onAction="#handleCameraDown" text="Down">
                 <accelerator>
                     <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>
             </MenuItem>
-            <MenuItem mnemonicParsing="false" onAction="#handleCameraDown" text="Up">
+            <MenuItem mnemonicParsing="false" onAction="#handleCameraUp" text="Up">
                 <accelerator>
                     <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP" shortcut="UP" />
                 </accelerator>

@@ -346,7 +346,7 @@ public class GUIController {
 
         // Перевод разницы в углы
         float yaw = (float) (-deltaX * MOUSE_SENSITIVITY);
-        float pitch = (float) (-deltaY * MOUSE_SENSITIVITY); // Инвертируем ось Y
+        float pitch = (float) (-deltaY * MOUSE_SENSITIVITY);
 
         // Поворачиваем камеру
         camera.rotateWithoutTrigger(yaw, pitch);
