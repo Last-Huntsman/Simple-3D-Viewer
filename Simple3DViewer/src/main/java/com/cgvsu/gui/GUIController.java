@@ -7,8 +7,7 @@ import com.cgvsu.io.objWriter.ObjWriter;
 import com.cgvsu.math.matrices.Matrix4x4;
 import com.cgvsu.math.vectors.Vector2f;
 import com.cgvsu.math.vectors.Vector3f;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import com.cgvsu.math.vectors.Vector4f;
 import com.cgvsu.model.FinishedModel;
 import com.cgvsu.model.Model;
@@ -21,9 +20,9 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -62,6 +61,8 @@ public class GUIController {
     private List<TitledPane> titledPanes = new ArrayList<>();
     @FXML
     private AnchorPane anchorPane; // Контейнер для интерфейса
+    @FXML
+    private CheckBox usePoligonMesh, useTexture, useLight;
 
     @FXML
     private Canvas canvas; // Холст для рендеринга сцены
@@ -185,7 +186,7 @@ public class GUIController {
             resetButton.setOnAction(event -> {
                 // Восстанавливаем начальные значения модели
                 mesh.position = new Vector3f();
-                mesh.scale = new Vector3f();
+                mesh.scale = new Vector3f(1, 1, 1);
                 mesh.rotation = new Vector3f();
 
                 // Обновляем текст в метке
@@ -400,7 +401,7 @@ public class GUIController {
             for (FinishedModel finishedModel : modelController.getModels()) {
                 Model model = finishedModel.getModel();
                 Image texture = finishedModel.getRenderMode().getTexture();
-                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, true, true, true, Color.RED, 0.5);
+                renderEngine.render(canvas.getGraphicsContext2D(), camera, model, (int) width, (int) height, texture, useTexture.isSelected(), true, useLight.isSelected(), Color.RED, 0.5);
             }
         });
     }

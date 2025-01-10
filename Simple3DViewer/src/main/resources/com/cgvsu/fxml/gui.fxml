@@ -7,7 +7,7 @@
 <?import javafx.scene.text.*?>
 
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cgvsu.gui.GUIController">
-    <MenuBar prefHeight="26.0" prefWidth="1264.0">
+    <MenuBar prefHeight="26.0" prefWidth="1264.0" visible="false">
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#onOpenModelMenuItemClick" text="Load Model">
                 <accelerator>
@@ -117,14 +117,36 @@
                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
                              </content>
                            </TitledPane>
-                           <TitledPane fx:id="titlePane3" animated="false" expanded="false" prefWidth="321.0" text="Models in Scene">
+                           <TitledPane fx:id="titlePane3" animated="false" expanded="false" prefWidth="321.0" text="Menu">
                              <content>
-                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="132.0" prefWidth="319.0" />
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="132.0" prefWidth="319.0">
+                                    <children>
+                                       <Button onAction="#onOpenModelMenuItemClick" layoutY="4.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="54.0" text="+">
+                                          <font>
+                                             <Font size="14.0" />
+                                          </font>
+                                       </Button>
+                                       <Label text="Загрузить модель(ctrl + F)" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="-1.0" />
+                                       <Button  onAction="#onOpenTextureItemClick" mnemonicParsing="false" prefHeight="18.0" prefWidth="54.0" text="+" AnchorPane.topAnchor="25.0" />
+                                       <Label text="Загрузить текстуру(ctrl + A)" AnchorPane.leftAnchor="75.0" AnchorPane.topAnchor="25.0" />
+                                       <Button onAction="#saveModifiedModelFile" mnemonicParsing="false" text="Сохранить модель" AnchorPane.topAnchor="50.0" />
+                                    </children></AnchorPane>
                              </content>
                            </TitledPane>
-                           <TitledPane fx:id="titledPane4" animated="false" expanded="false" prefWidth="321.0" text="Lights">
+                           <TitledPane fx:id="titledPane4" animated="false" expanded="false" prefHeight="214.0" prefWidth="266.0" text="Model rendering, rasterization &amp; light">
                              <content>
-                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                       <CheckBox fx:id="usePoligonMesh" mnemonicParsing="false" text="Использовать полигональную сетку" AnchorPane.topAnchor="0.0" />
+                                       <CheckBox fx:id="useTexture" mnemonicParsing="false" text="Использовать текстуру" AnchorPane.topAnchor="20.0" />
+                                       <CheckBox fx:id="useLight" mnemonicParsing="false" text="Использовать освещение" AnchorPane.topAnchor="40.0" />
+                                       <Label alignment="CENTER" contentDisplay="CENTER" text="Освещение" AnchorPane.leftAnchor="65.0" AnchorPane.topAnchor="70.0" />
+                                       <Slider layoutY="98.6" min="-100.0" prefHeight="38.0" prefWidth="215.0" showTickLabels="true" showTickMarks="true" AnchorPane.topAnchor="89.0" />
+                                       <TextField layoutY="118.6" prefHeight="26.0" prefWidth="36.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="150.0" />
+                                       <TextField layoutY="138.6" prefHeight="26.0" prefWidth="36.0" AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="150.0" />
+                                       <TextField layoutY="158.6" prefHeight="26.0" prefWidth="36.0" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="150.0" />
+                                       <Label text="RGB" AnchorPane.leftAnchor="130.0" AnchorPane.topAnchor="155.0" />
+                                    </children></AnchorPane>
                              </content>
                            </TitledPane>
                         </children>
